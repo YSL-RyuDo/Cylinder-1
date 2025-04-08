@@ -1,18 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditorInternal;
 using UnityEngine;
 
 public class PlayerScript : MonoBehaviour
 {
     public float Speed;
+    public float verSpeed;
     private Rigidbody2D rb;
-
-    public Collider2D BG_Area;
-
-    private float hor;
-    private float ver;
-
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -20,32 +14,35 @@ public class PlayerScript : MonoBehaviour
 
     void Update()
     {
-        hor = Input.GetAxis("Horizontal");
-        ver = Input.GetAxis("Vertical");
+
     }
 
-    void FixedUpdate()
+    private void FixedUpdate()
     {
-        Vector2 targetVelocity = new Vector2(hor * Speed, ver * Speed * 0.7f);
-        Vector2 nextPos = rb.position + targetVelocity * Time.fixedDeltaTime;
+        MovePlayer();
+    }
+    private void OnTriggerStay2D(Collider2D other)
+    {
+        
+    }
 
-        Bounds playerBounds = GetComponent<Collider2D>().bounds;
-        Vector2 boxSize = playerBounds.size;
+    private void MovePlayer()
+    {
+        //키 입력
+        float ver = Input.GetAxis("Vertical");
+        float hor = Input.GetAxis("Horizontal");
+        //위치 이동
+        rb.velocity = new Vector2(hor * Speed, verSpeed * ver * Speed);
 
-        int layerMask = LayerMask.GetMask("BG");
-
-        Collider2D hit = Physics2D.OverlapBox(nextPos, boxSize, 0f, layerMask);
-
-        if (hit != null && hit == BG_Area)
+        //회전
+        if (hor > 0)
         {
-            rb.velocity = targetVelocity;
-
-            if (hor > 0) transform.eulerAngles = new Vector3(0, 0, 0);
-            else if (hor < 0) transform.eulerAngles = new Vector3(0, 180, 0);
+            transform.eulerAngles = new Vector3(0, 0, 0);
         }
-        else
+        else if (hor < 0)
         {
-            rb.velocity = Vector2.zero;
+            transform.eulerAngles = new Vector3(0, 180, 0);
         }
     }
+
 }
