@@ -6,6 +6,7 @@ public class PlayerScript : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 1f;
 
+    public GameObject menu;
     private PlayerControlls playerControlls;
     private Vector2 movement;
     private Rigidbody2D rb;
@@ -24,6 +25,12 @@ public class PlayerScript : MonoBehaviour
     private void Update()
     {
         PlayerInput();
+        if (Input.GetKeyDown(KeyCode.Escape)) {
+            if(menu.activeSelf)
+                menu.SetActive(false);
+            else
+                menu.SetActive(true);
+        }
     }
 
     private void FixedUpdate()

@@ -42,8 +42,14 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Floor
+    uniqueID: 3282548947
+    locked: 0
   - name: BG
     uniqueID: 2922454741
+    locked: 0
+  - name: NPC
+    uniqueID: 2566024761
     locked: 0
   - name: Player
     uniqueID: 3037139989
