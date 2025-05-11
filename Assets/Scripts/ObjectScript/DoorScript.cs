@@ -6,6 +6,7 @@ using UnityEngine;
 public class DoorScript : MonoBehaviour
 {
     public bool needKey;
+    public bool whileOpen;
     public int KeyValue;
     public GameObject opendoor;
     [SerializeField] private float warpPointX;
@@ -20,17 +21,22 @@ public class DoorScript : MonoBehaviour
 
     public void interact()
     {
+        if (whileOpen)
+        {
+            opendoor.SetActive(true);
+            gameObject.SetActive(false);
+        }
         if (!needKey)
         {
             PlayerScript player = FindObjectOfType<PlayerScript>();
             player.Warp(warpPointX, warpPointY);
         }
-        else
+        if(needKey)
         {
             PlayerScript player = FindObjectOfType<PlayerScript>();
-            if (player.HasItem(1))
+            if (player.HasItem(KeyValue))
             {
-                player.RemoveItem(1);
+                player.RemoveItem(KeyValue);
                 needKey = false;
                 opendoor.SetActive(true);
                 gameObject.SetActive(false);
