@@ -18,21 +18,16 @@ public class PlayerScript : MonoBehaviour
     private PlayerControlls playerControlls;
     private Vector2 movement;
     private Rigidbody2D rb;
+    private Animator animator;
 
     [System.Serializable]
     public class InventoryItem
     {
-        public string itemName;
-        public string itemDescription;
-        public Sprite itemIcon;
-        public int itemId;
+        public ItemData itemData;
 
-        public InventoryItem(string name, string description, Sprite icon, int id)
+        public InventoryItem(ItemData data)
         {
-            itemName = name;
-            itemDescription = description;
-            itemIcon = icon;
-            itemId = id;
+            itemData = data;
         }
     }
 
@@ -40,6 +35,7 @@ public class PlayerScript : MonoBehaviour
 
     private void Awake()
     {
+        animator = GetComponent<Animator>();
         playerControlls = new PlayerControlls();
         rb = GetComponent<Rigidbody2D>();
     }
@@ -95,6 +91,16 @@ public class PlayerScript : MonoBehaviour
     private void Move()
     {
         rb.MovePosition(rb.position + movement * (moveSpeed * Time.fixedDeltaTime));
+        if (movement.x > 0.01f)
+        {
+            transform.localScale = new Vector3(1, 1, 1);
+        }
+        else if (movement.x < -0.01f)
+        {
+            transform.localScale = new Vector3(-1, 1, 1);
+        }
+        bool isWalking = movement.sqrMagnitude > 0.01f;
+        animator.SetBool("IsWalk", isWalking);
     }
 
     //문, 워프 같은것을 위해 만든 함수, x y값을 입력받아 해당 위치로 player의 위치를 즉시 이동시킴
@@ -152,38 +158,37 @@ public class PlayerScript : MonoBehaviour
             GameObject newItemText = Instantiate(itemTextPrefab, inventoryPanel.transform);
 
             TextMeshProUGUI itemNameText = newItemText.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
-            itemNameText.text = $"{item.itemName} - {item.itemDescription}";
+            itemNameText.text = $"{item.itemData.itemName} - {item.itemData.description}";
 
             Image itemIconImage = newItemText.transform.GetChild(1).GetComponent<Image>();
-            itemIconImage.sprite = item.itemIcon;
+            itemIconImage.sprite = item.itemData.icon;
         }
     }
 
-    public void AddItem(string name, string description, Sprite icon, int id)
+    public void AddItem(ItemData data)
     {
-        InventoryItem newItem = new InventoryItem(name, description, icon, id);
-        inventory.Add(newItem);
-        Debug.Log("아이템 추가됨: " + name + ", 설명:" + description);
+        inventory.Add(new InventoryItem(data));
+        Debug.Log("아이템 추가됨: " + data.itemName);
     }
 
-    public void RemoveItem(int id)
+    public void RemoveItem(ItemData data)
     {
-        InventoryItem itemToRemove = inventory.Find(item => item.itemId == id);
+        InventoryItem itemToRemove = inventory.Find(item => item.itemData == data);
         if (itemToRemove != null)
         {
             inventory.Remove(itemToRemove);
-            Debug.Log("아이템 제거됨: " + itemToRemove.itemName);
+            Debug.Log("아이템 제거됨: " + data.itemName);
             UpdateInventoryUI();
         }
         else
         {
-            Debug.LogWarning("제거할 아이템을 찾을 수 없음: ID " + id);
+            Debug.LogWarning("제거할 아이템을 찾을 수 없음: ID " + data.itemName);
         }
     }
 
-    public bool HasItem(int id)
+    public bool HasItem(ItemData data)
     {
-        return inventory.Exists(item => item.itemId == id);
+        return inventory.Exists(item => item.itemData == data);
     }
 
     public void NextPage()

@@ -7,7 +7,7 @@ public class DoorScript : MonoBehaviour
 {
     public bool needKey;
     public bool whileOpen;
-    public int KeyValue;
+    public ItemData itemData;
     public GameObject opendoor;
     [SerializeField] private float warpPointX;
     [SerializeField] private float warpPointY;
@@ -30,17 +30,6 @@ public class DoorScript : MonoBehaviour
         {
             PlayerScript player = FindObjectOfType<PlayerScript>();
             player.Warp(warpPointX, warpPointY);
-        }
-        if(needKey)
-        {
-            PlayerScript player = FindObjectOfType<PlayerScript>();
-            if (player.HasItem(KeyValue))
-            {
-                player.RemoveItem(KeyValue);
-                needKey = false;
-                opendoor.SetActive(true);
-                gameObject.SetActive(false);
-            }
         }
     }
 }

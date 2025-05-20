@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using static DialogueNode;
 
 public class TalkManagerScript : MonoBehaviour, IPointerDownHandler
 {
@@ -12,9 +13,12 @@ public class TalkManagerScript : MonoBehaviour, IPointerDownHandler
     public GameObject RightImg;
     public GameObject LogButton;
     public CanvasGroup dialogueGroup;
-    public Queue<string> sentences;
-    public Queue<Sprite> Lsprites;
-    public Queue<Sprite> Rsprites;
+    public GameObject choicePanel;
+    public GameObject choiceButtonPrefab;
+
+    private Queue<DialogueData> dialogues = new Queue<DialogueData>();
+    private DialogueData currentDialogue;
+
     public GameObject logPanel;
     public Text logText;
     private List<string> dialogueLog = new List<string>();
@@ -31,38 +35,18 @@ public class TalkManagerScript : MonoBehaviour, IPointerDownHandler
     {
         instance = this;
     }
-    void Start()
+
+    public void Ondialogue(DialogueData[] data)
     {
-        sentences = new Queue<string>();
-        Lsprites = new Queue<Sprite>();
-        Rsprites = new Queue<Sprite>();
-
-    }
-
-    public void Ondialogue(string[] lines, Sprite[] lsprite, Sprite[] rsprite)
-    {
-        sentences.Clear();
-        Lsprites.Clear();
-        Rsprites.Clear();
-
-        foreach (string line in lines)
+        dialogues.Clear();
+        foreach (DialogueData item in data)
         {
-            sentences.Enqueue(line);
-        }
-
-        foreach (Sprite sprite in lsprite)
-        {
-            Lsprites.Enqueue(sprite);
-        }
-
-        foreach (Sprite sprite in rsprite)
-        {
-            Rsprites.Enqueue(sprite);
+            dialogues.Enqueue(item);
         }
 
         dialogueGroup.alpha = 1;
         dialogueGroup.blocksRaycasts = true;
-        
+
         LeftImg.SetActive(true);
         RightImg.SetActive(true);
         LogButton.SetActive(true);
@@ -72,30 +56,26 @@ public class TalkManagerScript : MonoBehaviour, IPointerDownHandler
 
     public void NextSentence()
     {
-        if(sentences.Count != 0)
+        if (dialogues.Count != 0)
         {
-            currentSentence = sentences.Dequeue();
-            currentLSprite = Lsprites.Dequeue();
-            currentRSprite = Rsprites.Dequeue();
+            currentDialogue = dialogues.Dequeue();
+            currentSentence = currentDialogue.sentence;
+            currentLSprite = currentDialogue.leftSprite;
+            currentRSprite = currentDialogue.rightSprite;
+
             dialogueLog.Add(currentSentence);
 
-            // 오른쪽 이미지
-            Image rightImage = RightImg.GetComponent<Image>();
-            if (rightImage != null)
-            {
-                rightImage.sprite = currentRSprite;
-            }
-
-            // 왼쪽 이미지
-            Image leftImage = LeftImg.GetComponent<Image>();
-            if (leftImage != null)
-            {
-                leftImage.sprite = currentLSprite;
-            }
+            LeftImg.GetComponent<Image>().sprite = currentLSprite;
+            RightImg.GetComponent<Image>().sprite = currentRSprite;
 
             istyping = true;
             nextText.SetActive(false);
             StartCoroutine(Typing(currentSentence));
+
+            if (currentDialogue.hasChoices)
+            {
+                StartCoroutine(ShowChoicesAfterTyping(currentDialogue.choices));
+            }
         }
         else
         {
@@ -108,10 +88,32 @@ public class TalkManagerScript : MonoBehaviour, IPointerDownHandler
         }
     }
 
+    IEnumerator ShowChoicesAfterTyping(DialogueNode.Choice[] choices)
+    {
+        while (istyping) yield return null;
+
+        choicePanel.SetActive(true);
+        foreach (Transform child in choicePanel.transform)
+            Destroy(child.gameObject);
+
+        foreach (var choice in choices)
+        {
+            GameObject btn = Instantiate(choiceButtonPrefab, choicePanel.transform);
+            btn.GetComponentInChildren<Text>().text = choice.choiceText;
+
+            DialogueNode nextNode = choice.nextNode;
+            btn.GetComponent<Button>().onClick.AddListener(() =>
+            {
+                choicePanel.SetActive(false);
+                Ondialogue(nextNode.dialogues);
+            });
+        }
+    }
+
     IEnumerator Typing(string line)
     {
         dialogueText.text = "";
-        foreach (char letter in line.ToCharArray()) 
+        foreach (char letter in line.ToCharArray())
         {
             dialogueText.text += letter;
             yield return new WaitForSeconds(typingSpeed);
@@ -120,7 +122,7 @@ public class TalkManagerScript : MonoBehaviour, IPointerDownHandler
 
     void Update()
     {
-        if (dialogueText.text.Equals(currentSentence)) 
+        if (dialogueText.text.Equals(currentSentence))
         {
             nextText.SetActive(true);
             istyping = false;
@@ -129,7 +131,6 @@ public class TalkManagerScript : MonoBehaviour, IPointerDownHandler
 
     public void OnLogButton()
     {
-        Debug.Log("Log 버튼 눌림");
         logPanel.SetActive(true);
         logText.text = "";
         foreach (string line in dialogueLog)
@@ -145,7 +146,7 @@ public class TalkManagerScript : MonoBehaviour, IPointerDownHandler
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        if(!istyping)
+        if (!istyping)
             NextSentence();
     }
 }

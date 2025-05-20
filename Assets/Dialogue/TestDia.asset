@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6bb44663cb28f974caeb1cea7c51418a, type: 3}
+  m_Name: TestDia
+  m_EditorClassIdentifier: 
+  dialogues:
+  - sentence: "\uB77C\uBA74"
+    leftSprite: {fileID: 21300000, guid: f5d9d7a2b4be97a4884b69431f062ffa, type: 3}
+    rightSprite: {fileID: 21300000, guid: aeef755731ed0df42a4392d98a051b05, type: 3}
+    hasChoices: 0
+    choices: []
+  - sentence: "\uC548\uB155?"
+    leftSprite: {fileID: 21300000, guid: 4f0607c949089de45ac94d8e1ba87b03, type: 3}
+    rightSprite: {fileID: 21300000, guid: aeef755731ed0df42a4392d98a051b05, type: 3}
+    hasChoices: 1
+    choices:
+    - choiceText: "\u3147\u3147"
+      nextNode: {fileID: 11400000, guid: 4c08ae2f9322ed947a2d13bab5645878, type: 2}
+    - choiceText: "\u3134\u3134"
+      nextNode: {fileID: 11400000, guid: 93f8eae483275fc42a5002628004ff7a, type: 2}
+    - choiceText: "\u3134\u3134"
+      nextNode: {fileID: 11400000, guid: 4c08ae2f9322ed947a2d13bab5645878, type: 2}
