@@ -15,6 +15,8 @@ public class TalkManagerScript : MonoBehaviour, IPointerDownHandler
     public CanvasGroup dialogueGroup;
     public GameObject choicePanel;
     public GameObject choiceButtonPrefab;
+    public GameObject fadeOutObject;
+    private Dictionary<string, GameObject> systemMap;
 
     private Queue<DialogueData> dialogues = new Queue<DialogueData>();
     private DialogueData currentDialogue;
@@ -34,6 +36,11 @@ public class TalkManagerScript : MonoBehaviour, IPointerDownHandler
     private void Awake()
     {
         instance = this;
+        systemMap = new Dictionary<string, GameObject>
+    {
+        { "FadeOut", fadeOutObject }
+        // 필요한 시스템 오브젝트들을 여기에 추가
+    };
     }
 
     public void Ondialogue(DialogueData[] data)
@@ -56,6 +63,19 @@ public class TalkManagerScript : MonoBehaviour, IPointerDownHandler
 
     public void NextSentence()
     {
+        if (!string.IsNullOrEmpty(currentDialogue.systemName))
+        {
+            if (systemMap.TryGetValue(currentDialogue.systemName, out GameObject systemObj))
+            {
+                systemObj.SetActive(true);
+                dialogueGroup.alpha = 0;
+                dialogueGroup.blocksRaycasts = false;
+                LeftImg.SetActive(false);
+                RightImg.SetActive(false);
+                LogButton.SetActive(false);
+                dialogueLog.Clear();
+            }
+        }
         if (dialogues.Count != 0)
         {
             currentDialogue = dialogues.Dequeue();

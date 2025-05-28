@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static PlayerScript;
 
 public class PlayerScript : MonoBehaviour
 {
@@ -19,6 +20,25 @@ public class PlayerScript : MonoBehaviour
     private Vector2 movement;
     private Rigidbody2D rb;
     private Animator animator;
+    //캐릭터 자동 이동 구현용
+    private bool isAutoMoving = false;
+    private Vector2 autoMoveTarget;
+    private float autoMoveSpeed = 1f;
+    public float autoMoveThreshold = 0.25f;
+    [SerializeField] private identityType playeridentity = identityType.None;
+    //가장 가까운 오브젝트 위에 상호작용 가능 이모지 띄우기
+    public GameObject interactIconPrefab;
+    private GameObject currentInteractIcon;
+    private GameObject currentNearest;
+    public enum identityType
+    {
+        None,
+        affectionate,
+        Sensitive,
+        Depression,
+        Reserved,
+        Curious
+    }
 
     [System.Serializable]
     public class InventoryItem
@@ -48,7 +68,21 @@ public class PlayerScript : MonoBehaviour
     private void Update()
     {
         //키 조작
-        PlayerInput();
+        if (!isAutoMoving)
+        {
+            PlayerInput();
+        }
+        else
+        {
+            Vector2 direction = (autoMoveTarget - rb.position).normalized;
+            movement = direction;
+
+            if (Vector2.Distance(rb.position, autoMoveTarget) < autoMoveThreshold)
+            {
+                movement = Vector2.zero;
+                isAutoMoving = false;
+            }
+        }
         //일시정지
         if (Input.GetKeyDown(KeyCode.Escape)) {
             if (menu.activeSelf)
@@ -73,7 +107,7 @@ public class PlayerScript : MonoBehaviour
                 overlappingObjects.Remove(nearest);
             }
         }
-
+        UpdateNearestAndInteractionIcon();
     }
     
     private void FixedUpdate()
@@ -90,7 +124,8 @@ public class PlayerScript : MonoBehaviour
     //playerinput에서 받은 정보에 따라 속도를 곱해 이동시키는 함수
     private void Move()
     {
-        rb.MovePosition(rb.position + movement * (moveSpeed * Time.fixedDeltaTime));
+        float speed = isAutoMoving ? autoMoveSpeed : moveSpeed;
+        rb.MovePosition(rb.position + movement * (speed * Time.fixedDeltaTime));
         if (movement.x > 0.01f)
         {
             transform.localScale = new Vector3(1, 1, 1);
@@ -206,6 +241,55 @@ public class PlayerScript : MonoBehaviour
         {
             currentPage--;
             UpdateInventoryUI();
+        }
+    }
+
+    public void AutoMoveTo(Vector2 target)
+    {
+        AutoMoveTo(target, moveSpeed);
+    }
+    public void AutoMoveTo(Vector2 target, float speed)
+    {
+        autoMoveTarget = target;
+        autoMoveSpeed = speed;
+        isAutoMoving = true;
+    }
+
+    public identityType Playeridentity
+    {
+        get { return playeridentity; }
+        set
+        {
+            playeridentity = value;
+            Debug.Log("속성 변경됨: " + playeridentity);
+        }
+    }
+
+    public void ChangeIdentity(identityType newIdentity)
+    {
+        playeridentity = newIdentity;
+    }
+
+    private void UpdateNearestAndInteractionIcon()
+    {
+        GameObject nearest = FindNearestObject();
+
+        if (nearest != currentNearest)
+        {
+            currentNearest = nearest;
+
+            if (currentInteractIcon != null)
+            {
+                Destroy(currentInteractIcon);
+                currentInteractIcon = null;
+            }
+
+            if (currentNearest != null)
+            {
+                currentInteractIcon = Instantiate(interactIconPrefab);
+                currentInteractIcon.transform.SetParent(currentNearest.transform);
+                currentInteractIcon.transform.localPosition = new Vector3(0, 1.0f, 0); // 오브젝트 위에 띄우기
+            }
         }
     }
 }

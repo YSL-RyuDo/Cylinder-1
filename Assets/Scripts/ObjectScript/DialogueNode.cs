@@ -14,6 +14,7 @@ public class DialogueNode : ScriptableObject
 
         public bool hasChoices;
         public Choice[] choices;
+        public string systemName;
     }
 
 
