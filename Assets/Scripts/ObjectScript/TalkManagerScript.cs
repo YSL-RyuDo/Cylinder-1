@@ -15,7 +15,13 @@ public class TalkManagerScript : MonoBehaviour, IPointerDownHandler
     public CanvasGroup dialogueGroup;
     public GameObject choicePanel;
     public GameObject choiceButtonPrefab;
+    public GameObject fadeInObject;
     public GameObject fadeOutObject;
+    public GameObject startObject;
+    public Image dialogueBackgroundImage;
+    public Sprite normalDialogueBG;
+    public Sprite narrationBG;
+    private bool waitingForSystemTrigger = false;
     private Dictionary<string, GameObject> systemMap;
 
     private Queue<DialogueData> dialogues = new Queue<DialogueData>();
@@ -37,10 +43,12 @@ public class TalkManagerScript : MonoBehaviour, IPointerDownHandler
     {
         instance = this;
         systemMap = new Dictionary<string, GameObject>
-    {
-        { "FadeOut", fadeOutObject }
-        // 필요한 시스템 오브젝트들을 여기에 추가
-    };
+        {
+            { "FadeOut", fadeOutObject },
+            { "FadeIn", fadeInObject },
+            { "Start", startObject }
+            // 필요한 시스템 오브젝트들을 여기에 추가
+        };
     }
 
     public void Ondialogue(DialogueData[] data)
@@ -63,41 +71,9 @@ public class TalkManagerScript : MonoBehaviour, IPointerDownHandler
 
     public void NextSentence()
     {
-        if (!string.IsNullOrEmpty(currentDialogue.systemName))
-        {
-            if (systemMap.TryGetValue(currentDialogue.systemName, out GameObject systemObj))
-            {
-                systemObj.SetActive(true);
-                dialogueGroup.alpha = 0;
-                dialogueGroup.blocksRaycasts = false;
-                LeftImg.SetActive(false);
-                RightImg.SetActive(false);
-                LogButton.SetActive(false);
-                dialogueLog.Clear();
-            }
-        }
-        if (dialogues.Count != 0)
-        {
-            currentDialogue = dialogues.Dequeue();
-            currentSentence = currentDialogue.sentence;
-            currentLSprite = currentDialogue.leftSprite;
-            currentRSprite = currentDialogue.rightSprite;
+        if (waitingForSystemTrigger) return;
 
-            dialogueLog.Add(currentSentence);
-
-            LeftImg.GetComponent<Image>().sprite = currentLSprite;
-            RightImg.GetComponent<Image>().sprite = currentRSprite;
-
-            istyping = true;
-            nextText.SetActive(false);
-            StartCoroutine(Typing(currentSentence));
-
-            if (currentDialogue.hasChoices)
-            {
-                StartCoroutine(ShowChoicesAfterTyping(currentDialogue.choices));
-            }
-        }
-        else
+        if (dialogues.Count == 0)
         {
             dialogueGroup.alpha = 0;
             dialogueGroup.blocksRaycasts = false;
@@ -105,6 +81,47 @@ public class TalkManagerScript : MonoBehaviour, IPointerDownHandler
             RightImg.SetActive(false);
             LogButton.SetActive(false);
             dialogueLog.Clear();
+            return;
+        }
+
+        currentDialogue = dialogues.Dequeue();
+
+        currentSentence = currentDialogue.sentence;
+        currentLSprite = currentDialogue.leftSprite;
+        currentRSprite = currentDialogue.rightSprite;
+        
+        if (currentDialogue.isNarration)
+        {
+            LeftImg.SetActive(false);
+            RightImg.SetActive(false);
+            dialogueBackgroundImage.sprite = narrationBG;
+            dialogueText.color = Color.white;
+        }
+        else
+        {
+            LeftImg.SetActive(true);
+            RightImg.SetActive(true);
+            dialogueBackgroundImage.sprite = normalDialogueBG;
+            dialogueText.color = Color.black;
+        }
+
+        dialogueLog.Add(currentSentence);
+
+        LeftImg.GetComponent<Image>().sprite = currentLSprite;
+        RightImg.GetComponent<Image>().sprite = currentRSprite;
+
+        istyping = true;
+        nextText.SetActive(false);
+        StartCoroutine(Typing(currentSentence));
+
+        if (!string.IsNullOrEmpty(currentDialogue.systemName))
+        {
+            waitingForSystemTrigger = true;
+        }
+
+        if (currentDialogue.hasChoices)
+        {
+            StartCoroutine(ShowChoicesAfterTyping(currentDialogue.choices));
         }
     }
 
@@ -166,7 +183,40 @@ public class TalkManagerScript : MonoBehaviour, IPointerDownHandler
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        if (!istyping)
-            NextSentence();
+        if (istyping) return;
+
+        if (waitingForSystemTrigger)
+        {
+            waitingForSystemTrigger = false;
+
+            string[] sysNames = currentDialogue.systemName.Split(',');
+
+            foreach (string rawName in sysNames)
+            {
+                string sysName = rawName.Trim();
+                bool turnOff = false;
+
+                if (sysName.EndsWith("_OFF"))
+                {
+                    turnOff = true;
+                    sysName = sysName.Replace("_OFF", "");
+                }
+
+                if (systemMap.TryGetValue(sysName, out GameObject systemObj))
+                {
+                    systemObj.SetActive(!turnOff);
+                }
+            }
+            dialogueGroup.alpha = 0;
+            dialogueGroup.blocksRaycasts = false;
+            LeftImg.SetActive(false);
+            RightImg.SetActive(false);
+            LogButton.SetActive(false);
+            dialogueLog.Clear();
+
+            return;
+        }
+        NextSentence();
     }
+
 }

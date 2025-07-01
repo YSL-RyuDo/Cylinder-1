@@ -12,4 +12,84 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6bb44663cb28f974caeb1cea7c51418a, type: 3}
   m_Name: StartDialogue
   m_EditorClassIdentifier: 
-  dialogues: []
+  dialogues:
+  - sentence: "\uC774 \uC138\uC0C1\uC5D0\uB294 \uAE30\uC801\uC744 \uC77C\uC73C\uCF1C\uC8FC\uB294
+      \uB9C8\uBC95\uC774 \uC788\uB2E4."
+    leftSprite: {fileID: 21300000, guid: 7110d0dc7f1b5f64e9745a69447d0e07, type: 3}
+    rightSprite: {fileID: 21300000, guid: 7110d0dc7f1b5f64e9745a69447d0e07, type: 3}
+    hasChoices: 0
+    choices: []
+    systemName: 
+    isNarration: 1
+  - sentence: "\uB9C8\uBC95\uC758 \uC0AC\uC6A9\uC790\uB294 \uC545\uB9C8\uC640 \uC778\uAC04."
+    leftSprite: {fileID: 21300000, guid: 7110d0dc7f1b5f64e9745a69447d0e07, type: 3}
+    rightSprite: {fileID: 21300000, guid: 7110d0dc7f1b5f64e9745a69447d0e07, type: 3}
+    hasChoices: 0
+    choices: []
+    systemName: 
+    isNarration: 1
+  - sentence: "\uC778\uAC04\uB4E4 \uC911\uC5D0\uC11C\uB3C4 \uB9C8\uB140\uB9CC\uC774
+      \uB9C8\uBC95\uC744 \uC0AC\uC6A9\uD560 \uC218 \uC788\uB2E4."
+    leftSprite: {fileID: 21300000, guid: 7110d0dc7f1b5f64e9745a69447d0e07, type: 3}
+    rightSprite: {fileID: 21300000, guid: 7110d0dc7f1b5f64e9745a69447d0e07, type: 3}
+    hasChoices: 0
+    choices: []
+    systemName: 
+    isNarration: 1
+  - sentence: "\uB9C8\uB140\uAC00 \uC544\uB2CC \uC778\uAC04\uB3C4 \uC545\uB9C8\uC640
+      \uACC4\uC57D\uD558\uBA74 \uB9C8\uBC95\uC744 \uC4F8 \uC218 \uC788\uAC8C \uB41C\uB2E4."
+    leftSprite: {fileID: 21300000, guid: 7110d0dc7f1b5f64e9745a69447d0e07, type: 3}
+    rightSprite: {fileID: 21300000, guid: 7110d0dc7f1b5f64e9745a69447d0e07, type: 3}
+    hasChoices: 0
+    choices: []
+    systemName: 
+    isNarration: 1
+  - sentence: "\uC545\uB9C8\uC640 \uC778\uAC04\uC758 \uACC4\uC57D\uC774 \uC774\uB8E8\uC5B4\uC9C0\uB294
+      \uB9C8\uBC95 \uC758\uC2DD\uC744 \uC18C\uD658 \uC758\uC2DD\uC774\uB77C\uACE0
+      \uD55C\uB2E4."
+    leftSprite: {fileID: 21300000, guid: 7110d0dc7f1b5f64e9745a69447d0e07, type: 3}
+    rightSprite: {fileID: 21300000, guid: 7110d0dc7f1b5f64e9745a69447d0e07, type: 3}
+    hasChoices: 0
+    choices: []
+    systemName: 
+    isNarration: 1
+  - sentence: "\uB2F9\uC2E0\uC740 \uC2DC\uAC04\uC744 \uB418\uB3CC\uB9B4 \uC218 \uC788\uB294
+      \uD798\uC744 \uAC00\uC9C4 \uC545\uB9C8\uACE0,"
+    leftSprite: {fileID: 21300000, guid: 7110d0dc7f1b5f64e9745a69447d0e07, type: 3}
+    rightSprite: {fileID: 21300000, guid: 7110d0dc7f1b5f64e9745a69447d0e07, type: 3}
+    hasChoices: 0
+    choices: []
+    systemName: 
+    isNarration: 1
+  - sentence: "\uB2F9\uC2E0\uC744 \uBD80\uB974\uB294 \uC18C\uD658 \uC758\uC2DD\uC5D0
+      \uC751\uD558\uB824\uACE0 \uD558\uACE0 \uC788\uB2E4."
+    leftSprite: {fileID: 21300000, guid: 7110d0dc7f1b5f64e9745a69447d0e07, type: 3}
+    rightSprite: {fileID: 21300000, guid: 7110d0dc7f1b5f64e9745a69447d0e07, type: 3}
+    hasChoices: 0
+    choices: []
+    systemName: 
+    isNarration: 1
+  - sentence: "\uC9C0\uAE08\uBD80\uD130, \uB2F9\uC2E0\uC740 \uD55C \uC18C\uB140\uC640
+      \uACC4\uC57D\uC744 \uC774\uD589\uD55C\uB2E4."
+    leftSprite: {fileID: 21300000, guid: 7110d0dc7f1b5f64e9745a69447d0e07, type: 3}
+    rightSprite: {fileID: 21300000, guid: 7110d0dc7f1b5f64e9745a69447d0e07, type: 3}
+    hasChoices: 0
+    choices: []
+    systemName: 
+    isNarration: 1
+  - sentence: "\uB2F9\uC2E0\uC740 \uC2DC\uAC04\uC758 \uD798\uC744 \uC18C\uB140\uC5D0\uAC8C
+      \uBE4C\uB824\uC8FC\uB294 \uB300\uAC00\uB85C,"
+    leftSprite: {fileID: 21300000, guid: 7110d0dc7f1b5f64e9745a69447d0e07, type: 3}
+    rightSprite: {fileID: 21300000, guid: 7110d0dc7f1b5f64e9745a69447d0e07, type: 3}
+    hasChoices: 0
+    choices: []
+    systemName: 
+    isNarration: 1
+  - sentence: "\uC18C\uB140\uC758 \uC0B6\uACFC \uADF8 \uC120\uD0DD\uC5D0 \uAD00\uC5EC\uD560
+      \uAD8C\uB9AC\uB97C \uBD80\uC5EC\uBC1B\uAC8C \uB41C\uB2E4."
+    leftSprite: {fileID: 21300000, guid: 7110d0dc7f1b5f64e9745a69447d0e07, type: 3}
+    rightSprite: {fileID: 21300000, guid: 7110d0dc7f1b5f64e9745a69447d0e07, type: 3}
+    hasChoices: 0
+    choices: []
+    systemName: Start_OFF, FadeIn
+    isNarration: 1
