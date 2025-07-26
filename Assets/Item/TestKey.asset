@@ -15,4 +15,4 @@ MonoBehaviour:
   id: 1
   itemName: 1key
   description: key for test
-  icon: {fileID: 21300000, guid: 49e55f7612cdf934b923d7275f352a0d, type: 3}
+  icon: {fileID: 21300000, guid: 3b019e8315798364d9950d9322090fa4, type: 3}

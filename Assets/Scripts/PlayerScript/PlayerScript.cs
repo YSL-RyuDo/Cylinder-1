@@ -8,14 +8,9 @@ using static PlayerScript;
 public class PlayerScript : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 1f;
-    //인벤토리 페이지와 페이지당 아이템 수
-    private int currentPage = 0;
-    private const int itemsPerPage = 5;
     //오브젝트 여러개 겹쳤을때 리스트에 일단 등록
     public List<GameObject> overlappingObjects = new List<GameObject>();
     public GameObject menu;
-    public GameObject inventoryPanel;
-    public GameObject itemTextPrefab;
     private PlayerControlls playerControlls;
     private Vector2 movement;
     private Rigidbody2D rb;
@@ -25,11 +20,19 @@ public class PlayerScript : MonoBehaviour
     private Vector2 autoMoveTarget;
     private float autoMoveSpeed = 1f;
     public float autoMoveThreshold = 0.25f;
+    //리코셰 퍼즐
+    public bool isOnRicochetPlatform = false;
+    public bool isSliding = false;
+    public Vector2 slideDirection;
     [SerializeField] private identityType playeridentity = identityType.None;
     //가장 가까운 오브젝트 위에 상호작용 가능 이모지 띄우기
     public GameObject interactIconPrefab;
     private GameObject currentInteractIcon;
     private GameObject currentNearest;
+    [SerializeField] private GameObject npcIconPrefab;
+    [SerializeField] private GameObject itemIconPrefab;
+    //대화중인지 감지하기 위함
+    public DialogueNode dialogueNode;
     public enum identityType
     {
         None,
@@ -67,7 +70,20 @@ public class PlayerScript : MonoBehaviour
 
     private void Update()
     {
+        if (TalkManagerScript.instance != null && TalkManagerScript.instance.dialogueGroup.alpha > 0)
+        {
+            movement = Vector2.zero;
+            animator.SetBool("IsWalk", false);
+            return;
+        }
         //키 조작
+        if (!isAutoMoving && !isSliding && isOnRicochetPlatform)
+        {
+            if (Input.GetKeyDown(KeyCode.W)) StartRicochet(Vector2.up);
+            if (Input.GetKeyDown(KeyCode.S)) StartRicochet(Vector2.down);
+            if (Input.GetKeyDown(KeyCode.A)) StartRicochet(Vector2.left);
+            if (Input.GetKeyDown(KeyCode.D)) StartRicochet(Vector2.right);
+        }
         if (!isAutoMoving)
         {
             PlayerInput();
@@ -84,7 +100,8 @@ public class PlayerScript : MonoBehaviour
             }
         }
         //일시정지
-        if (Input.GetKeyDown(KeyCode.Escape)) {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
             if (menu.activeSelf)
             {
                 menu.SetActive(false);
@@ -94,7 +111,6 @@ public class PlayerScript : MonoBehaviour
             {
                 menu.SetActive(true);
                 Time.timeScale = 0;
-                UpdateInventoryUI();
             }
         }
         //상호작용키
@@ -109,10 +125,22 @@ public class PlayerScript : MonoBehaviour
         }
         UpdateNearestAndInteractionIcon();
     }
-    
+
     private void FixedUpdate()
     {
+        if (TalkManagerScript.instance != null && TalkManagerScript.instance.dialogueGroup.alpha > 0)
+            return;
         Move();
+        if (isSliding)
+        {
+            rb.MovePosition(rb.position + slideDirection * moveSpeed * Time.fixedDeltaTime);
+            animator.SetBool("IsWalk", true);
+
+            if (slideDirection.x > 0.01f)
+                transform.localScale = new Vector3(-1, 1, 1);
+            else if (slideDirection.x < -0.01f)
+                transform.localScale = new Vector3(1, 1, 1);
+        }
     }
 
     //입력을 받는 함수
@@ -128,11 +156,11 @@ public class PlayerScript : MonoBehaviour
         rb.MovePosition(rb.position + movement * (speed * Time.fixedDeltaTime));
         if (movement.x > 0.01f)
         {
-            transform.localScale = new Vector3(1, 1, 1);
+            transform.localScale = new Vector3(-1, 1, 1);
         }
         else if (movement.x < -0.01f)
         {
-            transform.localScale = new Vector3(-1, 1, 1);
+            transform.localScale = new Vector3(1, 1, 1);
         }
         bool isWalking = movement.sqrMagnitude > 0.01f;
         animator.SetBool("IsWalk", isWalking);
@@ -141,21 +169,43 @@ public class PlayerScript : MonoBehaviour
     //문, 워프 같은것을 위해 만든 함수, x y값을 입력받아 해당 위치로 player의 위치를 즉시 이동시킴
     public void Warp(float x, float y)
     {
+        if (TalkManagerScript.instance != null && TalkManagerScript.instance.dialogueGroup.alpha > 0)
+        {
+            return;
+        }
         rb.position = new Vector2(x, y);
     }
 
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.collider.CompareTag("Wall"))
+        {
+            Debug.Log("벽에 부딪힘, 슬라이딩 멈춤");
+            isSliding = false;
+            movement = Vector2.zero;
+            animator.SetBool("IsWalk", false);
+        }
+    }
     private void OnTriggerEnter2D(Collider2D collision)
     {
         //아이템과 NPC 겹쳐진것 전부 등록
         if (collision.CompareTag("Interact"))
-        {
+        { 
             overlappingObjects.Add(collision.gameObject);
+        }
+        if (collision.CompareTag("RicochetPlatform"))
+        {
+            isOnRicochetPlatform = true;
         }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
         overlappingObjects.Remove(collision.gameObject);
+        if (collision.CompareTag("RicochetPlatform") && collision.isTrigger)
+        {
+            isOnRicochetPlatform = false;
+        }
     }
 
     private GameObject FindNearestObject()
@@ -164,7 +214,8 @@ public class PlayerScript : MonoBehaviour
         float minDistance = float.MaxValue;
         Vector2 playerPos = transform.position;
 
-        foreach (GameObject obj in overlappingObjects) {
+        foreach (GameObject obj in overlappingObjects)
+        {
             if (obj == null) continue;
             float distance = Vector2.Distance(playerPos, obj.transform.position);
             if (distance < minDistance)
@@ -174,30 +225,6 @@ public class PlayerScript : MonoBehaviour
             }
         }
         return nearest;
-    }
-
-    private void UpdateInventoryUI()
-    {
-        foreach (Transform child in inventoryPanel.transform)
-        {
-            Destroy(child.gameObject);
-        }
-
-        // 현재 페이지의 시작 인덱스 계산
-        int startIndex = currentPage * itemsPerPage;
-
-        // 시작 인덱스부터 최대 5개 아이템 표시
-        for (int i = startIndex; i < startIndex + itemsPerPage && i < inventory.Count; i++)
-        {
-            InventoryItem item = inventory[i];
-            GameObject newItemText = Instantiate(itemTextPrefab, inventoryPanel.transform);
-
-            TextMeshProUGUI itemNameText = newItemText.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
-            itemNameText.text = $"{item.itemData.itemName} - {item.itemData.description}";
-
-            Image itemIconImage = newItemText.transform.GetChild(1).GetComponent<Image>();
-            itemIconImage.sprite = item.itemData.icon;
-        }
     }
 
     public void AddItem(ItemData data)
@@ -213,7 +240,6 @@ public class PlayerScript : MonoBehaviour
         {
             inventory.Remove(itemToRemove);
             Debug.Log("아이템 제거됨: " + data.itemName);
-            UpdateInventoryUI();
         }
         else
         {
@@ -226,23 +252,6 @@ public class PlayerScript : MonoBehaviour
         return inventory.Exists(item => item.itemData == data);
     }
 
-    public void NextPage()
-    {
-        if ((currentPage + 1) * itemsPerPage < inventory.Count)
-        {
-            currentPage++;
-            UpdateInventoryUI();
-        }
-    }
-
-    public void PreviousPage()
-    {
-        if (currentPage > 0)
-        {
-            currentPage--;
-            UpdateInventoryUI();
-        }
-    }
 
     public void AutoMoveTo(Vector2 target)
     {
@@ -273,7 +282,6 @@ public class PlayerScript : MonoBehaviour
     private void UpdateNearestAndInteractionIcon()
     {
         GameObject nearest = FindNearestObject();
-
         if (nearest != currentNearest)
         {
             currentNearest = nearest;
@@ -286,10 +294,28 @@ public class PlayerScript : MonoBehaviour
 
             if (currentNearest != null)
             {
-                currentInteractIcon = Instantiate(interactIconPrefab);
-                currentInteractIcon.transform.SetParent(currentNearest.transform);
-                currentInteractIcon.transform.localPosition = new Vector3(0, 1.0f, 0); // 오브젝트 위에 띄우기
+                InteractScript interactScript = currentNearest.GetComponent<InteractScript>();
+                bool isNpc = interactScript != null && interactScript.isNpc;
+
+                GameObject prefabToUse = isNpc ? npcIconPrefab : itemIconPrefab;
+
+                if (prefabToUse != null)
+                {
+                    currentInteractIcon = Instantiate(prefabToUse);
+                    currentInteractIcon.transform.SetParent(transform, false);
+                    currentInteractIcon.transform.localPosition = new Vector3(0, 1.25f, 0); // 오브젝트 위에 띄우기
+                }
+                else
+                {
+                    Debug.LogWarning("프리팹이 설정되지 않았습니다: " + (isNpc ? "npcIconPrefab" : "itemIconPrefab"));
+                }
             }
         }
+    }
+
+    private void StartRicochet(Vector2 direction)
+    {
+        isSliding = true;
+        slideDirection = direction.normalized;
     }
 }

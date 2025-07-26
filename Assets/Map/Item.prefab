@@ -102,9 +102,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 0
   isNpc: 0
-  Name: 
-  Description: 
-  Icon: {fileID: 0}
+  itemData: {fileID: 0}
 --- !u!50 &8699832550156688492
 Rigidbody2D:
   serializedVersion: 4
@@ -189,4 +187,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c25db328a842ec04395b9e475f8712ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sentences: []
+  dialogueNode: {fileID: 0}
