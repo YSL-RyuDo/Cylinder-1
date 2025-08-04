@@ -1,0 +1,34 @@
+﻿{
+  "dialogues": [
+    {
+      "teller": "집사", 
+      "sentence": "아가씨, 교주님께서 부르십니다.",
+      "leftSprite": "Ras_Standing_Affectionate_Standard", 
+      "rightSprite": "Butler_Standing_Standard",
+      "hasChoices": false, 
+      "choices": [],
+      "systemName": "",
+      "isNarration": false 
+    },
+    {
+      "teller": "집사",
+      "sentence": "아가씨, 교주님께서 부르십니다.",
+      "leftSprite": "Ras_Standing_Affectionate_Standard", 
+      "rightSprite": "Butler_Standing_Standard", 
+      "hasChoices": true, 
+      "choices": [
+        {
+          "choiceText": "선택지1",
+          "nextFile": "StartEvent"
+        },
+        {
+          "choiceText": "선택지2",
+          "nextFile": "StartEvent"
+        }
+      ],
+      "systemName": "FadeOut",
+      "isNarration": true
+    }
+
+  ]
+}

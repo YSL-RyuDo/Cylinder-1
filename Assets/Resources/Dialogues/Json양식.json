@@ -12,10 +12,10 @@
       "isNarration": false //현재 대화가 나레이션인지 구별하는 용도. true시 글자 색과 대화창이 색상이랑 디자인이 바뀐다.
     },
     {
-      "teller": "",
-      "sentence": "",
-      "leftSprite": "",
-      "rightSprite": "",
+      "teller": "집사", //화자, 즉 현재 말하는 사람을 써두는 공간이다. 대화창의 이름 칸에 들어갈 내용
+      "sentence": "아가씨, 교주님께서 부르십니다.", // 대화내용
+      "leftSprite": "Ras_Standing_Affectionate_Standard", //좌측 이미지 이름을 정확히 기입한다. 해당 이미지들은 전부 Resoures 폴더 내의 Standings 안에 넣어야 적용되는 점 유의.
+      "rightSprite": "Butler_Standing_Standard", // 우측 이미지
       "hasChoices": true, // 만약 선택지를 써야하는 경우 이렇게 true로 한다.
       "choices": [
         {
