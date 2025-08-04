@@ -32,7 +32,6 @@ public class PlayerScript : MonoBehaviour
     [SerializeField] private GameObject npcIconPrefab;
     [SerializeField] private GameObject itemIconPrefab;
     //대화중인지 감지하기 위함
-    public DialogueNode dialogueNode;
     public enum identityType
     {
         None,

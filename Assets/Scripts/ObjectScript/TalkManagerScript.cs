@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
-using static DialogueNode;
 
 public class TalkManagerScript : MonoBehaviour, IPointerDownHandler
 {
@@ -22,25 +21,23 @@ public class TalkManagerScript : MonoBehaviour, IPointerDownHandler
     public Image dialogueBackgroundImage;
     public Sprite normalDialogueBG;
     public Sprite narrationBG;
+
     private bool waitingForSystemTrigger = false;
     private Dictionary<string, GameObject> systemMap;
 
-    private Queue<DialogueData> dialogues = new Queue<DialogueData>();
-    private DialogueData currentDialogue;
+    private Queue<DialogueNodeJSON.DialogueData> dialogues = new Queue<DialogueNodeJSON.DialogueData>();
+    private DialogueNodeJSON.DialogueData currentDialogue;
 
+    private string currentSentence;
+    public float typingSpeed = 0.1f;
+    private bool istyping;
+    public static TalkManagerScript instance;
+
+    // ·Î±×
     public GameObject logPanel;
     public Text logText;
     private List<string> dialogueLog = new List<string>();
 
-    private string currentName;
-    private string currentSentence;
-    private Sprite currentLSprite;
-    private Sprite currentRSprite;
-
-    public float typingSpeed = 0.1f;
-    private bool istyping;
-
-    public static TalkManagerScript instance;
     private void Awake()
     {
         instance = this;
@@ -52,13 +49,23 @@ public class TalkManagerScript : MonoBehaviour, IPointerDownHandler
         };
     }
 
-    public void Ondialogue(DialogueData[] data)
+    DialogueNodeJSON LoadDialogueNode(string fileNameWithoutExtension)
+    {
+        TextAsset ta = Resources.Load<TextAsset>($"Dialogues/{fileNameWithoutExtension}");
+        return JsonUtility.FromJson<DialogueNodeJSON>(ta.text);
+    }
+
+    public void StartDialogue(string fileName)
+    {
+        DialogueNodeJSON node = LoadDialogueNode(fileName);
+        InitializeDialogue(node.dialogues);
+    }
+
+    void InitializeDialogue(DialogueNodeJSON.DialogueData[] data)
     {
         dialogues.Clear();
-        foreach (DialogueData item in data)
-        {
-            dialogues.Enqueue(item);
-        }
+        foreach (var d in data)
+            dialogues.Enqueue(d);
 
         dialogueGroup.alpha = 1;
         dialogueGroup.blocksRaycasts = true;
@@ -87,13 +94,9 @@ public class TalkManagerScript : MonoBehaviour, IPointerDownHandler
 
         currentDialogue = dialogues.Dequeue();
 
-        currentName = currentDialogue.teller;
-        tellerText.text = "";
-        tellerText.text = currentName;
+        tellerText.text = currentDialogue.teller;
         currentSentence = currentDialogue.sentence;
-        currentLSprite = currentDialogue.leftSprite;
-        currentRSprite = currentDialogue.rightSprite;
-        
+
         if (currentDialogue.isNarration)
         {
             LeftImg.SetActive(false);
@@ -111,8 +114,14 @@ public class TalkManagerScript : MonoBehaviour, IPointerDownHandler
 
         dialogueLog.Add(currentSentence);
 
-        LeftImg.GetComponent<Image>().sprite = currentLSprite;
-        RightImg.GetComponent<Image>().sprite = currentRSprite;
+        if (!string.IsNullOrEmpty(currentDialogue.leftSprite))
+        {
+            LeftImg.GetComponent<Image>().sprite = Resources.Load<Sprite>($"Sprites/Standings/{currentDialogue.leftSprite}");
+        }
+        if (!string.IsNullOrEmpty(currentDialogue.rightSprite))
+        {
+            RightImg.GetComponent<Image>().sprite = Resources.Load<Sprite>($"Sprites/Standings/{currentDialogue.rightSprite}");
+        }
 
         istyping = true;
         nextText.SetActive(false);
@@ -129,24 +138,24 @@ public class TalkManagerScript : MonoBehaviour, IPointerDownHandler
         }
     }
 
-    IEnumerator ShowChoicesAfterTyping(DialogueNode.Choice[] choices)
+    IEnumerator ShowChoicesAfterTyping(DialogueNodeJSON.Choice[] choices)
     {
         while (istyping) yield return null;
 
         choicePanel.SetActive(true);
-        foreach (Transform child in choicePanel.transform)
-            Destroy(child.gameObject);
+        foreach (Transform c in choicePanel.transform)
+            Destroy(c.gameObject);
 
         foreach (var choice in choices)
         {
             GameObject btn = Instantiate(choiceButtonPrefab, choicePanel.transform);
             btn.GetComponentInChildren<Text>().text = choice.choiceText;
 
-            DialogueNode nextNode = choice.nextNode;
+            string nextFile = choice.nextFile;
             btn.GetComponent<Button>().onClick.AddListener(() =>
             {
                 choicePanel.SetActive(false);
-                Ondialogue(nextNode.dialogues);
+                StartDialogue(nextFile);
             });
         }
     }
@@ -154,16 +163,16 @@ public class TalkManagerScript : MonoBehaviour, IPointerDownHandler
     IEnumerator Typing(string line)
     {
         dialogueText.text = "";
-        foreach (char letter in line.ToCharArray())
+        foreach (char ch in line)
         {
-            dialogueText.text += letter;
+            dialogueText.text += ch;
             yield return new WaitForSeconds(typingSpeed);
         }
     }
 
     void Update()
     {
-        if (dialogueText.text.Equals(currentSentence))
+        if (dialogueText.text == currentSentence)
         {
             nextText.SetActive(true);
             istyping = false;
@@ -174,9 +183,9 @@ public class TalkManagerScript : MonoBehaviour, IPointerDownHandler
     {
         logPanel.SetActive(true);
         logText.text = "";
-        foreach (string line in dialogueLog)
+        foreach (var l in dialogueLog)
         {
-            logText.text += line + "\n";
+            logText.text += l + "\n";
         }
     }
 
@@ -194,33 +203,31 @@ public class TalkManagerScript : MonoBehaviour, IPointerDownHandler
             waitingForSystemTrigger = false;
 
             string[] sysNames = currentDialogue.systemName.Split(',');
-
-            foreach (string rawName in sysNames)
+            foreach (string raw in sysNames)
             {
-                string sysName = rawName.Trim();
+                string name = raw.Trim();
                 bool turnOff = false;
-
-                if (sysName.EndsWith("_OFF"))
+                if (name.EndsWith("_OFF"))
                 {
                     turnOff = true;
-                    sysName = sysName.Replace("_OFF", "");
+                    name = name.Replace("_OFF", "");
                 }
 
-                if (systemMap.TryGetValue(sysName, out GameObject systemObj))
+                if (systemMap.TryGetValue(name, out GameObject obj))
                 {
-                    systemObj.SetActive(!turnOff);
+                    obj.SetActive(!turnOff);
                 }
             }
+
             dialogueGroup.alpha = 0;
             dialogueGroup.blocksRaycasts = false;
             LeftImg.SetActive(false);
             RightImg.SetActive(false);
             LogButton.SetActive(false);
             dialogueLog.Clear();
-
             return;
         }
+
         NextSentence();
     }
-
 }

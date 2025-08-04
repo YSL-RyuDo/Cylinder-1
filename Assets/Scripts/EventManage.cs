@@ -7,14 +7,14 @@ public class EventManage : MonoBehaviour
 {
     public GameObject FadeIn;
     public GameObject WhiteBackground;
-    public DialogueNode startDialogueNode;
+    public string startDialogueNode;
     public bool alreadyStart = false;
     void Start()
     {
         FadeIn.SetActive(true);
         if (TalkManagerScript.instance.dialogueGroup.alpha == 0 && !alreadyStart)
         {
-            TalkManagerScript.instance.Ondialogue(startDialogueNode.dialogues);
+            TalkManagerScript.instance.StartDialogue(startDialogueNode);
         }
     }
 

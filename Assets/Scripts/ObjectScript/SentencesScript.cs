@@ -4,13 +4,14 @@ using UnityEngine;
 
 public class SentencesScript : MonoBehaviour
 {
-    public DialogueNode dialogueNode;
+    [Tooltip("Resources/Dialogues 폴더 안에 있는 json 파일 이름(확장자 제외)")]
+    public string dialogueFileName;
 
     public void interact()
     {
-        if(TalkManagerScript.instance.dialogueGroup.alpha == 0) 
+        if (TalkManagerScript.instance.dialogueGroup.alpha == 0)
         {
-            TalkManagerScript.instance.Ondialogue(dialogueNode.dialogues);
+            TalkManagerScript.instance.StartDialogue(dialogueFileName);
         }
     }
 }

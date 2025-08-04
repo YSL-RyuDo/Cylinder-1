@@ -1,17 +1,15 @@
-using System.Collections.Generic;
-using System.Xml.Serialization;
-using UnityEngine;
-
-[CreateAssetMenu(fileName = "NewDialogue", menuName = "Dialogue/Node")]
-public class DialogueNode : ScriptableObject
+[System.Serializable]
+public class DialogueNodeJSON
 {
+    public DialogueData[] dialogues;
+
     [System.Serializable]
-    public struct DialogueData
+    public class DialogueData
     {
         public string teller;
         public string sentence;
-        public Sprite leftSprite;
-        public Sprite rightSprite;
+        public string leftSprite;
+        public string rightSprite;
 
         public bool hasChoices;
         public Choice[] choices;
@@ -19,13 +17,10 @@ public class DialogueNode : ScriptableObject
         public bool isNarration;
     }
 
-
     [System.Serializable]
-    public struct Choice
+    public class Choice
     {
         public string choiceText;
-        public DialogueNode nextNode;
+        public string nextFile; //json 파일 명 넣기
     }
-
-    public DialogueData[] dialogues;
 }

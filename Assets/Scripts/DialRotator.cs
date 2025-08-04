@@ -12,7 +12,7 @@ public class DialRotator : MonoBehaviour
     }
 
     public RectTransform dialTransform;
-    public DialogueNode DialogueNode;
+    public string DialogueNode;
     public List<SlotData> slots;
     public PlayerScript playerScript;
     public GameObject FadeIn;
@@ -85,7 +85,7 @@ public class DialRotator : MonoBehaviour
         yield return new WaitForSeconds(0.3f);
         transform.parent.gameObject.SetActive(false);
         FadeIn.SetActive(true);
-        TalkManagerScript.instance.Ondialogue(DialogueNode.dialogues);
+        TalkManagerScript.instance.StartDialogue(DialogueNode);
         PlayerScript player = FindObjectOfType<PlayerScript>();
         player.Warp(0f, 0f);
     }
