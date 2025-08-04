@@ -4,29 +4,49 @@ using UnityEngine;
 
 public class MenuManager : MonoBehaviour
 {
+    public GameObject menu;
     public GameObject itemPanel;
     public GameObject savePanel;
     public GameObject mapPanel;
     public GameObject questPanel;
+    public GameObject[] turnOnObjects;
+    public GameObject[] turnOffObjects;
 
-    public void OpenItemTab()
+    public MenuButton currentSelectedTab;
+
+    public void OnTabSelected(MenuButton button)
     {
-        SetActiveTab(itemPanel);
+        currentSelectedTab = button;
+
+        switch (button.tabType)
+        {
+            case MenuButton.TabType.Item:
+                SetActiveTab(itemPanel);
+                break;
+            case MenuButton.TabType.Save:
+                SetActiveTab(savePanel);
+                break;
+            case MenuButton.TabType.Map:
+                SetActiveTab(mapPanel);
+                break;
+            case MenuButton.TabType.Quest:
+                SetActiveTab(questPanel);
+                break;
+        }
+
+        UpdateAllButtonVisuals();
     }
 
-    public void OpenSaveTab()
+    private void OnEnable()
     {
-        SetActiveTab(savePanel);
-    }
-
-    public void OpenMapTab()
-    {
-        SetActiveTab(mapPanel);
-    }
-
-    public void OpenQuestTab()
-    {
-        SetActiveTab(questPanel);
+        foreach (var item in turnOffObjects)
+        {
+            item.SetActive(false);
+        }
+        foreach (var item in turnOnObjects)
+        {
+            item.SetActive(true);
+        }
     }
 
     private void SetActiveTab(GameObject selected)
@@ -37,4 +57,17 @@ public class MenuManager : MonoBehaviour
         questPanel.SetActive(selected == questPanel);
     }
 
+    private void UpdateAllButtonVisuals()
+    {
+        foreach (var button in FindObjectsOfType<MenuButton>())
+        {
+            button.UpdateVisual();
+        }
+    }
+
+    public void TurnOffMenu()
+    {
+        menu.SetActive(false);
+        Time.timeScale = 1;
+    }
 }

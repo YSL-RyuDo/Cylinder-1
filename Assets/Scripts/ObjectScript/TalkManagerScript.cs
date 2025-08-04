@@ -7,6 +7,7 @@ using static DialogueNode;
 
 public class TalkManagerScript : MonoBehaviour, IPointerDownHandler
 {
+    public Text tellerText;
     public Text dialogueText;
     public GameObject nextText;
     public GameObject LeftImg;
@@ -31,6 +32,7 @@ public class TalkManagerScript : MonoBehaviour, IPointerDownHandler
     public Text logText;
     private List<string> dialogueLog = new List<string>();
 
+    private string currentName;
     private string currentSentence;
     private Sprite currentLSprite;
     private Sprite currentRSprite;
@@ -47,7 +49,6 @@ public class TalkManagerScript : MonoBehaviour, IPointerDownHandler
             { "FadeOut", fadeOutObject },
             { "FadeIn", fadeInObject },
             { "Start", startObject }
-            // 필요한 시스템 오브젝트들을 여기에 추가
         };
     }
 
@@ -86,6 +87,9 @@ public class TalkManagerScript : MonoBehaviour, IPointerDownHandler
 
         currentDialogue = dialogues.Dequeue();
 
+        currentName = currentDialogue.teller;
+        tellerText.text = "";
+        tellerText.text = currentName;
         currentSentence = currentDialogue.sentence;
         currentLSprite = currentDialogue.leftSprite;
         currentRSprite = currentDialogue.rightSprite;

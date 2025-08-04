@@ -5,6 +5,7 @@ public class ItemPanelUI : MonoBehaviour
 {
     public GameObject itemButtonPrefab;
     public Transform contentParent;
+    public Text itemDescriptionName;
     public Text itemDescriptionText;
     public Image itemDescriptionIcon;
     public Button useButton;
@@ -24,27 +25,36 @@ public class ItemPanelUI : MonoBehaviour
         foreach (Transform child in contentParent)
             Destroy(child.gameObject);
 
-        // 아이템 버튼 생성
         foreach (var item in player.inventory)
         {
             GameObject buttonObj = Instantiate(itemButtonPrefab, contentParent);
 
-            // 버튼의 이미지 설정 (아이콘)
-            Image buttonImage = buttonObj.GetComponent<Image>();
-            if (buttonImage != null && item.itemData.icon != null)
+            // 아이콘 설정
+            Transform iconTransform = buttonObj.transform.Find("Icon");
+            if (iconTransform != null)
             {
-                buttonImage.sprite = item.itemData.icon;
-                buttonImage.preserveAspect = true;
+                Image iconImage = iconTransform.GetComponent<Image>();
+                if (iconImage != null && item.itemData.icon != null)
+                {
+                    iconImage.sprite = item.itemData.icon;
+                    iconImage.preserveAspect = true;
+                }
             }
-            
-            Text nameText = buttonObj.GetComponentInChildren<Text>();
-            if (nameText != null)
-                nameText.text = item.itemData.itemName;
+
+            // 텍스트 설정
+            Transform nameTextTransform = buttonObj.transform.Find("NameText");
+            if (nameTextTransform != null)
+            {
+                Text nameText = nameTextTransform.GetComponent<Text>();
+                if (nameText != null)
+                    nameText.text = item.itemData.itemName;
+            }
 
             // 클릭 이벤트 등록
             Button button = buttonObj.GetComponent<Button>();
             button.onClick.AddListener(() =>
             {
+                itemDescriptionName.text = item.itemData.itemName;
                 itemDescriptionText.text = item.itemData.description;
                 itemDescriptionIcon.sprite = item.itemData.icon;
 
@@ -52,6 +62,7 @@ public class ItemPanelUI : MonoBehaviour
                 useButton.onClick.AddListener(() =>
                 {
                     player.RemoveItem(item.itemData);
+                    itemDescriptionName.text = "";
                     itemDescriptionText.text = "";
                     itemDescriptionIcon.sprite = invisibleIcon;
                     RefreshItemList();

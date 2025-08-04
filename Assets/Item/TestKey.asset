@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: TestKey
   m_EditorClassIdentifier: 
   id: 1
-  itemName: 1key
-  description: key for test
+  itemName: "\uBC15\uC81C\uB098\uBE44\uC561\uC790"
+  description: "\uD478\uB978 \uB098\uBE44\uAC00 \uBC15\uC81C\uB418\uC5B4\uC788\uB294
+    \uC561\uC790\uC774\uB2E4"
   icon: {fileID: 21300000, guid: 3b019e8315798364d9950d9322090fa4, type: 3}

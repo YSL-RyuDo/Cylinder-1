@@ -303,7 +303,7 @@ public class PlayerScript : MonoBehaviour
                 {
                     currentInteractIcon = Instantiate(prefabToUse);
                     currentInteractIcon.transform.SetParent(transform, false);
-                    currentInteractIcon.transform.localPosition = new Vector3(0, 1.25f, 0); // 오브젝트 위에 띄우기
+                    currentInteractIcon.transform.localPosition = new Vector3(0, 2.1f, 0); // 오브젝트 위에 띄우기
                 }
                 else
                 {

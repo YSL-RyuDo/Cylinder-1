@@ -8,6 +8,7 @@ public class DialogueNode : ScriptableObject
     [System.Serializable]
     public struct DialogueData
     {
+        public string teller;
         public string sentence;
         public Sprite leftSprite;
         public Sprite rightSprite;
