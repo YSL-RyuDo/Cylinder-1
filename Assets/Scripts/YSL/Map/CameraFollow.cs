@@ -16,6 +16,7 @@ public class CameraFollow : MonoBehaviour
 
         if (target != null)
             playerMove = target.GetComponent<PlayerMove>();
+
         AdjustCameraSizeToMap();
     }
 
@@ -25,43 +26,95 @@ public class CameraFollow : MonoBehaviour
             return;
 
         var mapBoundary = playerMove.CurrentMapBoundary;
-        if (mapBoundary == null)
+        var circularBoundary = playerMove.CurrentCircularBoundary;
+
+        if (mapBoundary == null && circularBoundary == null)
             return;
 
-        Vector3 newPos = target.position;
+        if (circularBoundary != null)
+        {
+            // 무조건 고정 좌표로 이동
+            transform.position = new Vector3(150f, 230f, transform.position.z);
+            return;
+        }
 
-        float minX = mapBoundary.min.x + camHalfWidth;
-        float maxX = mapBoundary.max.x - camHalfWidth;
-        float minY = mapBoundary.min.y + camHalfHeight;
-        float maxY = mapBoundary.max.y - camHalfHeight;
+        // 이하 mapBoundary 처리
+        Vector3 targetPos = target.position;
+        Vector3 newPos = targetPos;
 
-        newPos.x = Mathf.Clamp(newPos.x, minX, maxX);
-        newPos.y = Mathf.Clamp(newPos.y, minY, maxY);
+        float camViewWidth = camHalfWidth * 2f;
+        float camViewHeight = camHalfHeight * 2f;
+
+        float mapWidth = mapBoundary.max.x - mapBoundary.min.x;
+        float mapHeight = mapBoundary.max.y - mapBoundary.min.y;
+
+        bool mapSmallerThanCamView = (mapWidth < camViewWidth) || (mapHeight < camViewHeight);
+
+        if (!mapSmallerThanCamView)
+        {
+            float minX = mapBoundary.min.x + camHalfWidth;
+            float maxX = mapBoundary.max.x - camHalfWidth;
+            float minY = mapBoundary.min.y + camHalfHeight;
+            float maxY = mapBoundary.max.y - camHalfHeight;
+
+            newPos.x = Mathf.Clamp(targetPos.x, minX, maxX);
+            newPos.y = Mathf.Clamp(targetPos.y, minY, maxY);
+        }
+
         newPos.z = transform.position.z;
-
-        float smoothSpeed = 10f;
-        transform.position = Vector3.Lerp(transform.position, newPos, smoothSpeed * Time.fixedDeltaTime);
+        transform.position = newPos;
     }
-
 
     public void SnapToPositionImmediate(Vector3 pos)
     {
         if (target == null)
             return;
 
-        MapBoundary mapBoundary = target.GetComponent<PlayerMove>()?.CurrentMapBoundary;
-        if (mapBoundary == null)
+        PlayerMove pm = target.GetComponent<PlayerMove>();
+        if (pm == null)
             return;
 
-        float minX = mapBoundary.min.x + camHalfWidth;
-        float maxX = mapBoundary.max.x - camHalfWidth;
-        float minY = mapBoundary.min.y + camHalfHeight;
-        float maxY = mapBoundary.max.y - camHalfHeight;
+        MapBoundary mapBoundary = pm.CurrentMapBoundary;
+        CircularMapBoundary circularBoundary = pm.CurrentCircularBoundary;
 
-        float clampedX = Mathf.Clamp(pos.x, minX, maxX);
-        float clampedY = Mathf.Clamp(pos.y, minY, maxY);
+        Vector3 newPos = pos;
 
-        transform.position = new Vector3(clampedX, clampedY, transform.position.z);
+        float camRadiusX = camHalfWidth;
+        float camRadiusY = camHalfHeight;
+
+        if (circularBoundary != null)
+        {
+            newPos = new Vector3(150f, 230f, transform.position.z);
+            transform.position = newPos;
+            return;
+            //float mapMinX = circularBoundary.center.x - circularBoundary.radius;
+            //float mapMaxX = circularBoundary.center.x + circularBoundary.radius;
+            //float mapMinY = circularBoundary.center.y - circularBoundary.radius;
+            //float mapMaxY = circularBoundary.center.y + circularBoundary.radius;
+
+            //float clampedMinX = mapMinX + Mathf.Min(camRadiusX, circularBoundary.radius);
+            //float clampedMaxX = mapMaxX - Mathf.Min(camRadiusX, circularBoundary.radius);
+            //float clampedMinY = mapMinY + Mathf.Min(camRadiusY, circularBoundary.radius);
+            //float clampedMaxY = mapMaxY - Mathf.Min(camRadiusY, circularBoundary.radius);
+
+            //newPos.x = Mathf.Clamp(pos.x, clampedMinX, clampedMaxX);
+            //newPos.y = Mathf.Clamp(pos.y, clampedMinY, clampedMaxY);
+        }
+        else if (mapBoundary != null)
+        {
+            float mapWidth = mapBoundary.max.x - mapBoundary.min.x;
+            float mapHeight = mapBoundary.max.y - mapBoundary.min.y;
+
+            float clampedMinX = mapBoundary.min.x + Mathf.Min(camRadiusX, mapWidth / 2f);
+            float clampedMaxX = mapBoundary.max.x - Mathf.Min(camRadiusX, mapWidth / 2f);
+            float clampedMinY = mapBoundary.min.y + Mathf.Min(camRadiusY, mapHeight / 2f);
+            float clampedMaxY = mapBoundary.max.y - Mathf.Min(camRadiusY, mapHeight / 2f);
+
+            newPos.x = Mathf.Clamp(pos.x, clampedMinX, clampedMaxX);
+            newPos.y = Mathf.Clamp(pos.y, clampedMinY, clampedMaxY);
+        }
+
+        transform.position = new Vector3(newPos.x, newPos.y, transform.position.z);
     }
 
     public void AdjustCameraSizeToMap()
@@ -81,20 +134,17 @@ public class CameraFollow : MonoBehaviour
         float sizeByHeight = defaultSize;
         float sizeByWidth = defaultSize;
 
-        // Y 방향이 너무 작으면 줄이기
         if (mapHeight < defaultSize * 2f)
         {
             sizeByHeight = mapHeight / 2f;
         }
 
-        // X 방향이 너무 작으면 줄이기 (가로 기준 세로 크기 계산)
         float widthBasedSize = mapWidth / (2f * aspect);
         if (mapWidth < defaultSize * 2f * aspect)
         {
             sizeByWidth = widthBasedSize;
         }
 
-        // 둘 중 작은 쪽을 선택 (여백 안 보이게)
         cam.orthographicSize = Mathf.Min(sizeByHeight, sizeByWidth);
 
         camHalfHeight = cam.orthographicSize;
@@ -102,5 +152,4 @@ public class CameraFollow : MonoBehaviour
 
         SnapToPositionImmediate(target.position);
     }
-
 }

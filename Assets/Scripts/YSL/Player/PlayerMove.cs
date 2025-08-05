@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections;
 
 public class PlayerMove : MonoBehaviour
 {
@@ -8,8 +7,12 @@ public class PlayerMove : MonoBehaviour
     private Vector2 input;
     private BoxCollider2D playerCollider;
     private Animator animator;
+
     public CameraFollow cameraFollow;
+
     public MapBoundary CurrentMapBoundary { get; private set; }
+    public CircularMapBoundary CurrentCircularBoundary { get; private set; }
+
     private void Awake()
     {
         playerCollider = GetComponent<BoxCollider2D>();
@@ -23,20 +26,26 @@ public class PlayerMove : MonoBehaviour
 
     void Update()
     {
-        // 입력 받기
         input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
         if (input.sqrMagnitude > 1) input = input.normalized;
 
         Vector3 moveDelta = new Vector3(input.x, input.y, 0) * moveSpeed * Time.deltaTime;
         Vector3 newPos = transform.position + moveDelta;
 
-        UpdateCurrentMapBoundary();
+        UpdateCurrentBoundaries();
 
-        if (CurrentMapBoundary != null && playerCollider != null)
+        if (playerCollider == null)
         {
-            Vector2 halfSize = playerCollider.bounds.extents;
-            Vector2 offset = playerCollider.offset;
+            transform.position = newPos;
+            return;
+        }
 
+        Vector2 halfSize = playerCollider.bounds.extents;
+        Vector2 offset = playerCollider.offset;
+
+        // 직사각형 맵 경계 처리
+        if (CurrentMapBoundary != null)
+        {
             float playerBottomY = newPos.y + (offset.y - halfSize.y);
             float playerTopY = newPos.y + (offset.y + halfSize.y);
 
@@ -57,48 +66,81 @@ public class PlayerMove : MonoBehaviour
             }
         }
 
-        // 위치 이동
+        // 원형 경계 처리
+        if (CurrentCircularBoundary != null)
+        {
+            Vector2 center = CurrentCircularBoundary.center;
+            float radius = CurrentCircularBoundary.radius;
+
+            Vector2 playerPos2D = new Vector2(newPos.x, newPos.y);
+
+            float dist = Vector2.Distance(playerPos2D, center);
+            float allowedRadius = radius - Mathf.Max(halfSize.x, halfSize.y);
+
+            if (dist > allowedRadius)
+            {
+                Vector2 dir = (playerPos2D - center).normalized;
+                Vector2 correctedPos = center + dir * allowedRadius;
+                newPos.x = correctedPos.x;
+                newPos.y = correctedPos.y;
+            }
+        }
+
         transform.position = newPos;
 
-        // 애니메이션 처리
         bool isWalking = input.sqrMagnitude > 0.01f;
         animator?.SetBool("IsWalk", isWalking);
 
-        // 캐릭터 방향 전환
         if (input.x > 0.01f)
-        {
             transform.localScale = new Vector3(-1, 1, 1);
-        }
         else if (input.x < -0.01f)
-        {
             transform.localScale = new Vector3(1, 1, 1);
-        }
     }
 
-    void UpdateCurrentMapBoundary()
+    void UpdateCurrentBoundaries()
     {
         int mapLayerMask = LayerMask.GetMask("Map");
-        Collider2D mapCollider = Physics2D.OverlapPoint(transform.position, mapLayerMask);
 
-        MapBoundary newBoundary = mapCollider != null ? mapCollider.GetComponent<MapBoundary>() : null;
+        Collider2D[] colliders = Physics2D.OverlapPointAll(transform.position, mapLayerMask);
 
-        if (newBoundary != CurrentMapBoundary)
+        MapBoundary foundMapBoundary = null;
+        CircularMapBoundary foundCircularBoundary = null;
+
+        foreach (var col in colliders)
         {
-            CurrentMapBoundary = newBoundary;
+            if (foundMapBoundary == null)
+                foundMapBoundary = col.GetComponent<MapBoundary>();
+            if (foundCircularBoundary == null)
+                foundCircularBoundary = col.GetComponent<CircularMapBoundary>();
 
-            if (cameraFollow != null)
-            {
-                cameraFollow.AdjustCameraSizeToMap();
-            }
+            if (foundMapBoundary != null && foundCircularBoundary != null)
+                break;
+        }
+
+        bool changed = false;
+
+        if (foundMapBoundary != CurrentMapBoundary)
+        {
+            CurrentMapBoundary = foundMapBoundary;
+            changed = true;
+        }
+
+        if (foundCircularBoundary != CurrentCircularBoundary)
+        {
+            CurrentCircularBoundary = foundCircularBoundary;
+            changed = true;
+        }
+
+        if (changed && cameraFollow != null)
+        {
+            cameraFollow.AdjustCameraSizeToMap();
         }
     }
-
 
     public void Warp(float x, float y)
     {
         transform.position = new Vector2(x, y);
-
-        UpdateCurrentMapBoundary();
+        UpdateCurrentBoundaries();
 
         if (cameraFollow != null)
         {
@@ -111,5 +153,8 @@ public class PlayerMove : MonoBehaviour
         CurrentMapBoundary = boundary;
     }
 
-
+    public void SetCurrentCircularBoundary(CircularMapBoundary boundary)
+    {
+        CurrentCircularBoundary = boundary;
+    }
 }

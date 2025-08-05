@@ -9,6 +9,7 @@ TagManager:
   - Item
   - Wall
   - RicochetPlatform
+  - LayerTrigger
   layers:
   - Default
   - TransparentFX
