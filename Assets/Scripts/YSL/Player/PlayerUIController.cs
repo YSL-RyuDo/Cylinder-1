@@ -14,6 +14,9 @@ public class PlayerUIController : MonoBehaviour
     [Header("탭 관련 버튼들")]
     public RectTransform[] tabButtons;
 
+    [Header("탭 버튼에 대응하는 패널들 (아이템, 맵, 세이브, 퀘스트 등)")]
+    public GameObject[] tabPanels;
+
     [Header("선택선 이동 위치 (X 좌표)")]
     public float selectedOffsetX = -625f;
 
@@ -68,6 +71,7 @@ public class PlayerUIController : MonoBehaviour
                 });
             }
 
+            // 초기 선택 탭
             SelectButton(0);
         }
     }
@@ -179,6 +183,19 @@ public class PlayerUIController : MonoBehaviour
 
             tabButtons[i].DOKill();
             tabButtons[i].DOAnchorPos(targetPos, selectorMoveDuration).SetEase(Ease.OutCubic);
+        }
+
+        ShowOnlySelectedPanel(index);
+    }
+
+    void ShowOnlySelectedPanel(int index)
+    {
+        if (tabPanels == null || index < 0 || index >= tabPanels.Length)
+            return;
+
+        for (int i = 0; i < tabPanels.Length; i++)
+        {
+            tabPanels[i].SetActive(i == index);
         }
     }
 }
