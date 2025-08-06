@@ -3,11 +3,11 @@ using UnityEngine;
 
 public class menuButtonHandler : MonoBehaviour
 {
-    public menudial menuDial; // menudial 스크립트 참조
+    public menudial menuDial;
 
     public void OnMenuButtonClick()
     {
-        int selectedIndex = menuDial.SelectedIndex; // 선택된 인덱스 받기
+        int selectedIndex = menuDial.SelectedIndex;
 
         switch (selectedIndex)
         {
@@ -17,11 +17,9 @@ public class menuButtonHandler : MonoBehaviour
                 break;
             case 1:
                 Debug.Log("이어오기");
-                // 이어오기 처리
                 break;
             case 3:
                 Debug.Log("메뉴 창 열기");
-                // 설정 UI 활성화
                 break;
             case 5:
                 Debug.Log("게임 종료");

@@ -33,12 +33,10 @@ public class CameraFollow : MonoBehaviour
 
         if (circularBoundary != null)
         {
-            // 무조건 고정 좌표로 이동
             transform.position = new Vector3(150f, 230f, transform.position.z);
             return;
         }
 
-        // 이하 mapBoundary 처리
         Vector3 targetPos = target.position;
         Vector3 newPos = targetPos;
 
@@ -87,18 +85,6 @@ public class CameraFollow : MonoBehaviour
             newPos = new Vector3(150f, 230f, transform.position.z);
             transform.position = newPos;
             return;
-            //float mapMinX = circularBoundary.center.x - circularBoundary.radius;
-            //float mapMaxX = circularBoundary.center.x + circularBoundary.radius;
-            //float mapMinY = circularBoundary.center.y - circularBoundary.radius;
-            //float mapMaxY = circularBoundary.center.y + circularBoundary.radius;
-
-            //float clampedMinX = mapMinX + Mathf.Min(camRadiusX, circularBoundary.radius);
-            //float clampedMaxX = mapMaxX - Mathf.Min(camRadiusX, circularBoundary.radius);
-            //float clampedMinY = mapMinY + Mathf.Min(camRadiusY, circularBoundary.radius);
-            //float clampedMaxY = mapMaxY - Mathf.Min(camRadiusY, circularBoundary.radius);
-
-            //newPos.x = Mathf.Clamp(pos.x, clampedMinX, clampedMaxX);
-            //newPos.y = Mathf.Clamp(pos.y, clampedMinY, clampedMaxY);
         }
         else if (mapBoundary != null)
         {

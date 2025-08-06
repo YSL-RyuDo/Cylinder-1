@@ -14,7 +14,7 @@ public class LibraryPuzzlePanel : MonoBehaviour
 
     [Header("Timing")]
     [SerializeField] private float glowDelay = 1.2f;
-    [SerializeField] private float rotateDuration = 30f; // 회전 시간만 조절하면 속도 조절 가능
+    [SerializeField] private float rotateDuration = 30f;
     private int rotationDoneCount = 0;
     private void OnEnable()
     {
@@ -76,7 +76,6 @@ public class LibraryPuzzlePanel : MonoBehaviour
             if (AllCorrect())
             {
                 resultText.text = "<color=green>Clear</color>";
-                // Clear 로직 추가
             }
             else
             {

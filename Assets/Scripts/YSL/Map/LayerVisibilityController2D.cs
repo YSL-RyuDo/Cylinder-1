@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class LayerVisibilityController2D : MonoBehaviour
 {
-    public PlayerLayerController playerLayerController; // 플레이어의 현재 층 정보
-    public GameObject[] layers; // 층별 오브젝트들
+    public PlayerLayerController playerLayerController;
+    public GameObject[] layers;
 
     void Update()
     {
@@ -30,7 +30,6 @@ public class LayerVisibilityController2D : MonoBehaviour
             end = current + 2;
         }
 
-        // 범위 클램프
         start = Mathf.Clamp(start, 0, layers.Length - 1);
         end = Mathf.Clamp(end, 0, layers.Length - 1);
 

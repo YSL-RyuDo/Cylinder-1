@@ -36,7 +36,6 @@ public class CircularMapBoundary : MonoBehaviour
 
         Vector2 internalCenter = (min + max) * 0.5f;
 
-        // center가 (0,0)이라면 내부 계산값 사용, 아니면 외부 할당값 유지
         if (center == Vector2.zero)
         {
             center = internalCenter;

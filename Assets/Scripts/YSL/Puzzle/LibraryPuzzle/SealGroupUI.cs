@@ -88,7 +88,7 @@ public class SealGroupUI : MonoBehaviour
         if (markInstance != null)
             Destroy(markInstance.gameObject);
 
-        Transform parent = panel.transform;  // 여기서 LibraryPuzzlePanel의 transform 사용
+        Transform parent = panel.transform;
         markInstance = Instantiate(markPrefab, parent);
 
         var rt = markInstance.rectTransform;

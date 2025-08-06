@@ -1,21 +1,35 @@
 using UnityEngine;
 using DG.Tweening;
 using System.Collections;
+using UnityEngine.UI;
 
 public class PlayerUIController : MonoBehaviour
 {
+    [Header("메뉴 패널 관련")]
     public GameObject menuPanel;
     public RectTransform menuBookCover;
     private CanvasGroup menuCanvasGroup;
+    public Button closeButton;
 
+    [Header("탭 관련 버튼들")]
+    public RectTransform[] tabButtons;
+
+    [Header("선택선 이동 위치 (X 좌표)")]
+    public float selectedOffsetX = -625f;
+
+    [Header("북커버 애니메이션")]
     public float slideDuration = 0.5f;
     public float fadeDuration = 0.3f;
+    public float selectorMoveDuration = 0.3f;
 
     private Vector2 hiddenPosition = new Vector2(0, -1000);
     private Vector2 visiblePosition = new Vector2(0, 0);
 
+    private Vector2[] originalPositions;
+
     private bool isMenuOpen = false;
-    private bool isAnimating = false; // 애니메이션 진행 중 체크 변수
+    private bool isAnimating = false;
+    private int selectedButtonIndex = 0;
 
     void Start()
     {
@@ -26,20 +40,43 @@ public class PlayerUIController : MonoBehaviour
             if (menuCanvasGroup == null)
                 menuCanvasGroup = menuPanel.AddComponent<CanvasGroup>();
 
-            menuCanvasGroup.alpha = 0f;  // 처음에 완전 투명
+            menuCanvasGroup.alpha = 0f;
             menuCanvasGroup.interactable = false;
             menuCanvasGroup.blocksRaycasts = false;
         }
 
         if (menuBookCover != null)
             menuBookCover.anchoredPosition = hiddenPosition;
+
+        if (closeButton != null)
+            closeButton.onClick.AddListener(OnCloseButtonClicked);
+
+        if (tabButtons != null && tabButtons.Length > 0)
+        {
+            originalPositions = new Vector2[tabButtons.Length];
+            for (int i = 0; i < tabButtons.Length; i++)
+            {
+                originalPositions[i] = tabButtons[i].anchoredPosition;
+
+                int index = i;
+                tabButtons[i].GetComponent<Button>().onClick.AddListener(() =>
+                {
+                    if (!isAnimating)
+                    {
+                        SelectButton(index);
+                    }
+                });
+            }
+
+            SelectButton(0);
+        }
     }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Q))
         {
-            if (!isAnimating)  // 애니메이션 중이 아니면 토글 가능
+            if (!isAnimating)
             {
                 ToggleMenu();
             }
@@ -71,14 +108,12 @@ public class PlayerUIController : MonoBehaviour
         menuBookCover.DOKill();
         menuBookCover.anchoredPosition = hiddenPosition;
 
-        // CanvasGroup 초기 상태 세팅
         menuCanvasGroup.alpha = 0f;
         menuCanvasGroup.interactable = true;
         menuCanvasGroup.blocksRaycasts = true;
 
-        yield return null; // 한 프레임 대기
+        yield return null;
 
-        // 위치 애니메이션 + 페이드인 동시 실행
         Tween moveTween = menuBookCover.DOAnchorPos(visiblePosition, slideDuration).SetEase(Ease.OutCubic);
         Tween fadeTween = menuCanvasGroup.DOFade(1f, fadeDuration).SetEase(Ease.Linear);
 
@@ -104,14 +139,12 @@ public class PlayerUIController : MonoBehaviour
                 if (!fadeStarted && menuBookCover.anchoredPosition.y <= -500f)
                 {
                     fadeStarted = true;
-                    // 페이드 아웃 시작
                     menuCanvasGroup.DOFade(0f, fadeDuration).SetEase(Ease.Linear);
                 }
             });
 
         yield return moveTween.WaitForCompletion();
 
-        // 페이드 아웃이 끝나지 않았을 수도 있으니 확실히 기다리기
         while (menuCanvasGroup.alpha > 0.01f)
             yield return null;
 
@@ -122,4 +155,30 @@ public class PlayerUIController : MonoBehaviour
         isAnimating = false;
     }
 
+    void OnCloseButtonClicked()
+    {
+        if (!isAnimating && isMenuOpen)
+        {
+            isMenuOpen = false;
+            StartCoroutine(CloseMenuRoutine());
+        }
+    }
+
+    void SelectButton(int index)
+    {
+        selectedButtonIndex = index;
+
+        for (int i = 0; i < tabButtons.Length; i++)
+        {
+            Vector2 targetPos = originalPositions[i];
+
+            if (i == selectedButtonIndex)
+            {
+                targetPos.x = selectedOffsetX;
+            }
+
+            tabButtons[i].DOKill();
+            tabButtons[i].DOAnchorPos(targetPos, selectorMoveDuration).SetEase(Ease.OutCubic);
+        }
+    }
 }

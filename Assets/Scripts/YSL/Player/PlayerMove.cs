@@ -43,7 +43,6 @@ public class PlayerMove : MonoBehaviour
         Vector2 halfSize = playerCollider.bounds.extents;
         Vector2 offset = playerCollider.offset;
 
-        // 직사각형 맵 경계 처리
         if (CurrentMapBoundary != null)
         {
             float playerBottomY = newPos.y + (offset.y - halfSize.y);
@@ -66,7 +65,6 @@ public class PlayerMove : MonoBehaviour
             }
         }
 
-        // 원형 경계 처리
         if (CurrentCircularBoundary != null)
         {
             Vector2 center = CurrentCircularBoundary.center;

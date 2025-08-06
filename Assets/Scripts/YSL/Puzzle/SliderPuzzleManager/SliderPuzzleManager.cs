@@ -6,14 +6,14 @@ using UnityEngine.UI;
 public class SliderPuzzleManager : MonoBehaviour
 {
     [Header("UI Settings")]
-    public RectTransform boardRoot;       // 퍼즐 보드 UI 부모
-    public float tileSize = 100f;          // 셀 크기 (픽셀)
+    public RectTransform boardRoot;
+    public float tileSize = 100f;
 
     [Header("Tile Prefabs")]
-    public TilePrefabs tilePrefabs;       // 0,1,2,3,4 프리팹 + 플레이어(5)
+    public TilePrefabs tilePrefabs;
 
     [Header("CSV Map File")]
-    public TextAsset csvFile;              // CSV 파일 (숫자 맵)
+    public TextAsset csvFile;
 
     private int width;
     private int height;
@@ -22,7 +22,6 @@ public class SliderPuzzleManager : MonoBehaviour
     private Vector2Int goalPos;
     private RectTransform playerVisual;
 
-    // 부드러운 이동용 변수들
     private bool isMoving = false;
     private Vector2 moveStartPos;
     private Vector2 moveTargetPos;
@@ -33,7 +32,6 @@ public class SliderPuzzleManager : MonoBehaviour
 
     private void OnEnable()
     {
-        // 활성화 될 때마다 초기화
         InitializePuzzle();
     }
 
@@ -42,7 +40,6 @@ public class SliderPuzzleManager : MonoBehaviour
         LoadCSV();
         LoadMapFromCSV();
 
-        // 기존에 이미 생성된 타일, 플레이어가 있다면 삭제(필요하면)
         foreach (Transform child in boardRoot)
         {
             Destroy(child.gameObject);
@@ -74,8 +71,6 @@ public class SliderPuzzleManager : MonoBehaviour
             }
         }
     }
-
-    // CSV 파일 텍스트를 한 줄씩 읽어 리스트에 저장
     private void LoadCSV()
     {
         mapLines.Clear();
@@ -113,14 +108,14 @@ public class SliderPuzzleManager : MonoBehaviour
                 if (!int.TryParse(cells[x], out tileValue))
                 {
                     Debug.LogWarning($"맵 데이터 파싱 실패: {cells[x]} (위치 {x},{y})");
-                    tileValue = 1; // 기본 1 (못가는 곳) 처리
+                    tileValue = 1;
                 }
 
                 grid[y, x] = tileValue;
 
-                if (tileValue == 3) // 3 : A 시작 위치
+                if (tileValue == 3)
                     playerPos = new Vector2Int(x, y);
-                else if (tileValue == 4) // 4 : B 도착 위치
+                else if (tileValue == 4)
                     goalPos = new Vector2Int(x, y);
             }
         }
@@ -168,7 +163,7 @@ public class SliderPuzzleManager : MonoBehaviour
 
     public void TryMove(Vector2Int dir)
     {
-        if (isMoving) return; // 이동 중이면 무시
+        if (isMoving) return;
 
         Vector2Int newPos = Slide(playerPos, dir);
         if (newPos == playerPos) return;
@@ -192,7 +187,7 @@ public class SliderPuzzleManager : MonoBehaviour
             if (next.x < 0 || next.x >= width || next.y < 0 || next.y >= height)
                 break;
 
-            if (grid[next.y, next.x] == 1 || grid[next.y, next.x] == 2) // 못가는 곳: X(1), C(2)
+            if (grid[next.y, next.x] == 1 || grid[next.y, next.x] == 2)
                 break;
 
             cur = next;

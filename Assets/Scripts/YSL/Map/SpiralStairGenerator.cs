@@ -25,11 +25,10 @@ public class RepeatingAnglesStairs : MonoBehaviour
                 sr.sortingOrder = i;
         }
 
-        // 중심 전달 후 경계 계산
         var boundary = GetComponent<CircularMapBoundary>();
         if (boundary != null)
         {
-            boundary.center = new Vector2(centerPosition.x, centerPosition.y); // 중요!!
+            boundary.center = new Vector2(centerPosition.x, centerPosition.y);
             boundary.CalculateBounds();
         }
     }
