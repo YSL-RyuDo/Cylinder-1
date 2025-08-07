@@ -1,0 +1,54 @@
+{
+  "personality_switch_fail_dialogues": [
+    {
+      "personality_id": 0,
+      "personality_name": "pure",
+      "lines": [
+        { "segments": ["이걸 시도하는 게 정말 현명한 걸까?"] },
+        { "segments": ["탄환도 없는데 왜 이렇게 무리하려 하는 거지?"] },
+        { "segments": ["아직 준비가 덜 된 것 같아. 다른 방법을 찾아보자."] },
+        { "segments": ["거의 불가능한 일인데 왜 포기하지 않는 걸까?"] }
+      ]
+    },
+    {
+      "personality_id": 1,
+      "personality_name": "lack",
+      "lines": [
+        { "segments": ["야, 탄환도 없는데 왜 또 이러는 거야!"] },
+        { "segments": ["무리하지 말라고! 이거 거의 안 되는 거야!"] },
+        { "segments": ["아무리 해도 안 돼! 그만두라고!"] },
+        { "segments": ["이게 무슨 소용이야? 난 반대야!"] }
+      ]
+    },
+    {
+      "personality_id": 2,
+      "personality_name": "desire",
+      "lines": [
+        { "segments": ["이런 상황에서 시도하는 게 무모한 걸까?"] },
+        { "segments": ["탄환이 없는데, 그래도 해보고 싶다니… 신기하네."] },
+        { "segments": ["대단한 열망이긴 한데, 좀 현실적이었으면 좋겠어."] },
+        { "segments": ["포기하지 않는 마음은 좋지만, 이건 너무 힘들어."] }
+      ]
+    },
+    {
+      "personality_id": 3,
+      "personality_name": "grief",
+      "lines": [
+        { "segments": ["또 실패할 게 뻔한데 왜 자꾸 무리하려고 하는 거야..."] },
+        { "segments": ["탄환도 없고, 정말 할 수 있는 게 아무것도 없어."] },
+        { "segments": ["그냥 포기하는 게 낫지 않을까? 너무 힘들어."] },
+        { "segments": ["이렇게 애쓰는 게 슬퍼질 뿐이야..."] }
+      ]
+    },
+    {
+      "personality_id": 4,
+      "personality_name": "arrogance",
+      "lines": [
+        { "segments": ["뭐? 탄환도 없는데 이걸 시도한다고?"] },
+        { "segments": ["바보 같은 짓을 하지 마. 이건 거의 불가능해."] },
+        { "segments": ["내가 보기엔 시간 낭비일 뿐이야. 그만둬."] },
+        { "segments": ["실패할 거 뻔히 알면서 왜 고집을 부리는 거지?"] }
+      ]
+    }
+  ]
+}

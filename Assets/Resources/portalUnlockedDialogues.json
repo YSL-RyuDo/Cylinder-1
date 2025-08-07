@@ -1,0 +1,49 @@
+{
+  "portal_unlocked_dialogues": [
+    {
+      "personality_id": 0,
+      "personality_name": "pure",
+      "lines": [
+        { "segments": ["문이 열렸어! 들어가도 될까?"] },
+        { "segments": ["이제 통과할 수 있겠네."] },
+        { "segments": ["좋아, 다음 단계로 가보자!"] }
+      ]
+    },
+    {
+      "personality_id": 1,
+      "personality_name": "lack",
+      "lines": [
+        { "segments": ["열렸다! 이제 들어가자!"] },
+        { "segments": ["후후, 드디어 문이 열렸네."] },
+        { "segments": ["어서 안으로!"] }
+      ]
+    },
+    {
+      "personality_id": 2,
+      "personality_name": "desire",
+      "lines": [
+        { "segments": ["와, 마법이 통했어!"] },
+        { "segments": ["기회가 왔어, 바로 들어가자."] },
+        { "segments": ["새로운 모험이 시작된다!"] }
+      ]
+    },
+    {
+      "personality_id": 3,
+      "personality_name": "grief",
+      "lines": [
+        { "segments": ["문이 열렸구나..."] },
+        { "segments": ["조심스럽게 들어가야겠다."] },
+        { "segments": ["뭔가 불안하지만 가보자."] }
+      ]
+    },
+    {
+      "personality_id": 4,
+      "personality_name": "arrogance",
+      "lines": [
+        { "segments": ["후, 결국 열렸군."] },
+        { "segments": ["내 실력 덕분이지."] },
+        { "segments": ["어서 들어가보자."] }
+      ]
+    }
+  ]
+}

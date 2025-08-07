@@ -10,6 +10,7 @@ TagManager:
   - Wall
   - RicochetPlatform
   - LayerTrigger
+  - Puzzle
   layers:
   - Default
   - TransparentFX

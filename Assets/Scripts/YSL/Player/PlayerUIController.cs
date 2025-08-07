@@ -34,6 +34,27 @@ public class PlayerUIController : MonoBehaviour
     private bool isAnimating = false;
     private int selectedButtonIndex = 0;
 
+    public static PlayerUIController Instance { get; private set; }
+
+    // 포탈 연동 관련
+    private PortalTrigger currentPortal = null;
+    private bool isPortalMode = false;
+
+    // **아이템 사용 요청 관련 변수 추가**
+    private bool hasRequestedUnlock = false;
+    private int requestedItemId = -1;
+
+    public bool IsPortalMode => isPortalMode;
+    public PortalTrigger CurrentPortal => currentPortal;
+
+    private void Awake()
+    {
+        if (Instance == null)
+            Instance = this;
+        else
+            Destroy(gameObject);
+    }
+
     void Start()
     {
         if (menuPanel != null)
@@ -71,7 +92,6 @@ public class PlayerUIController : MonoBehaviour
                 });
             }
 
-            // 초기 선택 탭
             SelectButton(0);
         }
     }
@@ -101,8 +121,22 @@ public class PlayerUIController : MonoBehaviour
         }
     }
 
+    public void CloseMenu()
+    {
+        if (!isAnimating && isMenuOpen)
+        {
+            isMenuOpen = false;
+            StartCoroutine(CloseMenuRoutine());
+        }
+    }
+
     IEnumerator OpenMenuRoutine()
     {
+        if (selectedButtonIndex == 0)
+        {
+            InventoryUIManager.Instance.Refresh();
+        }
+
         isAnimating = true;
 
         menuPanel.SetActive(true);
@@ -156,6 +190,30 @@ public class PlayerUIController : MonoBehaviour
         menuCanvasGroup.blocksRaycasts = false;
         menuPanel.SetActive(false);
 
+        if (isPortalMode)
+        {
+            if (currentPortal != null)
+            {
+                if (!currentPortal.IsOpen)
+                {
+                    // 포탈 UI 닫힌 후 잠김 대사 출력
+                    currentPortal.OnPortalUIClosedWithoutUse();
+                }
+
+                // 아이템 사용 요청이 있을 때만 잠금 해제 시도
+                if (hasRequestedUnlock)
+                {
+                    currentPortal.TryUnlockPortalWithItem(requestedItemId);
+
+                    hasRequestedUnlock = false;
+                    requestedItemId = -1;
+                }
+            }
+
+            isPortalMode = false;
+            currentPortal = null;
+        }
+
         isAnimating = false;
     }
 
@@ -197,5 +255,30 @@ public class PlayerUIController : MonoBehaviour
         {
             tabPanels[i].SetActive(i == index);
         }
+
+        if (index == 0)
+        {
+            InventoryUIManager.Instance.Refresh();
+        }
+    }
+
+    public void OpenPortalMenu(PortalTrigger portal)
+    {
+        currentPortal = portal;
+        isPortalMode = true;
+
+        InventoryUIManager.Instance.SetPortalMode(true, portal);
+        if (!isAnimating && !isMenuOpen)
+        {
+            selectedButtonIndex = 0; // 인벤토리 탭 강제 선택
+            ToggleMenu();
+        }
+    }
+
+    // 공개용: 아이템 사용 요청 기록 함수 (InventoryUIManager와 연결 가능)
+    public void RequestPortalUnlock(int itemId)
+    {
+        hasRequestedUnlock = true;
+        requestedItemId = itemId;
     }
 }

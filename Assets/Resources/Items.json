@@ -1,0 +1,81 @@
+{
+  "items": [
+    {
+      "id": 0,
+      "itemName": "낡은 열쇠",
+      "description": "녹슨 자물쇠에 맞을 법한 오래된 열쇠. 지하실 입구 근처에서 발견됐다.",
+      "uses": 1,
+      "iconName": "rusty_key"
+    },
+    {
+      "id": 1,
+      "itemName": "의문의 메모",
+      "description": "반쯤 불에 탄 종이. '13번째 그림자'라는 문장이 희미하게 남아 있다.",
+      "uses": 1,
+      "iconName": "mystery_note"
+    },
+    {
+      "id": 2,
+      "itemName": "성냥",
+      "description": "남은 건 딱 한 개비. 어둠 속에 무언가를 밝혀야 할 때 사용될지도 모른다.",
+      "uses": 1,
+      "iconName": "match"
+    },
+    {
+      "id": 3,
+      "itemName": "부서진 시계",
+      "description": "시간이 멈춘 손목시계. 오후 3시 33분을 가리키고 있다.",
+      "uses": 1,
+      "iconName": "broken_watch"
+    },
+    {
+      "id": 4,
+      "itemName": "손전등",
+      "description": "건전지가 거의 다 닳았지만, 아직 쓸 수는 있다.",
+      "uses": 3,
+      "iconName": "flashlight"
+    },
+    {
+      "id": 5,
+      "itemName": "피묻은 손수건",
+      "description": "이름표가 떨어져 나간 손수건. 누군가의 흔적이 남아 있다.",
+      "uses": 1,
+      "iconName": "bloodied_handkerchief"
+    },
+    {
+      "id": 6,
+      "itemName": "고서",
+      "description": "고대 마법에 대한 기록이 담긴 책. 몇몇 페이지는 찢겨져 있다.",
+      "uses": 5,
+      "iconName": "ancient_book"
+    },
+    {
+      "id": 7,
+      "itemName": "수정 조각",
+      "description": "차가운 기운이 감도는 작은 결정. 빛에 따라 색이 변한다.",
+      "uses": 1,
+      "iconName": "crystal_fragment"
+    },
+    {
+      "id": 8,
+      "itemName": "수상한 병",
+      "description": "라벨이 없는 유리병. 안엔 파란 액체가 들어 있다.",
+      "uses": 2,
+      "iconName": "suspicious_bottle"
+    },
+    {
+      "id": 9,
+      "itemName": "열쇠 꾸러미",
+      "description": "서재, 창고, 지하실 등 여러 공간의 열쇠가 함께 묶여 있다.",
+      "uses": 10,
+      "iconName": "key_bundle"
+    },
+    {
+      "id": 10,
+      "itemName": "가족 사진",
+      "description": "먼지가 쌓인 액자 안에 옛날 가족사진. 낯선 얼굴이 섞여 있다.",
+      "uses": 1,
+      "iconName": "family_photo"
+    }
+  ]
+}

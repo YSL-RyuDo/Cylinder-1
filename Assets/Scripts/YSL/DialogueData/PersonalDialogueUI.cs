@@ -19,9 +19,9 @@ public class PersonalitySprite
     public Sprite defaultSprite;
 }
 
-public class PortalDialogueUI : MonoBehaviour
+public class PersonalDialogueUI : MonoBehaviour
 {
-    public static PortalDialogueUI Instance;
+    public static PersonalDialogueUI Instance;
 
     [Header("UI Components")]
     public GameObject dialoguePanel;

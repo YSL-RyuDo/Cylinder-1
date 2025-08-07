@@ -27,4 +27,24 @@ public class PortalManager : MonoBehaviour
         }
         return null;
     }
+
+    public int GetPortalIndex(GameObject portal)
+    {
+        for (int i = 0; i < portalPairs.Count; i++)
+        {
+            if (portalPairs[i].portalA == portal || portalPairs[i].portalB == portal)
+                return i;
+        }
+        return -1;
+    }
+
+    public void SetPortalActive(int portalIndex, bool active)
+    {
+        if (portalIndex < 0 || portalIndex >= portalPairs.Count)
+            return;
+
+        portalPairs[portalIndex].AtoB_Active = active;
+        portalPairs[portalIndex].BtoA_Active = active;
+    }
+
 }

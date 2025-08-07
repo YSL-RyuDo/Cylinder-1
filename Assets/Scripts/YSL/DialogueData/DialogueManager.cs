@@ -8,7 +8,16 @@ public class DialogueManager : MonoBehaviour
     private int currentIndex = 0;
     private bool isDialogueActive = false;
     private int currentPersonalityId = 0;
+    public static DialogueManager Instance { get; private set; }
+    public event System.Action OnDialogueEnded;
 
+    private void Awake()
+    {
+        if (Instance == null)
+            Instance = this;
+        else
+            Destroy(gameObject);
+    }
     public void StartDialogue(string[] segments, int personalityId)
     {
         currentSegments = segments;
@@ -22,7 +31,7 @@ public class DialogueManager : MonoBehaviour
     {
         if (currentIndex < currentSegments.Length)
         {
-            PortalDialogueUI.Instance.ShowDialogueSegment(currentSegments[currentIndex], currentPersonalityId);
+            PersonalDialogueUI.Instance.ShowDialogueSegment(currentSegments[currentIndex], currentPersonalityId);
         }
         else
         {
@@ -48,7 +57,9 @@ public class DialogueManager : MonoBehaviour
     private void EndDialogue()
     {
         isDialogueActive = false;
-        PortalDialogueUI.Instance.HideDialogue();
+        PersonalDialogueUI.Instance.HideDialogue();
+
+        OnDialogueEnded?.Invoke();  // 대사 종료 이벤트 호출
     }
 
     private void Update()
@@ -57,7 +68,7 @@ public class DialogueManager : MonoBehaviour
         {
             string currentText = currentSegments[currentIndex];
 
-            bool canGoNext = PortalDialogueUI.Instance.OnClickShowTextOrNext(currentText);
+            bool canGoNext = PersonalDialogueUI.Instance.OnClickShowTextOrNext(currentText);
             if (canGoNext)
             {
                 NextSegment();
