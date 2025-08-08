@@ -1,0 +1,25 @@
+{
+  "chapterName": "튜토리얼",
+  "events": [
+    {
+      "eventName": "게임시작",
+      "actions": [
+        {
+          "description": "",
+          "waitTime": 1.5
+        },
+        {
+          "description": "NPC와 대화 시작",
+          "waitTime": 0.5
+        },
+        {
+          "description": "카메라 줌인",
+          "waitTime": 0.5
+        }
+      ]
+    },
+    {
+      "eventName": "첫 번째 전투",
+    }
+  ]
+}

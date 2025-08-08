@@ -51,7 +51,16 @@ public class TalkManagerScript : MonoBehaviour, IPointerDownHandler
 
     DialogueNodeJSON LoadDialogueNode(string fileNameWithoutExtension)
     {
-        TextAsset ta = Resources.Load<TextAsset>($"Dialogues/{fileNameWithoutExtension}");
+        // 현재 챕터 경로 붙이기
+        string chapterPath = ChapterManager.instance.GetChapterPath();
+        string fullPath = $"Dialogues/{chapterPath}/{fileNameWithoutExtension}";
+
+        TextAsset ta = Resources.Load<TextAsset>(fullPath);
+        if (ta == null)
+        {
+            Debug.LogError($"[TalkManager] Dialogue file not found: {fullPath}");
+            return null;
+        }
         return JsonUtility.FromJson<DialogueNodeJSON>(ta.text);
     }
 
