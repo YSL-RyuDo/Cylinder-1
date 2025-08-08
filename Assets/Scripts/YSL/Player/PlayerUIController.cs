@@ -36,16 +36,20 @@ public class PlayerUIController : MonoBehaviour
 
     public static PlayerUIController Instance { get; private set; }
 
-    // 포탈 연동 관련
     private PortalTrigger currentPortal = null;
     private bool isPortalMode = false;
 
-    // **아이템 사용 요청 관련 변수 추가**
+    private PuzzleTrigger currentPuzzle = null;
+    private bool isPuzzleMode = false;
+
     private bool hasRequestedUnlock = false;
     private int requestedItemId = -1;
 
     public bool IsPortalMode => isPortalMode;
     public PortalTrigger CurrentPortal => currentPortal;
+
+    public bool IsPuzzleMode => isPuzzleMode;
+    public PuzzleTrigger CurrentPuzzle => currentPuzzle;
 
     private void Awake()
     {
@@ -214,6 +218,14 @@ public class PlayerUIController : MonoBehaviour
             currentPortal = null;
         }
 
+        if (isPuzzleMode)
+        {
+            // 퍼즐 모드 닫힐 때 처리할 내용 있으면 여기에 추가
+
+            isPuzzleMode = false;
+            currentPuzzle = null;
+        }
+
         isAnimating = false;
     }
 
@@ -266,8 +278,11 @@ public class PlayerUIController : MonoBehaviour
     {
         currentPortal = portal;
         isPortalMode = true;
+        isPuzzleMode = false;
 
         InventoryUIManager.Instance.SetPortalMode(true, portal);
+        InventoryUIManager.Instance.SetPuzzleMode(false, null);
+
         if (!isAnimating && !isMenuOpen)
         {
             selectedButtonIndex = 0; // 인벤토리 탭 강제 선택
@@ -275,7 +290,22 @@ public class PlayerUIController : MonoBehaviour
         }
     }
 
-    // 공개용: 아이템 사용 요청 기록 함수 (InventoryUIManager와 연결 가능)
+    public void OpenPuzzleMenu(PuzzleTrigger puzzle)
+    {
+        currentPuzzle = puzzle;
+        isPuzzleMode = true;
+        isPortalMode = false;
+
+        InventoryUIManager.Instance.SetPuzzleMode(true, puzzle);
+        InventoryUIManager.Instance.SetPortalMode(false, null);
+
+        if (!isAnimating && !isMenuOpen)
+        {
+            selectedButtonIndex = 0; // 인벤토리 탭 강제 선택
+            ToggleMenu();
+        }
+    }
+
     public void RequestPortalUnlock(int itemId)
     {
         hasRequestedUnlock = true;

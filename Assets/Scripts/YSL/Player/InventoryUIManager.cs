@@ -10,13 +10,14 @@ public class InventoryUIManager : MonoBehaviour
     public GameObject itemUIPrefab;
     public Transform contentParent;
 
-    public InventorySelectionUI selectionUI;  // 선택 UI 참조
+    public InventorySelectionUI selectionUI;
     public int CurrentItemId { get; private set; } = -1;
+
     private bool isPortalMode = false;
     private PortalTrigger portalForUse = null;
 
-    // **아이템 사용 요청 관련 변수는 PlayerUIController에 있으므로 여기서는 기록하지 않음**
-
+    private bool isPuzzleMode = false;
+    private PuzzleTrigger currentPuzzleTrigger;
     private void Awake()
     {
         if (Instance == null)
@@ -29,6 +30,22 @@ public class InventoryUIManager : MonoBehaviour
     {
         isPortalMode = enabled;
         portalForUse = portal;
+
+        if (enabled)
+            Debug.Log("인벤토리: 포탈 모드 활성화");
+        else
+            Debug.Log("인벤토리: 포탈 모드 비활성화");
+    }
+
+    public void SetPuzzleMode(bool enabled, PuzzleTrigger trigger)
+    {
+        isPuzzleMode = enabled;
+        currentPuzzleTrigger = trigger;
+
+        if (enabled)
+            Debug.Log("인벤토리: 퍼즐 모드 활성화");
+        else
+            Debug.Log("인벤토리: 퍼즐 모드 비활성화");
     }
 
     public void Refresh()
@@ -58,7 +75,7 @@ public class InventoryUIManager : MonoBehaviour
             TMP_Text nameText = go.transform.Find("ItemNameText").GetComponent<TMP_Text>();
             nameText.text = data.itemName;
 
-            // 클릭 이벤트 추가 (Button 컴포넌트 필요)
+            // 클릭 이벤트 추가
             Button btn = go.GetComponent<Button>();
             if (btn != null)
             {
@@ -74,24 +91,27 @@ public class InventoryUIManager : MonoBehaviour
         selectionUI.Hide();
     }
 
-    // 아이템 사용 시도 함수
     public void TryUseSelectedItem(int itemId)
     {
+        Debug.Log($"TryUseSelectedItem 호출 - isPuzzleMode: {isPuzzleMode}, currentPuzzleTrigger: {currentPuzzleTrigger}");
+
         if (isPortalMode && portalForUse != null)
         {
-            // PlayerUIController에 아이템 사용 요청 신호 전달
             PlayerUIController.Instance.RequestPortalUnlock(itemId);
-
-            // 인벤토리 UI 닫기 (UI 닫힘 시 아이템 잠금 해제 시도 코루틴 안에서 처리)
             PlayerUIController.Instance.CloseMenu();
-
-            // 포탈 모드 초기화는 UI 닫히는 코루틴에서 처리
+        }
+        else if (isPuzzleMode && currentPuzzleTrigger != null)
+        {
+            currentPuzzleTrigger.TryUseItemOnPuzzle(itemId);
+            PlayerUIController.Instance.CloseMenu();
+            Debug.Log($"퍼즐 모드에서 아이템 {itemId} 사용 시도");
         }
         else
         {
-            Debug.Log($"아이템 {itemId} 사용 시도 (포탈 모드 아님)");
+            Debug.Log($"아이템 {itemId} 사용 시도 (일반 모드)");
         }
     }
+
 
     public void ClearItemInfoUI()
     {

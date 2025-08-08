@@ -32,13 +32,33 @@ public class PlayerMove : MonoBehaviour
         Vector3 moveDelta = new Vector3(input.x, input.y, 0) * moveSpeed * Time.deltaTime;
         Vector3 newPos = transform.position + moveDelta;
 
-        UpdateCurrentBoundaries();
-
-        if (playerCollider == null)
+        // 충돌 체크
+        if (playerCollider != null)
         {
-            transform.position = newPos;
-            return;
+            // BoxCollider 크기 및 위치 기반 이동 위치에서 겹치는 콜라이더 검사
+            Collider2D[] hits = Physics2D.OverlapBoxAll(
+                newPos + (Vector3)playerCollider.offset,  // 새 위치 + 콜라이더 오프셋
+                playerCollider.size,
+                0f);
+
+            bool blocked = false;
+            foreach (var hit in hits)
+            {
+                if (hit != null && hit.gameObject != gameObject && hit.CompareTag("Obstacle"))
+                {
+                    blocked = true;
+                    break;
+                }
+            }
+
+            if (blocked)
+            {
+                // 장애물이 있어서 이동하지 않음
+                newPos = transform.position;
+            }
         }
+
+        UpdateCurrentBoundaries();
 
         Vector2 halfSize = playerCollider.bounds.extents;
         Vector2 offset = playerCollider.offset;

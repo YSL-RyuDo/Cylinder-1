@@ -10,6 +10,8 @@ public class DialogueDatas
 
     public List<PersonalitySwitchFailDialogue> personality_switch_fail_dialogues;
     public List<PersonalitySwitchSuccessDialogue> personality_switch_success_dialogues;
+
+    public List<SurgeryRoomEnter0Dialogues> surgery_room_enter_dialogues;
 }
 
 [Serializable]
@@ -44,6 +46,13 @@ public class PersonalitySwitchSuccessDialogue
     public List<DialogueLine> lines;
 }
 
+[Serializable]
+public class SurgeryRoomEnter0Dialogues
+{
+    public int personality_id;
+    public string personality_name;
+    public List<DialogueLine> lines;
+}
 
 [Serializable]
 public class DialogueLine

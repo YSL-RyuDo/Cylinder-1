@@ -10,6 +10,9 @@ public class DialogueLoader : MonoBehaviour
     private Dictionary<int, List<List<string>>> personalitySwitchFailDialogueDict = new Dictionary<int, List<List<string>>>();
     private Dictionary<int, List<List<string>>> personalitySwitchSuccessDialogueDict = new Dictionary<int, List<List<string>>>();
 
+    // 수술실 진입 대사는 대사 한 개만 있으니 딕셔너리에 string[]로 저장
+    private Dictionary<int, string[]> surgeryRoomEnterDialogueDict = new Dictionary<int, string[]>();
+
     private void Awake()
     {
         if (Instance == null)
@@ -95,7 +98,7 @@ public class DialogueLoader : MonoBehaviour
             }
         }
 
-        // 성공 대사 로드 (추가)
+        // 성공 대사 로드
         TextAsset successJsonText = Resources.Load<TextAsset>("PersonalitySwitchSuccessDialogues");
         if (successJsonText == null)
         {
@@ -117,10 +120,29 @@ public class DialogueLoader : MonoBehaviour
                 }
             }
         }
+
+
+        TextAsset surgeryJsonText = Resources.Load<TextAsset>("SurgeryRoomEnterDialogues");
+        if (surgeryJsonText == null)
+        {
+            Debug.LogError("SurgeryRoomEnterDialogues.json 파일을 Resources 폴더에 넣으세요.");
+        }
+        else
+        {
+            DialogueDatas surgeryData = JsonUtility.FromJson<DialogueDatas>(surgeryJsonText.text);
+            if (surgeryData.surgery_room_enter_dialogues != null)
+            {
+                foreach (var dlg in surgeryData.surgery_room_enter_dialogues)
+                {
+                    if (dlg.lines != null && dlg.lines.Count > 0)
+                    {
+                        surgeryRoomEnterDialogueDict[dlg.personality_id] = dlg.lines[0].segments.ToArray();
+                    }
+                }
+            }
+        }
     }
 
-
-    // 잠긴 포탈 대사 랜덤 추출
     public string[] GetRandomLockedPortalDialogueLines(int personalityId)
     {
         if (portalLockedDialogueDict.TryGetValue(personalityId, out var allLines) && allLines.Count > 0)
@@ -142,7 +164,7 @@ public class DialogueLoader : MonoBehaviour
         return new string[] { "..." };
     }
 
-    // 인격 전환 실패 대사 랜덤 추출 (추가)
+    // 인격 전환 실패 대사 랜덤 추출
     public string[] GetRandomPersonalitySwitchFailDialogueLines(int personalityId)
     {
         if (personalitySwitchFailDialogueDict.TryGetValue(personalityId, out var allLines) && allLines.Count > 0)
@@ -153,7 +175,7 @@ public class DialogueLoader : MonoBehaviour
         return new string[] { "..." };
     }
 
-    // 인격 전환 성공 대사 랜덤 추출 (추가)
+    // 인격 전환 성공 대사 랜덤 추출
     public string[] GetRandomPersonalitySwitchSuccessDialogueLines(int personalityId)
     {
         if (personalitySwitchSuccessDialogueDict.TryGetValue(personalityId, out var allLines) && allLines.Count > 0)
@@ -164,4 +186,13 @@ public class DialogueLoader : MonoBehaviour
         return new string[] { "..." };
     }
 
+    // 수술실 진입 대사 반환
+    public string[] GetSurgeryRoomEnterDialogue(int personalityId)
+    {
+        if (surgeryRoomEnterDialogueDict.TryGetValue(personalityId, out var line))
+        {
+            return line;
+        }
+        return new string[] { "..." };
+    }
 }
