@@ -108,9 +108,14 @@ public class PuzzleManager : MonoBehaviour
 
         if (InventoryUIManager.Instance != null)
             InventoryUIManager.Instance.SetPuzzleMode(true, trigger);
+
+        if (MagicManager.Instance != null)
+        {
+            MagicManager.Instance.SetPuzzleMode(true);
+            //MagicManager.Instance.OpenMagicPanel();
+        }
     }
 
-    // 수정: trigger 파라미터 추가
     public void ClosePuzzle(string id, PuzzleTrigger trigger)
     {
         PuzzleData data = GetPuzzle(id);
@@ -122,6 +127,13 @@ public class PuzzleManager : MonoBehaviour
 
         if (InventoryUIManager.Instance != null)
             InventoryUIManager.Instance.SetPuzzleMode(false, trigger);
+
+        if (MagicManager.Instance != null)
+        {
+            MagicManager.Instance.SetPuzzleMode(false);
+            MagicManager.Instance.CloseMagicPanel();
+            Debug.Log($"{id} 퍼즐 모드 종료");
+        }
 
         if (!data.isCleared)
             Debug.Log($"{id} 퍼즐 포기 처리됨");

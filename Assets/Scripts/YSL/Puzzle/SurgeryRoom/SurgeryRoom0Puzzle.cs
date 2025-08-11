@@ -57,11 +57,9 @@ public class SurgeryRoom0Puzzle : PuzzleTrigger
                 if (InventoryUIManager.Instance != null)
                     InventoryUIManager.Instance.SetPuzzleMode(true, this);
 
-                // 매직 매니저에 퍼즐 모드 켜고 매직 패널 열기
                 if (MagicManager.Instance != null)
                 {
                     MagicManager.Instance.SetPuzzleMode(true);
-                    //MagicManager.Instance.OpenMagicPanel();
                 }
 
                 // 대사 호출 추가 부분

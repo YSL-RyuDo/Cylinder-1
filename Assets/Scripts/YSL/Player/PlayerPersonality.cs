@@ -2,8 +2,18 @@ using UnityEngine;
 
 public class PlayerPersonality : MonoBehaviour
 {
+    public static PlayerPersonality Instance { get; private set; }
+
     [Header("현재 인격 상태")]
     public PersonalityType currentPersonality = PersonalityType.pure;
+
+    private void Awake()
+    {
+        if (Instance == null)
+            Instance = this;
+        else
+            Destroy(gameObject);
+    }
 
     public void SetPersonality(PersonalityType newType)
     {
