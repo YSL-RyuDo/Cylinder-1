@@ -26,46 +26,65 @@ public class PlayerMove : MonoBehaviour
 
     void Update()
     {
-        // 입력
         input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
         if (input.sqrMagnitude > 1) input = input.normalized;
 
-        // 이동 벡터
-        Vector3 moveDelta = new Vector3(input.x, input.y, 0) * moveSpeed * Time.deltaTime;
-        Vector3 newPos = transform.position + moveDelta;
+        Vector3 newPos = transform.position;
+        Vector3 delta = new Vector3(input.x, input.y, 0) * moveSpeed * Time.deltaTime;
 
-        // 충돌 체크
+        // X축 이동
+        Vector3 xMovePos = newPos + new Vector3(delta.x, 0, 0);
         if (playerCollider != null)
         {
-            Collider2D[] hits = Physics2D.OverlapBoxAll(
-                newPos + (Vector3)playerCollider.offset,
+            Collider2D[] xHits = Physics2D.OverlapBoxAll(
+                xMovePos + (Vector3)playerCollider.offset,
                 playerCollider.size,
                 0f);
 
-            bool blocked = false;
-            foreach (var hit in hits)
+            bool blockedX = false;
+            foreach (var hit in xHits)
             {
                 if (hit != null && hit.gameObject != gameObject && hit.CompareTag("Obstacle"))
                 {
-                    blocked = true;
+                    blockedX = true;
                     break;
                 }
             }
 
-            if (blocked)
-            {
-                newPos = transform.position;
-            }
+            if (!blockedX)
+                newPos.x = xMovePos.x;
         }
 
-        // 현재 맵 경계 업데이트
+        // Y축 이동
+        Vector3 yMovePos = new Vector3(newPos.x, newPos.y + delta.y, 0);
+        if (playerCollider != null)
+        {
+            Collider2D[] yHits = Physics2D.OverlapBoxAll(
+                yMovePos + (Vector3)playerCollider.offset,
+                playerCollider.size,
+                0f);
+
+            bool blockedY = false;
+            foreach (var hit in yHits)
+            {
+                if (hit != null && hit.gameObject != gameObject && hit.CompareTag("Obstacle"))
+                {
+                    blockedY = true;
+                    break;
+                }
+            }
+
+            if (!blockedY)
+                newPos.y = yMovePos.y;
+        }
+
         UpdateCurrentBoundaries();
 
-        // BoxCollider 크기(월드 단위)
-        Vector2 halfSize = playerCollider.bounds.extents;
-
+        // 박스콜라이더 크기 기준 맵 바운더리 제한
         if (CurrentMapBoundary != null)
         {
+            Vector2 halfSize = playerCollider.size / 2f;
+
             float minX = CurrentMapBoundary.min.x + halfSize.x;
             float maxX = CurrentMapBoundary.max.x - halfSize.x;
             float minY = CurrentMapBoundary.min.y + halfSize.y;
@@ -75,13 +94,14 @@ public class PlayerMove : MonoBehaviour
             newPos.y = Mathf.Clamp(newPos.y, minY, maxY);
         }
 
+        // 원형 바운더리 제한
         if (CurrentCircularBoundary != null)
         {
+            Vector2 halfSize = playerCollider.size / 2f;
             Vector2 center = CurrentCircularBoundary.center;
             float radius = CurrentCircularBoundary.radius;
 
             Vector2 playerPos2D = new Vector2(newPos.x, newPos.y);
-
             float dist = Vector2.Distance(playerPos2D, center);
             float allowedRadius = radius - Mathf.Max(halfSize.x, halfSize.y);
 
@@ -94,14 +114,11 @@ public class PlayerMove : MonoBehaviour
             }
         }
 
-        // 최종 위치 적용
         transform.position = newPos;
 
-        // 애니메이터 상태 갱신
         bool isWalking = input.sqrMagnitude > 0.01f;
         animator?.SetBool("IsWalk", isWalking);
 
-        // 방향 전환
         if (input.x > 0.01f)
             transform.localScale = new Vector3(-1, 1, 1);
         else if (input.x < -0.01f)
