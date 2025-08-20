@@ -26,18 +26,19 @@ public class PlayerMove : MonoBehaviour
 
     void Update()
     {
+        // 입력
         input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
         if (input.sqrMagnitude > 1) input = input.normalized;
 
+        // 이동 벡터
         Vector3 moveDelta = new Vector3(input.x, input.y, 0) * moveSpeed * Time.deltaTime;
         Vector3 newPos = transform.position + moveDelta;
 
         // 충돌 체크
         if (playerCollider != null)
         {
-            // BoxCollider 크기 및 위치 기반 이동 위치에서 겹치는 콜라이더 검사
             Collider2D[] hits = Physics2D.OverlapBoxAll(
-                newPos + (Vector3)playerCollider.offset,  // 새 위치 + 콜라이더 오프셋
+                newPos + (Vector3)playerCollider.offset,
                 playerCollider.size,
                 0f);
 
@@ -53,36 +54,25 @@ public class PlayerMove : MonoBehaviour
 
             if (blocked)
             {
-                // 장애물이 있어서 이동하지 않음
                 newPos = transform.position;
             }
         }
 
+        // 현재 맵 경계 업데이트
         UpdateCurrentBoundaries();
 
+        // BoxCollider 크기(월드 단위)
         Vector2 halfSize = playerCollider.bounds.extents;
-        Vector2 offset = playerCollider.offset;
 
         if (CurrentMapBoundary != null)
         {
-            float playerBottomY = newPos.y + (offset.y - halfSize.y);
-            float playerTopY = newPos.y + (offset.y + halfSize.y);
-
-            float mapMinY = CurrentMapBoundary.min.y;
-            float mapMaxY = CurrentMapBoundary.max.y;
-
             float minX = CurrentMapBoundary.min.x + halfSize.x;
             float maxX = CurrentMapBoundary.max.x - halfSize.x;
-            newPos.x = Mathf.Clamp(newPos.x, minX, maxX);
+            float minY = CurrentMapBoundary.min.y + halfSize.y;
+            float maxY = CurrentMapBoundary.max.y - halfSize.y;
 
-            if (playerBottomY < mapMinY)
-            {
-                newPos.y = mapMinY - (offset.y - halfSize.y);
-            }
-            else if (playerTopY > mapMaxY)
-            {
-                newPos.y = mapMaxY - (offset.y + halfSize.y);
-            }
+            newPos.x = Mathf.Clamp(newPos.x, minX, maxX);
+            newPos.y = Mathf.Clamp(newPos.y, minY, maxY);
         }
 
         if (CurrentCircularBoundary != null)
@@ -104,11 +94,14 @@ public class PlayerMove : MonoBehaviour
             }
         }
 
+        // 최종 위치 적용
         transform.position = newPos;
 
+        // 애니메이터 상태 갱신
         bool isWalking = input.sqrMagnitude > 0.01f;
         animator?.SetBool("IsWalk", isWalking);
 
+        // 방향 전환
         if (input.x > 0.01f)
             transform.localScale = new Vector3(-1, 1, 1);
         else if (input.x < -0.01f)
