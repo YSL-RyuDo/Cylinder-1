@@ -1,0 +1,35 @@
+﻿//해당 json은 어떤식으로 대화를 적는지 알려주기 위한 예시 용도
+{
+  "dialogues": [
+    {
+      "teller": "집사", //화자, 즉 현재 말하는 사람을 써두는 공간이다. 대화창의 이름 칸에 들어갈 내용
+      "sentence": "아가씨, 교주님께서 부르십니다.", // 대화내용
+      "leftSprite": "Ras_Standing_Affectionate_Standard", //좌측 이미지 이름을 정확히 기입한다. 해당 이미지들은 전부 Resoures 폴더 내의 Standings 안에 넣어야 적용되는 점 유의.
+      "rightSprite": "Butler_Standing_Standard", // 우측 이미지
+      "hasChoices": false, //선택지일 시 무조건 true로 해둔다.
+      "choices": [], //선택지가 없을 시 이렇게 아무것도 없이 바로 대괄호를 닫는다
+      "systemName": "", //시스템을 사용할 시 이 안에 해당 시스템 이름을 쓴다. 만약 시스템을 즉시 끄고싶은 경우 _OFF를 붙인다. ex) FadeOut_OFF 시 해당 이벤트를 즉시 종료한다.
+      "isNarration": false //현재 대화가 나레이션인지 구별하는 용도. true시 글자 색과 대화창이 색상이랑 디자인이 바뀐다.
+    },
+    {
+      "teller": "집사", //화자, 즉 현재 말하는 사람을 써두는 공간이다. 대화창의 이름 칸에 들어갈 내용
+      "sentence": "아가씨, 교주님께서 부르십니다.", // 대화내용
+      "leftSprite": "Ras_Standing_Affectionate_Standard", //좌측 이미지 이름을 정확히 기입한다. 해당 이미지들은 전부 Resoures 폴더 내의 Standings 안에 넣어야 적용되는 점 유의.
+      "rightSprite": "Butler_Standing_Standard", // 우측 이미지
+      "hasChoices": true, // 만약 선택지를 써야하는 경우 이렇게 true로 한다.
+      "choices": [
+        {
+          "choiceText": "선택지1", //선택지에 들어갈 대사. 예 아니오 같은걸 여기다 기입.
+          "nextFile": "NextDialogueNode_01" //이후 선택시 나올 대화내용을 json 확장자명을 빼고 그대로 기입한다. 예를들면 Butler_first_selection이라는 이름의 대화 json을 가져오고 싶으면 그대로 기입하면 된다.
+        },
+        {
+          "choiceText": "선택지2",
+          "nextFile": "NextDialogueNode_02"
+        }
+      ],
+      "systemName": "FadeOut",
+      "isNarration": true
+    }
+
+  ]
+}

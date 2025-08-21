@@ -1,0 +1,14 @@
+{
+  "player": {
+    "name": "∂Û¡Ó",
+    "position": {
+      "x": 0,
+      "y": 0
+    },
+    "inventory": [ "" ]
+  },
+  "storyFlags": {
+    "chapter1Started": true,
+    "foundSecretRoom": false
+  }
+}

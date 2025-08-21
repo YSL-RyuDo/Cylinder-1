@@ -32,15 +32,14 @@ public class PlayerScript : MonoBehaviour
     [SerializeField] private GameObject npcIconPrefab;
     [SerializeField] private GameObject itemIconPrefab;
     //대화중인지 감지하기 위함
-    public DialogueNode dialogueNode;
     public enum identityType
     {
         None,
-        affectionate,
-        Sensitive,
-        Depression,
-        Reserved,
-        Curious
+        Pure,
+        Lack,
+        Desire,
+        Grief,
+        Arrogance
     }
 
     [System.Serializable]
@@ -164,6 +163,11 @@ public class PlayerScript : MonoBehaviour
         }
         bool isWalking = movement.sqrMagnitude > 0.01f;
         animator.SetBool("IsWalk", isWalking);
+        if (isWalking)
+        {
+            animator.SetFloat("WalkDirX", movement.x);
+            animator.SetFloat("WalkDirY", movement.y);
+        }
     }
 
     //문, 워프 같은것을 위해 만든 함수, x y값을 입력받아 해당 위치로 player의 위치를 즉시 이동시킴

@@ -1,0 +1,34 @@
+﻿{
+  "dialogues": [
+    {
+      "teller": "집사",
+      "sentence": "아가씨, 교주님께서 부르십니다.",
+      "leftSprite": "Ras_Standing_Affectionate_Standard",
+      "rightSprite": "Butler_Standing_Standard",
+      "hasChoices": false,
+      "choices": [],
+      "systemName": "",
+      "isNarration": false
+    },
+    {
+      "teller": "라즈",
+      "sentence": "아버지께서..?",
+      "leftSprite": "Ras_Standing_Affectionate_Standard",
+      "rightSprite": "Butler_Standing_Standard",
+      "hasChoices": false,
+      "choices": [],
+      "systemName": "",
+      "isNarration": false
+    },
+    {
+      "teller": "집사",
+      "sentence": "저번 의식 성공에 대한 상이라도 주시려는게 아닐까요?",
+      "leftSprite": "Ras_Standing_Affectionate_Standard",
+      "rightSprite": "Butler_Standing_Standard",
+      "hasChoices": false,
+      "choices": [],
+      "systemName": "",
+      "isNarration": false
+    }
+  ]
+}
