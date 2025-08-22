@@ -161,6 +161,7 @@ public class PortalTrigger : MonoBehaviour
         if (destTrigger != null)
             destTrigger.isOnCooldown = true;
 
+        // Fade out
         yield return FadeManager.Instance.FadeOut();
 
         PlayerMove playerMove = player.GetComponent<PlayerMove>();
@@ -170,9 +171,36 @@ public class PortalTrigger : MonoBehaviour
             if (parentMapBoundary != null)
                 playerMove.SetCurrentMapBoundary(parentMapBoundary);
 
-            playerMove.Warp(dest.position.x, dest.position.y);
+            Vector3 targetPos = dest.position;
+            RectTransform rectTransform = dest as RectTransform;
+            if (rectTransform != null)
+            {
+                Vector3 pivotLocalPos = new Vector3(
+                    rectTransform.rect.width * (rectTransform.pivot.x - 0.5f),
+                    rectTransform.rect.height * (rectTransform.pivot.y - 0.5f),
+                    0f
+                );
+                targetPos = rectTransform.TransformPoint(pivotLocalPos);
+            }
+
+            BoxCollider2D box = player.GetComponent<BoxCollider2D>();
+            if (box != null)
+            {
+                Vector3 colliderCenter = box.bounds.center;
+                Vector3 playerPivot = player.transform.position;
+
+                Vector3 offset = colliderCenter - playerPivot;
+                Vector3 finalPos = targetPos - offset;
+
+                playerMove.Warp(finalPos.x, finalPos.y);
+            }
+            else
+            {
+                playerMove.Warp(targetPos.x, targetPos.y);
+            }
         }
 
+        // Fade in
         yield return FadeManager.Instance.FadeIn();
 
         yield return new WaitForSeconds(0.2f);
@@ -180,6 +208,8 @@ public class PortalTrigger : MonoBehaviour
         if (destTrigger != null)
             destTrigger.isOnCooldown = false;
     }
+
+
 
     public bool IsOpen
     {
