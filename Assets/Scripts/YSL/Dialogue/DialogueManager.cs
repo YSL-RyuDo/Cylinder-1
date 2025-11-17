@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 
 public class DialogueManager : MonoBehaviour
 {
@@ -42,7 +43,7 @@ public class DialogueManager : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning($"스프라이트 없음: {emotionKey}");
+            Debug.LogWarning($"스프라이트를 찾을 수 없음: {emotionKey}");
             portraitImage.gameObject.SetActive(false);
         }
 
@@ -51,6 +52,7 @@ public class DialogueManager : MonoBehaviour
 
         typingCoroutine = StartCoroutine(TypeText(text));
     }
+
 
     private IEnumerator TypeText(string fullText)
     {
@@ -74,28 +76,54 @@ public class DialogueManager : MonoBehaviour
     {
         emotionSprites = new Dictionary<string, Sprite>();
 
-        string[] folders = { "pure", "lack", "desire", "grief", "arrogance", "glitch" };
+        // Characters 폴더의 모든 하위 폴더 자동 탐색
+        TextAsset dummy = Resources.Load<TextAsset>("dummy"); // 강제 Resources 초기화 (일부 환경에서 필요)
 
-        foreach (string folder in folders)
+        // Resources.LoadAll은 폴더 직접 검색 불가 → 대신 Sprite 전체 로드 후 폴더명 분석
+        Sprite[] allSprites = Resources.LoadAll<Sprite>("Characters");
+
+        if (allSprites.Length == 0)
         {
-            Sprite[] sprites = Resources.LoadAll<Sprite>($"Characters/{folder}");
+            Debug.LogError("Characters 폴더에서 스프라이트를 찾을 수 없습니다.");
+            return;
+        }
 
-            if (sprites == null || sprites.Length == 0)
+        foreach (var s in allSprites)
+        {
+            // 예: Characters/pure/0 → "pure"
+            string fullPath = s.texture.name;
+            string folderName = GetFolderName(s);
+
+            if (folderName == null)
             {
-                Debug.LogWarning($"폴더가 비어있거나 없음: Characters/{folder}");
+                Debug.LogWarning($"폴더명을 추출할 수 없음: {s.name}");
                 continue;
             }
 
-            foreach (Sprite s in sprites)
-            {
-                string key = $"{folder}_{s.name}";
-                emotionSprites[key] = s;
+            string key = $"{folderName}_{s.name}";
+            emotionSprites[key] = s;
 
-                Debug.Log($"로드됨: {key}");
-            }
+            Debug.Log($"[로드됨] {key}");
         }
 
-        Debug.Log($"감정 스프라이트 로드 완료 → 총 {emotionSprites.Count}개");
+        Debug.Log($"[완료] 감정 스프라이트 총 {emotionSprites.Count}개 로드");
+    }
+
+
+    // 텍스처 경로에서 폴더명 추출
+    private string GetFolderName(Sprite s)
+    {
+        string path = AssetDatabase.GetAssetPath(s);
+        // 예: Assets/Resources/Characters/pure/0.png
+        // → pure 추출
+        int index = path.IndexOf("Characters/");
+        if (index == -1) return null;
+
+        string sub = path.Substring(index + "Characters/".Length);
+        int slash = sub.IndexOf('/');
+        if (slash == -1) return null;
+
+        return sub.Substring(0, slash);
     }
 
 }
