@@ -20,7 +20,7 @@ public class CameraFollow : MonoBehaviour
         AdjustCameraSizeToMap();
     }
 
-    void FixedUpdate()
+    void LateUpdate()
     {
         if (playerMove == null)
             return;

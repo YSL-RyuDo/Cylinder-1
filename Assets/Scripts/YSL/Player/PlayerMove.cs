@@ -113,6 +113,11 @@ public class PlayerMove : MonoBehaviour
             transform.localScale = new Vector3(-1, 1, 1);
         else if (input.x < -0.01f)
             transform.localScale = new Vector3(1, 1, 1);
+        if (isWalking)
+        {
+            animator.SetFloat("WalkDirX", input.x);
+            animator.SetFloat("WalkDirY", input.y);
+        }
     }
 
     void UpdateCurrentBoundaries()

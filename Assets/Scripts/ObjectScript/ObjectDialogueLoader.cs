@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.IO;
 
-public class DialogueLoader
+public class ObjectDialogueLoader
 {
     public static DialogueNodeJSON LoadDialogue(string fileName)
     {

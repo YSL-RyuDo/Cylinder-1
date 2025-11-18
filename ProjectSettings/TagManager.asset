@@ -12,6 +12,7 @@ TagManager:
   - LayerTrigger
   - Puzzle
   - Obstacle
+  - PushPuzzle
   layers:
   - Default
   - TransparentFX
