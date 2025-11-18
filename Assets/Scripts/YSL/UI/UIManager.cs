@@ -1,30 +1,49 @@
 using UnityEngine;
-
+using UnityEngine.UI;
 public class UIManager : MonoBehaviour
 {
     public MenuUI menuUI;
     public PersonalityUI personalityUI;
-
+    public Image itemTabButtonImage;
     private IUIWindow currentWindow = null;
+    public static UIManager Instance;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
 
     void Update()
     {
+        DebugCurrentWindow();
         // UI가 열려 있을 때 ESC로 닫기
         if (currentWindow != null)
         {
             if (Input.GetKeyDown(KeyCode.Escape))
                 currentWindow.Close();
 
-            return; // UI가 열려 있을 때는 다른 입력 차단
+            return; 
         }
 
-        // UI가 닫혀 있을 때만 단축키 허용
         if (Input.GetKeyDown(KeyCode.Q))
+        {
             OpenMenuDefault();
+            return;
+        }
 
         if (Input.GetKeyDown(KeyCode.R))
+        {
             Open(personalityUI);
+            return;
+        }
     }
+
+    private void DebugCurrentWindow()
+    {
+        string name = (currentWindow == null) ? "NONE" : currentWindow.GetType().Name;
+        Debug.Log($"[UIManager] currentWindow = {name}, TimeScale = {Time.timeScale}");
+    }
+
 
     private void Open(IUIWindow window)
     {
@@ -63,6 +82,7 @@ public class UIManager : MonoBehaviour
 
         menuUI.Open();
         menuUI.SelectTab(0); // 0번 = 아이템 탭
+        InventoryUI.Instance.Open();
         currentWindow = menuUI;
 
         Time.timeScale = 0f;
@@ -79,5 +99,11 @@ public class UIManager : MonoBehaviour
     {
         if (currentWindow == null)
             Open(personalityUI);
+    }
+
+    public void UpdateItemTabIcon(Sprite icon)
+    {
+        if (itemTabButtonImage != null)
+            itemTabButtonImage.sprite = icon;
     }
 }

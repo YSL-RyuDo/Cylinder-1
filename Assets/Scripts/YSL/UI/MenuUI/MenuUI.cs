@@ -41,13 +41,16 @@ public class MenuUI : MonoBehaviour, IUIWindow
     {
         IsOpen = true;
         root.SetActive(true);
+        if (tabPanels.Length > 0 && tabPanels[0].activeSelf)
+        {
+            InventoryUI.Instance.Open();   // 여기가 Refresh()도 부른다
+        }
     }
 
     public void Close()
     {
         IsOpen = false;
         root.SetActive(false);
-
         FindAnyObjectByType<UIManager>().NotifyWindowClosed(this);
     }
 
@@ -58,15 +61,15 @@ public class MenuUI : MonoBehaviour, IUIWindow
             bool isSelected = (i == index);
 
             tabPanels[i].SetActive(isSelected);
-
             tabButtons[i].interactable = !isSelected;
-
-            if (!isSelected && !customMarking[i])
-            {
-                tabButtons[i].image.sprite = defaultSprites[i];
-            }
         }
+
+        if (index == 0)
+            InventoryUI.Instance.Open();
+        else
+            InventoryUI.Instance.Close();
     }
+
 
     // 1) 아이템 사용 시 아이템 탭 버튼 스프라이트 교체
     public void MarkItemUsed()

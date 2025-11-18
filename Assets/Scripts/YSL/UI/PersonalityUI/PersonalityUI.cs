@@ -9,7 +9,7 @@ public class PersonalityUI : MonoBehaviour, IUIWindow
     [SerializeField] private GameObject root;
 
     public Button chooseButton;
-
+    public TextMeshProUGUI nameText;
     public PersonalDialRotator dialRotator;
     public PlayerPersonality playerPersonality;
 
@@ -20,12 +20,18 @@ public class PersonalityUI : MonoBehaviour, IUIWindow
     public Image personalityButtonIcon;
     public Sprite[] personalityButtonSprites;
 
-    private void Start()
+    private void Awake()
     {
         root.SetActive(false);
+        IsOpen = false;
+    }
+
+    private void Start()
+    {
         chooseButton.onClick.AddListener(OnChooseClicked);
     }
 
+    
 
     public void Open()
     {
@@ -64,6 +70,10 @@ public class PersonalityUI : MonoBehaviour, IUIWindow
     {
         int index = dialRotator.CurrentIndex;
         currentDialogue = DialogueLoader.Instance.Get(index);
+
+        // 이름 갱신
+        if (currentDialogue != null && nameText != null)
+            nameText.text = currentDialogue.name;
     }
 
 

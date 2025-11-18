@@ -3,7 +3,7 @@
     {
       "id": 0,
       "folder": "pure",
-      "name": "무구",
+      "name": "라즐리",
       "preview": {
         "emotion": "0",
         "lines": [
@@ -23,7 +23,7 @@
     {
       "id": 1,
       "folder": "lack",
-      "name": "결핍",
+      "name": "라즐리",
       "preview": {
         "emotion": "0",
         "lines": [
@@ -43,7 +43,7 @@
     {
       "id": 2,
       "folder": "desire",
-      "name": "열망",
+      "name": "라즐리",
       "preview": {
         "emotion": "0",
         "lines": [
@@ -63,7 +63,7 @@
     {
       "id": 3,
       "folder": "grief",
-      "name": "비애",
+      "name": "라즐리",
       "preview": {
         "emotion": "0",
         "lines": [
@@ -83,7 +83,7 @@
     {
       "id": 4,
       "folder": "arrogance",
-      "name": "오만",
+      "name": "라즐리",
       "preview": {
         "emotion": "0",
         "lines": [
@@ -102,7 +102,7 @@
 
     {
       "id": 5,
-      "folder": "glitch0",
+      "folder": "glitch",
       "name": "???",
       "preview": {
         "emotion": "0",
