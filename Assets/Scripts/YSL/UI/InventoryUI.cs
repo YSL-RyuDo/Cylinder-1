@@ -70,12 +70,13 @@ public class InventoryUI : MonoBehaviour
 
         // 아이템 등록
         InventoryManager.Instance.RegisterItem(selectedItem);
+        chooseImage.gameObject.SetActive(false);
+        itemNameText.gameObject.SetActive(false);
+        itemDescriptionText.gameObject.SetActive(false);
+        useButton.gameObject.SetActive(false);
 
         // 나레이션 출력 (선택사항)
         NarrationUI.Instance.ShowMessage($"{selectedItem.itemName}을(를) 사용할 준비가 되었습니다.");
-
-        // 인벤토리 닫기
-        //Close();
 
         MenuUI menu = FindAnyObjectByType<MenuUI>();
         if (menu != null && menu.IsOpen)

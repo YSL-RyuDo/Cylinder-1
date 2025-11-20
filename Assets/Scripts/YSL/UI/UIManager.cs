@@ -5,12 +5,17 @@ public class UIManager : MonoBehaviour
     public MenuUI menuUI;
     public PersonalityUI personalityUI;
     public Image itemTabButtonImage;
+    public Sprite defaultItemTabSprite;
     private IUIWindow currentWindow = null;
     public static UIManager Instance;
 
     private void Awake()
     {
         Instance = this;
+
+        // 기본 아이콘 저장
+        if (itemTabButtonImage != null)
+            defaultItemTabSprite = itemTabButtonImage.sprite;
     }
 
     void Update()
@@ -106,4 +111,11 @@ public class UIManager : MonoBehaviour
         if (itemTabButtonImage != null)
             itemTabButtonImage.sprite = icon;
     }
+
+    public void ResetItemTabIcon()
+    {
+        if (itemTabButtonImage != null && defaultItemTabSprite != null)
+            itemTabButtonImage.sprite = defaultItemTabSprite;
+    }
+
 }

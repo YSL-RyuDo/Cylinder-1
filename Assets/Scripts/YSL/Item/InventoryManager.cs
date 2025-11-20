@@ -29,6 +29,17 @@ public class InventoryManager : MonoBehaviour
         items[item.id]++;
     }
 
+    public void RemoveItem(int id)
+    {
+        if (!items.ContainsKey(id)) return;
+
+        items[id]--;
+
+        if (items[id] <= 0)
+            items.Remove(id);
+    }
+
+
     public void RegisterItem(ItemData item)
     {
         registeredItem = item;
@@ -36,8 +47,21 @@ public class InventoryManager : MonoBehaviour
         UIManager.Instance.UpdateItemTabIcon(item.icon);
     }
 
-    public bool HasRegisteredItem()
+    public ItemData GetRegisteredItem()
     {
-        return registeredItem != null;
+        return registeredItem;
     }
+
+    public void ClearRegisteredItem()
+    {
+        if (registeredItem != null)
+        {
+            RemoveItem(registeredItem.id);
+        }
+
+        registeredItem = null;
+
+        UIManager.Instance.ResetItemTabIcon();
+    }
+
 }
