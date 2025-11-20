@@ -76,7 +76,7 @@ public class InventoryUI : MonoBehaviour
         useButton.gameObject.SetActive(false);
 
         // 나레이션 출력 (선택사항)
-        NarrationUI.Instance.ShowMessage($"{selectedItem.itemName}을(를) 사용할 준비가 되었습니다.");
+        //NarrationUI.Instance.ShowMessage($"{selectedItem.itemName}을(를) 사용할 준비가 되었습니다.");
 
         MenuUI menu = FindAnyObjectByType<MenuUI>();
         if (menu != null && menu.IsOpen)
