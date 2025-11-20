@@ -69,7 +69,7 @@ public class PersonalityUI : MonoBehaviour, IUIWindow
     private void UpdateUI()
     {
         int index = dialRotator.CurrentIndex;
-        currentDialogue = DialogueLoader.Instance.Get(index);
+        currentDialogue = DialogueLoader.Instance.PersonalityGet(index);
 
         // 이름 갱신
         if (currentDialogue != null && nameText != null)

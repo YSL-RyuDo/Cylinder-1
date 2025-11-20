@@ -12,6 +12,7 @@ TagManager:
   - LayerTrigger
   - Puzzle
   - Obstacle
+  - Portal
   layers:
   - Default
   - TransparentFX

@@ -10,9 +10,11 @@ public class DialogueManager : MonoBehaviour
     public static DialogueManager Instance;
 
     [SerializeField] private float typingSpeed = 0.03f;
-
+    [Header("인격전환 UI")]
     public TextMeshProUGUI dialogueText;
     public Image portraitImage;
+    [Header("모노로그 UI")]
+    public Image monologuePortraitImage;
 
     private Coroutine typingCoroutine;
 
@@ -92,23 +94,6 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-
-    // 텍스처 경로에서 폴더명 추출
-    //private string GetFolderName(Sprite s)
-    //{
-    //    string path = AssetDatabase.GetAssetPath(s);
-    //    // 예: Assets/Resources/Characters/pure/0.png
-    //    // → pure 추출
-    //    int index = path.IndexOf("Characters/");
-    //    if (index == -1) return null;
-
-    //    string sub = path.Substring(index + "Characters/".Length);
-    //    int slash = sub.IndexOf('/');
-    //    if (slash == -1) return null;
-
-    //    return sub.Substring(0, slash);
-    //}
-
     public void ShowLines(string[] lines)
     {
         if (lines == null || lines.Length == 0)
@@ -126,6 +111,31 @@ public class DialogueManager : MonoBehaviour
 
         // 포탈 대사는 이미지 필요 없을 수도 있으므로 숨김
         portraitImage.gameObject.SetActive(false);
+    }
+
+    public void ShowPortalMonologue(DialogueBlock block, string folder)
+    {
+        if (block == null || block.lines == null || block.lines.Length == 0)
+            return;
+
+        string line = block.lines[Random.Range(0, block.lines.Length)];
+
+        // 포탈 혼잣말 초상화 처리
+        string emotionKey = $"{folder}_{block.emotion}";
+
+        if (emotionSprites.TryGetValue(emotionKey, out Sprite sprite))
+        {
+            monologuePortraitImage.sprite = sprite;
+            monologuePortraitImage.gameObject.SetActive(true);
+        }
+        else
+        {
+            monologuePortraitImage.gameObject.SetActive(false);
+            Debug.LogWarning($"[PortalMono] 스프라이트 없음: {emotionKey}");
+        }
+
+        // MonologueUI 출력
+        MonologueUI.Instance.Show(line);
     }
 
 }

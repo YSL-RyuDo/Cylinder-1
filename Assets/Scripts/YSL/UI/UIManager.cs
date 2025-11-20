@@ -20,7 +20,7 @@ public class UIManager : MonoBehaviour
 
     void Update()
     {
-        DebugCurrentWindow();
+        //DebugCurrentWindow();
         // UI가 열려 있을 때 ESC로 닫기
         if (currentWindow != null)
         {

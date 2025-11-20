@@ -4,19 +4,32 @@ public class ObjectInteractionUI : MonoBehaviour
 {
     public static ObjectInteractionUI Instance;
 
+    public SpriteRenderer normalIcon;
+    public SpriteRenderer lockedIcon;
+
     private void Awake()
     {
         Instance = this;
-        gameObject.SetActive(false);
+
+        normalIcon.gameObject.SetActive(false);
+        lockedIcon.gameObject.SetActive(false);
     }
 
-    public void Show()
+    public void ShowNormal()
     {
-        gameObject.SetActive(true);
+        normalIcon.gameObject.SetActive(true);
+        lockedIcon.gameObject.SetActive(false);
+    }
+
+    public void ShowLocked()
+    {
+        normalIcon.gameObject.SetActive(false);
+        lockedIcon.gameObject.SetActive(true);
     }
 
     public void Hide()
     {
-        gameObject.SetActive(false);
+        normalIcon.gameObject.SetActive(false);
+        lockedIcon.gameObject.SetActive(false);
     }
 }

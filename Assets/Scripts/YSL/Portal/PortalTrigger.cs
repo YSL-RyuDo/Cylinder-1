@@ -9,9 +9,13 @@ public class PortalTrigger : MonoBehaviour
     private bool portalReady = true;   // 이 포탈이 현재 작동 가능한 상태
     private GameObject player;
 
+    public AudioClip unlockSound;      // 문이 열릴 때 재생할 효과음
+    private AudioSource audioSource;
+    private PortalMonologue portalMono;
     private void Start()
     {
         PortalManager.Instance.RegisterPortal(this);
+        audioSource = GetComponent<AudioSource>();
     }
 
     private void Update()
@@ -49,8 +53,6 @@ public class PortalTrigger : MonoBehaviour
             targetPortal.portalReady = false;
     }
 
-
-
     private IEnumerator TeleportWithFade(GameObject p, Vector3 targetPos)
     {
         yield return FadeManager.Instance.FadeOut();
@@ -61,28 +63,34 @@ public class PortalTrigger : MonoBehaviour
         yield return FadeManager.Instance.FadeIn();
     }
 
-
-
     // 잠금 해제
     private void TryUnlock()
     {
+        int pid = PlayerPersonality.Instance.GetPersonalityIndex();
+        PortalMonologue portalMono = DialogueLoader.Instance.PortalGet(pid);
+
         ItemData registered = InventoryManager.Instance.GetRegisteredItem();
 
+        // 아이템 없음
         if (registered == null)
         {
-            NarrationUI.Instance.ShowMessage("사용할 아이템이 없습니다.");
+            DialogueManager.Instance.ShowPortalMonologue(portalMono.missingItem, portalMono.folder);
             return;
         }
 
+        // 정답 아이템
         if (registered.id == data.requiredItemId)
         {
             InventoryManager.Instance.ClearRegisteredItem();
             data.isLocked = false;
+            SoundManager.Instance.PlaySFX(0);
             return;
         }
 
-        NarrationUI.Instance.ShowMessage("이 아이템으로는 열리지 않습니다.");
+        // 잘못된 아이템
+        DialogueManager.Instance.ShowPortalMonologue(portalMono.wrongItem, portalMono.folder);
     }
+
 
     // 콜라이더 체크
     private void OnTriggerEnter2D(Collider2D other)

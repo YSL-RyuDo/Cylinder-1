@@ -5,7 +5,8 @@ public class DialogueLoader : MonoBehaviour
 {
     public static DialogueLoader Instance;
 
-    private Dictionary<int, PersonalityDialogue> dialogueDict;
+    private Dictionary<int, PersonalityDialogue> personalitydialogueDict;
+    private Dictionary<int, PortalMonologue> portalmonologueDict;
 
     private void Awake()
     {
@@ -22,42 +23,54 @@ public class DialogueLoader : MonoBehaviour
 
     private void LoadDialogueJSON()
     {
-        TextAsset jsonFile = Resources.Load<TextAsset>("Dialogues/personality_dialogue");
+        TextAsset personalityJsonFile = Resources.Load<TextAsset>("Dialogues/personality_dialogue");
+        PersonalityDialogueCollection personalityJsonCollection =
+            JsonUtility.FromJson<PersonalityDialogueCollection>(personalityJsonFile.text);
+        personalitydialogueDict = new Dictionary<int, PersonalityDialogue>();
 
-        if (jsonFile == null)
+        foreach (PersonalityDialogue p in personalityJsonCollection.personalities)
         {
-            Debug.LogError("JSON 파일을 찾을 수 없습니다! 경로: Resources/Dialogues/personality_dialogue.json");
-            return;
-        }
-
-        PersonalityDialogueCollection collection =
-            JsonUtility.FromJson<PersonalityDialogueCollection>(jsonFile.text);
-
-        dialogueDict = new Dictionary<int, PersonalityDialogue>();
-
-        foreach (PersonalityDialogue p in collection.personalities)
-        {
-            if (!dialogueDict.ContainsKey(p.id))
-                dialogueDict.Add(p.id, p);
+            if (!personalitydialogueDict.ContainsKey(p.id))
+                personalitydialogueDict.Add(p.id, p);
             else
                 Debug.LogWarning($"중복 ID 감지: {p.id}");
         }
 
-        Debug.Log($"대사 JSON 로드 완료: {dialogueDict.Count}개");
+        TextAsset portalJsonFile = Resources.Load<TextAsset>("Dialogues/portal_monologue");
+        PortalMonologueCollection portalCollection =
+            JsonUtility.FromJson<PortalMonologueCollection>(portalJsonFile.text);
+        portalmonologueDict = new Dictionary<int, PortalMonologue>();
+
+        foreach (var m in portalCollection.portalMonologues)
+        {
+            if (!portalmonologueDict.ContainsKey(m.id))
+                portalmonologueDict.Add(m.id, m);
+        }
+
     }
 
-    public PersonalityDialogue Get(int id)
+    public PersonalityDialogue PersonalityGet(int id)
     {
-        if (dialogueDict == null)
+        if (personalitydialogueDict == null)
         {
             Debug.LogError("dialogueDict가 초기화되지 않았습니다. DialogueLoader가 존재하는지 확인하세요.");
             return null;
         }
 
-        if (dialogueDict.TryGetValue(id, out var entry))
+        if (personalitydialogueDict.TryGetValue(id, out var entry))
             return entry;
 
         Debug.LogWarning("해당 ID의 대사를 찾을 수 없습니다: " + id);
         return null;
     }
+
+    public PortalMonologue PortalGet(int id)
+    {
+        if (portalmonologueDict.TryGetValue(id, out var data))
+            return data;
+
+        Debug.LogWarning($"해당 포탈 ID 대사 없음 : {id}");
+        return null;
+    }
 }
+

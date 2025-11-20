@@ -1,16 +1,22 @@
 using UnityEngine;
+using UnityEngine.UIElements;
 
 [RequireComponent(typeof(PlayerInput))]
 public class PlayerInteraction : MonoBehaviour
 {
     public float interactRange = 1.2f;
-    public LayerMask interactLayer;
+    //public LayerMask interactLayer;
 
     private PlayerInput input;
     private bool lastShow = false;
 
     private readonly string[] validTags =
-        { "Item", "Portal", "Door", "Puzzle" };  // UI를 띄워줄 대상
+    { "Item", "Puzzle" };  // UI 띄울 '일반' 상호작용 대상
+
+    private readonly string[] lockableTags =
+    { "Portal" };   // 나중에 "Door", "Chest" 등 추가 가능
+
+    private bool lastState = false;
 
     private void Awake()
     {
@@ -27,41 +33,86 @@ public class PlayerInteraction : MonoBehaviour
 
     private void UpdateInteractionUI()
     {
-        Collider2D target = Physics2D.OverlapCircle(transform.position, interactRange, interactLayer);
+        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, interactRange);
 
-        bool shouldShow = false;
-
-        if (target != null)
+        foreach (var target in hits)
         {
+            if (target == null) continue;
+
+            // 1. 아이템 / 퍼즐
             foreach (var tag in validTags)
             {
                 if (target.CompareTag(tag))
                 {
-                    shouldShow = true;
-                    break;
+                    ObjectInteractionUI.Instance.ShowNormal();
+                    lastState = true;
+                    return;
+                }
+            }
+
+            // 2. 포탈
+            foreach (var tag in lockableTags)
+            {
+                if (target.CompareTag(tag))
+                {
+                    PortalTrigger p = target.GetComponent<PortalTrigger>();
+
+                    if (p != null && p.data.isLocked)
+                    {
+                        ObjectInteractionUI.Instance.ShowLocked();
+                        lastState = true;
+                        return;
+                    }
+
+                    ObjectInteractionUI.Instance.Hide();
+                    lastState = false;
+                    return;
                 }
             }
         }
 
-        // 변화가 있을 때만 UI 갱신
-        if (shouldShow != lastShow)
+        // 범위 내 아무 것도 없음 → 숨김
+        if (lastState)
         {
-            if (shouldShow)
-                ObjectInteractionUI.Instance.Show();
-            else
-                ObjectInteractionUI.Instance.Hide();
-
-            lastShow = shouldShow;
+            ObjectInteractionUI.Instance.Hide();
+            lastState = false;
         }
     }
 
+
     private void TryInteract()
     {
-        Collider2D target = Physics2D.OverlapCircle(transform.position, interactRange, interactLayer);
-        if (target == null) return;
+        // 범위 내 모든 Collider 검색
+        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, interactRange);
 
-        IInteractable interactable = target.GetComponent<IInteractable>();
-        if (interactable != null)
-            interactable.Interact(this.gameObject);
+        foreach (var target in hits)
+        {
+            if (target == null) continue;
+
+            // 1. 일반 상호작용 (Item / Puzzle)
+            foreach (var tag in validTags)
+            {
+                if (target.CompareTag(tag))
+                {
+                    IInteractable interactable = target.GetComponent<IInteractable>();
+                    if (interactable != null)
+                        interactable.Interact(this.gameObject);
+                    return;
+                }
+            }
+
+            // 2. 포탈
+            foreach (var tag in lockableTags)
+            {
+                if (target.CompareTag(tag))
+                {
+                    IInteractable interactable = target.GetComponent<IInteractable>();
+                    if (interactable != null)
+                        interactable.Interact(this.gameObject);
+                    return;
+                }
+            }
+        }
     }
+
 }
