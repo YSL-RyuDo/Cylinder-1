@@ -1,6 +1,7 @@
 using UnityEngine;
 
 [ExecuteAlways]
+[RequireComponent(typeof(Collider2D))]
 public class MapBoundary : MonoBehaviour
 {
     public Vector2 min;
@@ -8,34 +9,28 @@ public class MapBoundary : MonoBehaviour
 
     private void Reset()
     {
-        AutoCalculateBounds();
+        Recalculate();
     }
 
     private void OnValidate()
     {
-        AutoCalculateBounds();
+        Recalculate();
     }
 
-    public void AutoCalculateBounds()
+    public void Recalculate()
     {
-        var sr = GetComponent<SpriteRenderer>();
-        if (sr == null)
-        {
-            Debug.LogWarning($"{gameObject.name}에 SpriteRenderer가 없습니다.");
-            return;
-        }
+        Collider2D col = GetComponent<Collider2D>();
+        Bounds b = col.bounds;
 
-        Bounds bounds = sr.bounds;
-
-        min = bounds.min;
-        max = bounds.max;
+        min = b.min;
+        max = b.max;
     }
 
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.yellow;
+        Vector3 center = (min + max) * 0.5f;
         Vector3 size = new Vector3(max.x - min.x, max.y - min.y, 0.1f);
-        Vector3 center = new Vector3((min.x + max.x) / 2f, (min.y + max.y) / 2f, transform.position.z);
         Gizmos.DrawWireCube(center, size);
     }
 }

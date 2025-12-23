@@ -1,24 +1,30 @@
 using UnityEngine;
 
 [RequireComponent(typeof(PlayerInput))]
+[RequireComponent(typeof(BoxCollider2D))]
 public class PlayerMove : MonoBehaviour
 {
     public float moveSpeed = 5f;
+    private const float SKIN = 0.01f;
 
     private PlayerInput input;
     private BoxCollider2D col;
     private Animator anim;
+    private SpriteRenderer sr;
 
     public CameraFollow cameraFollow;
 
     public MapBoundary CurrentMapBoundary { get; private set; }
     public CircularMapBoundary CurrentCircularBoundary { get; private set; }
 
+    private Collider2D[] overlapBuffer = new Collider2D[8];
+
     private void Awake()
     {
         input = GetComponent<PlayerInput>();
         col = GetComponent<BoxCollider2D>();
         anim = GetComponent<Animator>();
+        sr = GetComponent<SpriteRenderer>();
     }
 
     private void Update()
@@ -34,12 +40,58 @@ public class PlayerMove : MonoBehaviour
 
     private void Move()
     {
-        Vector3 newPos = transform.position;
-        Vector3 delta = (Vector3)input.MoveAxis * moveSpeed * Time.deltaTime;
-        newPos += delta;
+        Vector2 inputDir = input.MoveAxis;
+        if (inputDir.sqrMagnitude < 0.0001f)
+            return;
 
-        ClampToBoundaries(ref newPos);
-        transform.position = newPos;
+        Vector3 startPos = transform.position;
+        Vector3 targetPos = startPos + (Vector3)(inputDir.normalized * moveSpeed * Time.deltaTime);
+
+        Vector3 finalPos = startPos;
+
+        // X축 (MapBoundary와 동일한 사고방식)
+        Vector3 testX = new Vector3(targetPos.x, startPos.y, startPos.z);
+        if (!IsInsideObstacle(testX))
+            finalPos.x = testX.x;
+
+        // Y축
+        Vector3 testY = new Vector3(finalPos.x, targetPos.y, startPos.z);
+        if (!IsInsideObstacle(testY))
+            finalPos.y = testY.y;
+
+        ClampToBoundaries(ref finalPos);
+        transform.position = finalPos;
+    }
+
+    private bool IsInsideObstacle(Vector3 pos)
+    {
+        Vector2 half = GetWorldHalfSize();
+        Vector2 offset = GetWorldOffset();
+
+        Vector2 center = (Vector2)pos + offset;
+        Vector2 size = half * 2f - Vector2.one * SKIN;
+
+        int count = Physics2D.OverlapBoxNonAlloc(
+            center,
+            size,
+            0f,
+            overlapBuffer
+        );
+
+        for (int i = 0; i < count; i++)
+        {
+            Collider2D hit = overlapBuffer[i];
+            if (hit == null)
+                continue;
+
+            if (hit == col)
+                continue;
+
+            if (hit.CompareTag("Obstacle"))
+                return true;
+        }
+
+        return false;
     }
 
     private void UpdateAnimation()
@@ -48,30 +100,40 @@ public class PlayerMove : MonoBehaviour
         anim?.SetBool("IsWalk", walking);
 
         if (input.MoveAxis.x > 0.01f)
-            transform.localScale = new Vector3(-1, 1, 1);
+            sr.flipX = true;
         else if (input.MoveAxis.x < -0.01f)
-            transform.localScale = new Vector3(1, 1, 1);
+            sr.flipX = false;
     }
 
     private void ClampToBoundaries(ref Vector3 pos)
     {
+        Vector2 half = GetWorldHalfSize();
+        Vector2 offset = GetWorldOffset();
+
         if (CurrentMapBoundary != null)
         {
-            Vector2 half = col.size / 2f;
-            pos.x = Mathf.Clamp(pos.x, CurrentMapBoundary.min.x + half.x, CurrentMapBoundary.max.x - half.x);
-            pos.y = Mathf.Clamp(pos.y, CurrentMapBoundary.min.y + half.y, CurrentMapBoundary.max.y - half.y);
+            pos.x = Mathf.Clamp(
+                pos.x,
+                CurrentMapBoundary.min.x + half.x - offset.x,
+                CurrentMapBoundary.max.x - half.x - offset.x
+            );
+
+            pos.y = Mathf.Clamp(
+                pos.y,
+                CurrentMapBoundary.min.y + half.y - offset.y,
+                CurrentMapBoundary.max.y - half.y - offset.y
+            );
         }
 
         if (CurrentCircularBoundary != null)
         {
-            Vector2 half = col.size / 2f;
-            float limit = CurrentCircularBoundary.radius - Mathf.Max(half.x, half.y);
+            float radius = Mathf.Max(half.x, half.y);
+            float limit = CurrentCircularBoundary.radius - radius;
 
             Vector2 center = CurrentCircularBoundary.center;
             Vector2 p = pos;
 
             float dist = Vector2.Distance(p, center);
-
             if (dist > limit)
             {
                 Vector2 dir = (p - center).normalized;
@@ -80,11 +142,30 @@ public class PlayerMove : MonoBehaviour
         }
     }
 
+    private Vector2 GetWorldHalfSize()
+    {
+        Vector3 scale = transform.lossyScale;
+        return new Vector2(
+            col.size.x * Mathf.Abs(scale.x) * 0.5f,
+            col.size.y * Mathf.Abs(scale.y) * 0.5f
+        );
+    }
+
+    private Vector2 GetWorldOffset()
+    {
+        Vector3 scale = transform.lossyScale;
+        return new Vector2(
+            col.offset.x * Mathf.Abs(scale.x),
+            col.offset.y * Mathf.Abs(scale.y)
+        );
+    }
+
     private void UpdateCurrentBoundaries()
     {
         int mapLayerMask = LayerMask.GetMask("Map");
+        Vector2 checkPoint = (Vector2)transform.position + GetWorldOffset();
 
-        Collider2D[] hits = Physics2D.OverlapPointAll(transform.position, mapLayerMask);
+        Collider2D[] hits = Physics2D.OverlapPointAll(checkPoint, mapLayerMask);
 
         MapBoundary foundMapBoundary = null;
         CircularMapBoundary foundCircularBoundary = null;
@@ -110,10 +191,7 @@ public class PlayerMove : MonoBehaviour
     public void Warp(Vector2 pos)
     {
         transform.position = pos;
-
         UpdateCurrentBoundaries();
-
-        if (cameraFollow != null)
-            cameraFollow.AdjustCameraSizeToMap();
+        cameraFollow?.AdjustCameraSizeToMap();
     }
 }

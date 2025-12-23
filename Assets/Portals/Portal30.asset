@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7bb9ccad8fbfadc4a8330e924232a970, type: 3}
-  m_Name: Portal0
+  m_Name: Portal30
   m_EditorClassIdentifier: 
-  portalId: 0
-  linkedPortalId: 1
+  portalId: 30
+  linkedPortalId: 31
   initiallyLocked: 0
   isLocked: 0
   requiredItemId: -1
