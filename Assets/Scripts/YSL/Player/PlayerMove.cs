@@ -13,6 +13,8 @@ public class PlayerMove : MonoBehaviour
     private SpriteRenderer sr;
 
     public CameraFollow cameraFollow;
+    [SerializeField]
+    private LayerMask obstacleLayer;
 
     public MapBoundary CurrentMapBoundary { get; private set; }
     public CircularMapBoundary CurrentCircularBoundary { get; private set; }
@@ -87,8 +89,9 @@ public class PlayerMove : MonoBehaviour
             if (hit == col)
                 continue;
 
-            if (hit.CompareTag("Obstacle"))
+            if (((1 << hit.gameObject.layer) & obstacleLayer) != 0)
                 return true;
+
         }
 
         return false;

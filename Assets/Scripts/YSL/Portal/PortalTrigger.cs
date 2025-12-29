@@ -74,7 +74,7 @@ public class PortalTrigger : MonoBehaviour
         // 아이템 없음
         if (registered == null)
         {
-            DialogueManager.Instance.ShowPortalMonologue(portalMono.missingItem, portalMono.folder);
+            //DialogueManager.Instance.ShowPortalMonologue(portalMono.missingItem, portalMono.folder);
             return;
         }
 
@@ -88,7 +88,7 @@ public class PortalTrigger : MonoBehaviour
         }
 
         // 잘못된 아이템
-        DialogueManager.Instance.ShowPortalMonologue(portalMono.wrongItem, portalMono.folder);
+        //DialogueManager.Instance.ShowPortalMonologue(portalMono.wrongItem, portalMono.folder);
     }
 
 

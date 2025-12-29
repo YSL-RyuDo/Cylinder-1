@@ -83,7 +83,7 @@ public class PersonalityUI : MonoBehaviour, IUIWindow
         if (index == lastPreviewIndex) return;
 
         lastPreviewIndex = index;
-        DialogueManager.Instance.ShowDialogue(currentDialogue, true);
+        //DialogueManager.Instance.ShowDialogue(currentDialogue, true);
     }
 
 
@@ -112,7 +112,7 @@ public class PersonalityUI : MonoBehaviour, IUIWindow
 
         playerPersonality.SetPersonality((PersonalityType)selected);
 
-        DialogueManager.Instance.ShowDialogue(currentDialogue, false);
+        //DialogueManager.Instance.ShowDialogue(currentDialogue, false);
         UpdatePersonalityButtonUI(selected);
         chooseButton.interactable = false;
         StartCoroutine(CloseAfterDelay(3f));
@@ -123,7 +123,7 @@ public class PersonalityUI : MonoBehaviour, IUIWindow
     {
         yield return new WaitForSecondsRealtime(sec);
 
-        DialogueManager.Instance.HideDialogue();
+        //DialogueManager.Instance.HideDialogue();
         Close();
     }
 

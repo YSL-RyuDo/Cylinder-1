@@ -50,7 +50,7 @@ public class UIManager : MonoBehaviour
     }
 
 
-    private void Open(IUIWindow window)
+    public void Open(IUIWindow window)
     {
         window.Open();
         currentWindow = window;

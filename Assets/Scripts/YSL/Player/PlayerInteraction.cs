@@ -1,118 +1,146 @@
 using UnityEngine;
-using UnityEngine.UIElements;
 
 [RequireComponent(typeof(PlayerInput))]
 public class PlayerInteraction : MonoBehaviour
 {
     public float interactRange = 1.2f;
-    //public LayerMask interactLayer;
+
+    public LayerMask interactableLayer;
+    public LayerMask npcLayer;
+    public LayerMask portalLayer;
+
+    public SpriteRenderer interactionRenderer;
+    public Sprite normalSprite;
+    public Sprite talkSprite;
+    public Sprite lockedSprite;
 
     private PlayerInput input;
-    private bool lastShow = false;
-
-    private readonly string[] validTags =
-    { "Item", "Puzzle" };  // UI 띄울 '일반' 상호작용 대상
-
-    private readonly string[] lockableTags =
-    { "Portal" };   // 나중에 "Door", "Chest" 등 추가 가능
-
-    private bool lastState = false;
+    private readonly Collider2D[] results = new Collider2D[8];
+    private Sprite lastSprite = null;
 
     private void Awake()
     {
         input = GetComponent<PlayerInput>();
+        interactionRenderer.sprite = null;
     }
 
     private void Update()
     {
-        UpdateInteractionUI();
+        bool canInteract = UpdateInteractionSprite();
 
-        if (input.InteractPressed)
+        if (canInteract && input.InteractPressed)
+        {
             TryInteract();
+        }
     }
 
-    private void UpdateInteractionUI()
+    private bool UpdateInteractionSprite()
     {
-        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, interactRange);
+        int count = Physics2D.OverlapCircleNonAlloc(
+            transform.position,
+            interactRange,
+            results,
+            interactableLayer | npcLayer | portalLayer
+        );
 
-        foreach (var target in hits)
+        Sprite nextSprite = null;
+
+        for (int i = 0; i < count; i++)
         {
-            if (target == null) continue;
+            if (!results[i]) continue;
 
-            // 1. 아이템 / 퍼즐
-            foreach (var tag in validTags)
+            if (((1 << results[i].gameObject.layer) & npcLayer) != 0)
             {
-                if (target.CompareTag(tag))
+                nextSprite = talkSprite;
+                break;
+            }
+        }
+
+        if (nextSprite == null)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                if (!results[i]) continue;
+
+                if (((1 << results[i].gameObject.layer) & interactableLayer) != 0)
                 {
-                    ObjectInteractionUI.Instance.ShowNormal();
-                    lastState = true;
-                    return;
+                    nextSprite = normalSprite;
+                    break;
                 }
             }
+        }
 
-            // 2. 포탈
-            foreach (var tag in lockableTags)
+        if (nextSprite == null)
+        {
+            for (int i = 0; i < count; i++)
             {
-                if (target.CompareTag(tag))
-                {
-                    PortalTrigger p = target.GetComponent<PortalTrigger>();
+                if (!results[i]) continue;
 
+                if (((1 << results[i].gameObject.layer) & portalLayer) != 0)
+                {
+                    PortalTrigger p = results[i].GetComponent<PortalTrigger>();
                     if (p != null && p.data.isLocked)
                     {
-                        ObjectInteractionUI.Instance.ShowLocked();
-                        lastState = true;
-                        return;
+                        nextSprite = lockedSprite;
                     }
-
-                    ObjectInteractionUI.Instance.Hide();
-                    lastState = false;
-                    return;
+                    break;
                 }
             }
         }
 
-        // 범위 내 아무 것도 없음 → 숨김
-        if (lastState)
+        if (lastSprite != nextSprite)
         {
-            ObjectInteractionUI.Instance.Hide();
-            lastState = false;
+            interactionRenderer.sprite = nextSprite;
+            lastSprite = nextSprite;
         }
-    }
 
+        return nextSprite != null;
+    }
 
     private void TryInteract()
     {
-        // 범위 내 모든 Collider 검색
-        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, interactRange);
+        int count = Physics2D.OverlapCircleNonAlloc(
+            transform.position,
+            interactRange,
+            results,
+            interactableLayer | npcLayer | portalLayer
+        );
 
-        foreach (var target in hits)
+        Debug.Log($"[Interact] Hit Count = {count}");
+
+        for (int i = 0; i < count; i++)
         {
-            if (target == null) continue;
+            if (!results[i]) continue;
 
-            // 1. 일반 상호작용 (Item / Puzzle)
-            foreach (var tag in validTags)
+            GameObject hitObj = results[i].gameObject;
+            int layer = hitObj.layer;
+            string layerName = LayerMask.LayerToName(layer);
+
+            Debug.Log(
+                $"[Interact] Hit Object = {hitObj.name}, " +
+                $"Layer = {layerName} ({layer})"
+            );
+
+            IInteractable interactable =
+                results[i].GetComponentInParent<IInteractable>();
+
+            if (interactable != null)
             {
-                if (target.CompareTag(tag))
-                {
-                    IInteractable interactable = target.GetComponent<IInteractable>();
-                    if (interactable != null)
-                        interactable.Interact(this.gameObject);
-                    return;
-                }
+                Debug.Log($"[Interact] IInteractable FOUND on {hitObj.name}");
+                interactable.Interact(gameObject);
+                return;
             }
-
-            // 2. 포탈
-            foreach (var tag in lockableTags)
+            else
             {
-                if (target.CompareTag(tag))
-                {
-                    IInteractable interactable = target.GetComponent<IInteractable>();
-                    if (interactable != null)
-                        interactable.Interact(this.gameObject);
-                    return;
-                }
+                Debug.Log($"[Interact] IInteractable NOT found on {hitObj.name}");
             }
         }
     }
 
+#if UNITY_EDITOR
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.DrawWireSphere(transform.position, interactRange);
+    }
+#endif
 }

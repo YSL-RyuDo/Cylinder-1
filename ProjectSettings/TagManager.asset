@@ -13,6 +13,7 @@ TagManager:
   - Puzzle
   - Obstacle
   - Portal
+  - NPC
   layers:
   - Default
   - TransparentFX
@@ -24,9 +25,9 @@ TagManager:
   - Wall
   - Map
   - Item
-  - 
-  - 
-  - 
+  - NPC
+  - Portal
+  - Obstacle
   - 
   - 
   - 
