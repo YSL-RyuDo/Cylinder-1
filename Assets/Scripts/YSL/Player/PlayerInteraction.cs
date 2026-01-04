@@ -26,6 +26,16 @@ public class PlayerInteraction : MonoBehaviour
 
     private void Update()
     {
+        // 대화 중이면 무조건 Next
+        if (DialogueUI.Instance != null && DialogueUI.Instance.IsOpen)
+        {
+            if (input.InteractPressed)
+            {
+                DialogueManager.Instance.Next();
+            }
+            return;
+        }
+
         bool canInteract = UpdateInteractionSprite();
 
         if (canInteract && input.InteractPressed)
@@ -49,42 +59,22 @@ public class PlayerInteraction : MonoBehaviour
         {
             if (!results[i]) continue;
 
-            if (((1 << results[i].gameObject.layer) & npcLayer) != 0)
+            NPCDialogueTrigger npc =
+                results[i].GetComponentInParent<NPCDialogueTrigger>();
+
+            if (npc != null)
             {
+                // 이 NPC 전용 완료 플래그 확인
+                if (!string.IsNullOrEmpty(npc.doneFlagKey) &&
+                    DialogueFlagTable.Instance != null &&
+                    DialogueFlagTable.Instance.Get(npc.doneFlagKey) == "true")
+                {
+                    // 이 NPC는 아이콘도 표시하지 않음
+                    continue;
+                }
+
                 nextSprite = talkSprite;
                 break;
-            }
-        }
-
-        if (nextSprite == null)
-        {
-            for (int i = 0; i < count; i++)
-            {
-                if (!results[i]) continue;
-
-                if (((1 << results[i].gameObject.layer) & interactableLayer) != 0)
-                {
-                    nextSprite = normalSprite;
-                    break;
-                }
-            }
-        }
-
-        if (nextSprite == null)
-        {
-            for (int i = 0; i < count; i++)
-            {
-                if (!results[i]) continue;
-
-                if (((1 << results[i].gameObject.layer) & portalLayer) != 0)
-                {
-                    PortalTrigger p = results[i].GetComponent<PortalTrigger>();
-                    if (p != null && p.data.isLocked)
-                    {
-                        nextSprite = lockedSprite;
-                    }
-                    break;
-                }
             }
         }
 
@@ -106,33 +96,17 @@ public class PlayerInteraction : MonoBehaviour
             interactableLayer | npcLayer | portalLayer
         );
 
-        Debug.Log($"[Interact] Hit Count = {count}");
-
         for (int i = 0; i < count; i++)
         {
             if (!results[i]) continue;
-
-            GameObject hitObj = results[i].gameObject;
-            int layer = hitObj.layer;
-            string layerName = LayerMask.LayerToName(layer);
-
-            Debug.Log(
-                $"[Interact] Hit Object = {hitObj.name}, " +
-                $"Layer = {layerName} ({layer})"
-            );
 
             IInteractable interactable =
                 results[i].GetComponentInParent<IInteractable>();
 
             if (interactable != null)
             {
-                Debug.Log($"[Interact] IInteractable FOUND on {hitObj.name}");
                 interactable.Interact(gameObject);
                 return;
-            }
-            else
-            {
-                Debug.Log($"[Interact] IInteractable NOT found on {hitObj.name}");
             }
         }
     }

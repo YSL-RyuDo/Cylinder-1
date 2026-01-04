@@ -6077,6 +6077,7 @@ GameObject:
   m_Component:
   - component: {fileID: 317093396}
   - component: {fileID: 317093397}
+  - component: {fileID: 317093398}
   m_Layer: 0
   m_Name: DialogueSystem
   m_TagString: Untagged
@@ -6111,6 +6112,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca6568d656f5e0d479be0101268be9c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &317093398
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 317093394}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2da73f1ca5a8a5439f4087edf30b534, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dl_done0: 0
+  ritual_offering: 
 --- !u!1 &318540880
 GameObject:
   m_ObjectHideFlags: 0
@@ -25444,7 +25459,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7057a9e81809aca439fa22dcfcf5f996, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startNodeId: 5
+  startSceneId: 1
+  doneFlagKey: dl_done0
 --- !u!1 &1246960529
 GameObject:
   m_ObjectHideFlags: 0
@@ -38766,7 +38782,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7057a9e81809aca439fa22dcfcf5f996, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startNodeId: 0
+  startSceneId: 0
+  doneFlagKey: dl_done1
 --- !u!1 &1870450526
 GameObject:
   m_ObjectHideFlags: 0

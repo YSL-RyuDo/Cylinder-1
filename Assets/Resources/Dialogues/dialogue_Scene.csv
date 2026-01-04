@@ -1,12 +1,13 @@
-id,scene_id,speaker,emotion,text,condition_key,condition_value,choice0_text,choice0_next,command,command_target,command_value,next_id
+﻿id,scene_id,speaker,emotion,text,condition_key,condition_value,choice0_text,choice0_next,command,command_target,command_value,next_id
 0,0,라즐리,0,"마침내 교단에 새로운 태양이 떠오를 때다.",,,,,,,,1
 1,0,라즐리,0,"신도들이여, 그대들은 이데아에 갈 자격을 얻게 될 것이다.",,,,,,,,2
-2,0,라즐리,0,"그 영광스러운 첫 비행을 오늘 선보이마.",,,,,,,,3
-3,0,라즐리,0,"나는 교단의 성녀로서 그분의 말씀을 받들고 이곳에서 기적을 행하리라.",,,,,,,,4
-4,0,Narration,0,"<W,A,S,D 키>로 이동할 수 있습니다.\n<F 키>로 상호작용할 수 있습니다.",,,,,,,,-1
-5,1,기도하는 신도,0,"제가 이 의식에서 제물로서 내놓을 것을 선택해주셨으면 합니다.",,,,,,,,6
-6,1,Narration,0,"기도하는 신도는 당신의 선택을 기다리고 있다...",,,,,,,,7
-7,1,Choice,0,"손",,,손,9,set_var,ritual_offering,손,
-8,1,Choice,0,"자아",,,자아,9,set_var,ritual_offering,자아,
-9,1,라즐리,0,"그분께서 너의 {ritual_offering}을 바라신다.",,,,,,,,10
-10,1,기도하는 신도,0,"모든 것은 교단을 위해…",,,,,,,,-1
+2,0,라즐리,0,"그 영광스러운 첫 비행을 오늘 선보이마",,,,,,,,3
+3,0,라즐리,0,"나는 교단의 성녀로서 그분의 말슴을 받들고 이곳에서 기적을 행하리라",,,,,,,,4
+4,0,Narration,0,"<W,A,S,D 키>로 이동할 수 있습니다.\n<F 키>로 상호작용 할 수 있습니다.",,,,,,,,-1
+5,1,기도하는 신도,0,"제가 이 의식에 제물로서 내놓을 것을 선택해주셨으면 합니다.",dl_done0,false,,,,,,6
+6,1,Narration,0,"기도하는 신도는 당신의 선택을 기다리고 있다.",,,,,,,,7
+7,1,Choice,0,"손",,,,,set_var,ritual_offering,손,9
+8,1,Choice,0,"자아",,,,,set_var,ritual_offering,자아,10
+9,1,라즐리,0,"그분께서 너의 손을 바라신다.",,,,,,,,11
+10,1,라즐리,0,"그분께서 너의 자아를 바라신다.",,,,,,,,11
+11,1,기도하는 신도,0,"모든 것은 교단을 위해",,,,,set_var,dl_done0,true,-1
