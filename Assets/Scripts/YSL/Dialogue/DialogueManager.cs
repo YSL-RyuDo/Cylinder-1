@@ -90,12 +90,14 @@ public class DialogueManager : MonoBehaviour
 
         currentNodeId = id;
 
+        // scene 변경 시 초기 슬롯 세팅
         if (node.scene_id != currentSceneId)
         {
             ApplyScene(node.scene_id);
             currentSceneId = node.scene_id;
         }
 
+        // 조건 실패 시 종료
         if (!CheckCondition(node))
         {
             currentNodeId = -1;
@@ -103,12 +105,52 @@ public class DialogueManager : MonoBehaviour
             return;
         }
 
-        // Choice는 즉시 표시
+        // Choice 처리
         if (node.speaker == "Choice")
         {
             waitingForChoice = true;
             ShowChoiceBlock(id);
             return;
+        }
+
+        // emotion 변경 반영 (기존 API만 사용)
+        if (!string.IsNullOrEmpty(node.speaker))
+        {
+            string targetSlot = null;
+
+            foreach (string slot in DialogueUI.Instance.GetAllSlots())
+            {
+                string speakerInSlot = DialogueUI.Instance.GetSpeakerInSlot(slot);
+                if (!string.IsNullOrEmpty(speakerInSlot) &&
+                    speakerInSlot == node.speaker)
+                {
+                    targetSlot = slot;
+                    break;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(targetSlot))
+            {
+                Sprite sp = null;
+
+                if (node.speaker == "라즐리")
+                {
+                    sp = PortraitDatabase.GetPlayer(0, node.emotion);
+                }
+                else
+                {
+                    sp = PortraitDatabase.GetNPC(node.speaker);
+                }
+
+                if (sp != null)
+                {
+                    DialogueUI.Instance.EnterSlot(
+                        targetSlot,
+                        sp,
+                        node.speaker
+                    );
+                }
+            }
         }
 
         // command 처리
@@ -133,17 +175,7 @@ public class DialogueManager : MonoBehaviour
             ParseText(node.text)
         );
 
-        // 다음 노드가 Choice면 자동으로 Choice 표시
-        if (node.next_id >= 0
-            && nodeTable.TryGetValue(node.next_id, out var next)
-            && next.scene_id == currentSceneId
-            && next.speaker == "Choice")
-        {
-            waitingForChoice = true;
-            ShowChoiceBlock(node.next_id);
-            return;
-        }
-
+        // 종료 처리
         if (node.next_id < 0)
         {
             currentNodeId = -1;
@@ -152,7 +184,6 @@ public class DialogueManager : MonoBehaviour
 
         currentNodeId = node.next_id;
     }
-
 
     private void ShowChoiceBlock(int startId)
     {

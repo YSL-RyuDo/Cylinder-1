@@ -6125,6 +6125,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dl_done0: 0
+  dl_done1: 0
+  dl_done2: 0
+  dl_done3: 0
+  dl_done4: 0
   ritual_offering: 
 --- !u!1 &318540880
 GameObject:
@@ -6768,6 +6772,7 @@ GameObject:
   - component: {fileID: 349036775}
   - component: {fileID: 349036774}
   - component: {fileID: 349036773}
+  - component: {fileID: 349036778}
   m_Layer: 10
   m_Name: Beliver2
   m_TagString: NPC
@@ -6950,6 +6955,20 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &349036778
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 349036771}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7057a9e81809aca439fa22dcfcf5f996, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startSceneId: 3
+  doneFlagKey: dl_done2
 --- !u!1 &351723078
 GameObject:
   m_ObjectHideFlags: 0
@@ -29317,6 +29336,7 @@ GameObject:
   - component: {fileID: 1372456802}
   - component: {fileID: 1372456801}
   - component: {fileID: 1372456800}
+  - component: {fileID: 1372456805}
   m_Layer: 10
   m_Name: Beliver4
   m_TagString: NPC
@@ -29499,6 +29519,20 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1372456805
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1372456798}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7057a9e81809aca439fa22dcfcf5f996, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startSceneId: 5
+  doneFlagKey: dl_done4
 --- !u!1 &1378920658
 GameObject:
   m_ObjectHideFlags: 0
@@ -38782,7 +38816,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7057a9e81809aca439fa22dcfcf5f996, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startSceneId: 0
+  startSceneId: 2
   doneFlagKey: dl_done1
 --- !u!1 &1870450526
 GameObject:
@@ -40473,6 +40507,7 @@ GameObject:
   - component: {fileID: 1934012916}
   - component: {fileID: 1934012915}
   - component: {fileID: 1934012914}
+  - component: {fileID: 1934012919}
   m_Layer: 10
   m_Name: Beliver3
   m_TagString: NPC
@@ -40655,6 +40690,20 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1934012919
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1934012912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7057a9e81809aca439fa22dcfcf5f996, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startSceneId: 4
+  doneFlagKey: dl_done3
 --- !u!1 &1934952185
 GameObject:
   m_ObjectHideFlags: 0
