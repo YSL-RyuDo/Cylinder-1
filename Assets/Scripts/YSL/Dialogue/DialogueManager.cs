@@ -16,6 +16,7 @@ public class DialogueManager : MonoBehaviour
     private int currentNodeId;
     private int currentSceneId = -1;
     private bool waitingForChoice = false;
+    private bool autoStartFinished = false;
 
     private void Awake()
     {
@@ -25,6 +26,21 @@ public class DialogueManager : MonoBehaviour
         LoadDialogueNodes("Dialogues/dialogue_Scene");
         LoadSceneSlots("Dialogues/dialogue");
     }
+    private void Start()
+    {
+        if (autoStartFinished)
+            return;
+
+        if (DialogueFlagTable.Instance == null)
+            return;
+
+        if (!DialogueFlagTable.Instance.dl_done)
+        {
+            autoStartFinished = true;
+            StartDialogueByScene(0);
+        }
+    }
+
     public bool CurrentNodeIsValid()
     {
         return currentNodeId >= 0;
@@ -32,9 +48,14 @@ public class DialogueManager : MonoBehaviour
 
     public void StartDialogueByScene(int sceneId)
     {
-        Debug.Log($"[StartDialogueByScene] sceneId={sceneId}, dl_done0={DialogueFlagTable.Instance?.Get("dl_done0")}");
+        // scene 0은 한 번 끝나면 다시 시작 금지
+        if (sceneId == 0 &&
+            DialogueFlagTable.Instance != null &&
+            DialogueFlagTable.Instance.dl_done)
+        {
+            return;
+        }
 
-        // 완전 초기화
         waitingForChoice = false;
         currentNodeId = -1;
         currentSceneId = -1;
@@ -50,7 +71,6 @@ public class DialogueManager : MonoBehaviour
         if (startNode == null)
             return;
 
-        // 조건 실패 시 아무 것도 하지 않음
         if (!CheckCondition(startNode))
             return;
 
@@ -60,17 +80,26 @@ public class DialogueManager : MonoBehaviour
 
     public void Next()
     {
+        // 타이핑 중이면 다음 노드로 가지 말고 텍스트 완성
+        if (DialogueUI.Instance.IsTyping())
+        {
+            DialogueUI.Instance.ForceCompleteTyping();
+            return;
+        }
+
         if (waitingForChoice)
             return;
 
         if (currentNodeId < 0)
         {
             DialogueUI.Instance.Close();
+            CheckFinalDialogueCondition();
             return;
         }
 
         ExecuteNode(currentNodeId);
     }
+
 
     private void ExecuteNode(int id)
     {
@@ -78,6 +107,7 @@ public class DialogueManager : MonoBehaviour
         {
             currentNodeId = -1;
             DialogueUI.Instance.Close();
+            CheckFinalDialogueCondition();
             return;
         }
 
@@ -90,14 +120,12 @@ public class DialogueManager : MonoBehaviour
 
         currentNodeId = id;
 
-        // scene 변경 시 초기 슬롯 세팅
         if (node.scene_id != currentSceneId)
         {
             ApplyScene(node.scene_id);
             currentSceneId = node.scene_id;
         }
 
-        // 조건 실패 시 종료
         if (!CheckCondition(node))
         {
             currentNodeId = -1;
@@ -105,7 +133,7 @@ public class DialogueManager : MonoBehaviour
             return;
         }
 
-        // Choice 처리
+        // Choice는 즉시 처리
         if (node.speaker == "Choice")
         {
             waitingForChoice = true;
@@ -113,47 +141,7 @@ public class DialogueManager : MonoBehaviour
             return;
         }
 
-        // emotion 변경 반영 (기존 API만 사용)
-        if (!string.IsNullOrEmpty(node.speaker))
-        {
-            string targetSlot = null;
-
-            foreach (string slot in DialogueUI.Instance.GetAllSlots())
-            {
-                string speakerInSlot = DialogueUI.Instance.GetSpeakerInSlot(slot);
-                if (!string.IsNullOrEmpty(speakerInSlot) &&
-                    speakerInSlot == node.speaker)
-                {
-                    targetSlot = slot;
-                    break;
-                }
-            }
-
-            if (!string.IsNullOrEmpty(targetSlot))
-            {
-                Sprite sp = null;
-
-                if (node.speaker == "라즐리")
-                {
-                    sp = PortraitDatabase.GetPlayer(0, node.emotion);
-                }
-                else
-                {
-                    sp = PortraitDatabase.GetNPC(node.speaker);
-                }
-
-                if (sp != null)
-                {
-                    DialogueUI.Instance.EnterSlot(
-                        targetSlot,
-                        sp,
-                        node.speaker
-                    );
-                }
-            }
-        }
-
-        // command 처리
+        // System / set_var 먼저 처리 (중요)
         if (!string.IsNullOrEmpty(node.command))
         {
             if (node.command == "set_var")
@@ -169,19 +157,45 @@ public class DialogueManager : MonoBehaviour
             }
         }
 
-        // 대사 출력
-        DialogueUI.Instance.ShowLine(
-            node.speaker,
-            ParseText(node.text)
-        );
+        // 텍스트는 반드시 출력
+        if (!string.IsNullOrEmpty(node.text))
+        {
+            DialogueUI.Instance.ShowLine(
+                node.speaker,
+                ParseText(node.text)
+            );
+        }
 
-        // 종료 처리
+        // 종료 노드
         if (node.next_id < 0)
         {
             currentNodeId = -1;
             return;
         }
 
+        // 다음 노드 판별
+        if (!nodeTable.TryGetValue(node.next_id, out var nextNode))
+        {
+            currentNodeId = -1;
+            return;
+        }
+
+        // 다음이 System이면 자동 연속 실행
+        if (nextNode.speaker == "System")
+        {
+            ExecuteNode(node.next_id);
+            return;
+        }
+
+        // 다음이 Choice면 즉시 Choice 표시
+        if (nextNode.speaker == "Choice")
+        {
+            waitingForChoice = true;
+            ShowChoiceBlock(node.next_id);
+            return;
+        }
+
+        // 그 외는 입력 대기
         currentNodeId = node.next_id;
     }
 
@@ -226,69 +240,66 @@ public class DialogueManager : MonoBehaviour
     {
         string cmd = node.command?.Trim();
         string target = node.command_target?.Trim();
-        string value = node.command_value?.Trim();
-
-        Debug.Log($"[RunSystem] cmd='{cmd}', target='{target}', value='{value}'");
 
         if (cmd == "enter")
         {
             Sprite sp = null;
 
             if (target == "라즐리")
-            {
                 sp = PortraitDatabase.GetPlayer(0, 0);
-            }
             else
-            {
                 sp = PortraitDatabase.GetNPC(target);
-            }
 
             if (sp == null)
-            {
-                Debug.LogError($"[RunSystem] ENTER Sprite NOT FOUND target='{target}'");
                 return;
-            }
 
-            DialogueUI.Instance.EnterSlot(value, sp, target);
+            DialogueUI.Instance.EnterSlot(node.command_value, sp, target);
             return;
         }
 
         if (cmd == "move")
         {
-            string fromSlot = null;
             Sprite foundSprite = null;
 
             foreach (string slot in DialogueUI.Instance.GetAllSlots())
             {
                 string speaker = DialogueUI.Instance.GetSpeakerInSlot(slot);
-
-                if (string.IsNullOrEmpty(speaker))
-                    continue;
-
-                if (speaker.Trim().Equals(target, StringComparison.Ordinal))
+                if (speaker == target)
                 {
                     foundSprite = DialogueUI.Instance.GetSlotSprite(slot);
-                    fromSlot = slot;
                     break;
                 }
             }
 
             if (foundSprite == null)
-            {
-                Debug.LogError(
-                    $"[RunSystem] MOVE source NOT FOUND target='{target}'"
-                );
                 return;
-            }
 
-            // 기존 슬롯은 비활성화 (제거가 아니라 이동)
-            DialogueUI.Instance.EnterSlot(value, foundSprite, target);
-
+            DialogueUI.Instance.EnterSlot(node.command_value, foundSprite, target);
             return;
         }
 
-        Debug.LogWarning($"[RunSystem] UNKNOWN command='{cmd}'");
+        if (cmd == "fade")
+        {
+            if (FadeManager.Instance == null)
+                return;
+
+            if (target == "out")
+            {
+                FadeManager.Instance.StartCoroutine(
+                    FadeManager.Instance.FadeOut()
+                );
+            }
+            else if (target == "in")
+            {
+                FadeManager.Instance.StartCoroutine(
+                    FadeManager.Instance.FadeIn()
+                );
+            }
+
+            return;
+        }
     }
+
     private void ApplyScene(int sceneId)
     {
         DialogueUI.Instance.ClearSlots();
@@ -494,4 +505,33 @@ public class DialogueManager : MonoBehaviour
         result.Add(cur);
         return result.ToArray();
     }
+
+    private void CheckFinalDialogueCondition()
+    {
+        // 대화 중이면 무시
+        if (currentNodeId >= 0)
+            return;
+
+        var f = DialogueFlagTable.Instance;
+        if (f == null)
+            return;
+
+        // scene 0이 아직 끝나지 않았으면 실행 금지
+        if (!f.dl_done)
+            return;
+
+        // 이미 최종 대화 실행했으면 무시
+        if (f.dl_done5)
+            return;
+
+        if (f.dl_done0 &&
+            f.dl_done1 &&
+            f.dl_done2 &&
+            f.dl_done3 &&
+            f.dl_done4)
+        {
+            StartDialogueByScene(6);
+        }
+    }
+
 }

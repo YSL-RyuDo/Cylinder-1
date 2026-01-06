@@ -17,6 +17,7 @@ public class PlayerInteraction : MonoBehaviour
     private PlayerInput input;
     private readonly Collider2D[] results = new Collider2D[8];
     private Sprite lastSprite = null;
+    private bool lastInteractPressed = false;
 
     private void Awake()
     {
@@ -26,24 +27,29 @@ public class PlayerInteraction : MonoBehaviour
 
     private void Update()
     {
-        // 대화 중이면 무조건 Next
+        bool pressed = input.InteractPressed;
+
+        // 대화 중
         if (DialogueUI.Instance != null && DialogueUI.Instance.IsOpen)
         {
-            if (input.InteractPressed)
+            if (pressed && !lastInteractPressed)
             {
                 DialogueManager.Instance.Next();
             }
+
+            lastInteractPressed = pressed;
             return;
         }
 
         bool canInteract = UpdateInteractionSprite();
 
-        if (canInteract && input.InteractPressed)
+        if (canInteract && pressed && !lastInteractPressed)
         {
             TryInteract();
         }
-    }
 
+        lastInteractPressed = pressed;
+    }
     private bool UpdateInteractionSprite()
     {
         int count = Physics2D.OverlapCircleNonAlloc(
@@ -64,7 +70,7 @@ public class PlayerInteraction : MonoBehaviour
 
             if (npc != null)
             {
-                // 이 NPC 전용 완료 플래그 확인
+                // NPC 전용 완료 플래그 확인
                 if (!string.IsNullOrEmpty(npc.doneFlagKey) &&
                     DialogueFlagTable.Instance != null &&
                     DialogueFlagTable.Instance.Get(npc.doneFlagKey) == "true")
