@@ -6077,6 +6077,7 @@ GameObject:
   m_Component:
   - component: {fileID: 317093396}
   - component: {fileID: 317093397}
+  - component: {fileID: 317093398}
   m_Layer: 0
   m_Name: DialogueSystem
   m_TagString: Untagged
@@ -6111,6 +6112,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca6568d656f5e0d479be0101268be9c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &317093398
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 317093394}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2da73f1ca5a8a5439f4087edf30b534, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dl_done: 0
+  dl_done0: 0
+  dl_done1: 0
+  dl_done2: 0
+  dl_done3: 0
+  dl_done4: 0
+  dl_done5: 0
+  ritual_offering: 
 --- !u!1 &318540880
 GameObject:
   m_ObjectHideFlags: 0
@@ -6753,6 +6774,7 @@ GameObject:
   - component: {fileID: 349036775}
   - component: {fileID: 349036774}
   - component: {fileID: 349036773}
+  - component: {fileID: 349036778}
   m_Layer: 10
   m_Name: Beliver2
   m_TagString: NPC
@@ -6935,6 +6957,20 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &349036778
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 349036771}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7057a9e81809aca439fa22dcfcf5f996, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startSceneId: 3
+  doneFlagKey: dl_done2
 --- !u!1 &351723078
 GameObject:
   m_ObjectHideFlags: 0
@@ -11584,7 +11620,7 @@ Transform:
   m_GameObject: {fileID: 596407845}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -241.5, y: -61.95, z: 0}
+  m_LocalPosition: {x: -240, y: -55, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -25444,7 +25480,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7057a9e81809aca439fa22dcfcf5f996, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startNodeId: 5
+  startSceneId: 1
+  doneFlagKey: dl_done0
 --- !u!1 &1246960529
 GameObject:
   m_ObjectHideFlags: 0
@@ -29301,6 +29338,7 @@ GameObject:
   - component: {fileID: 1372456802}
   - component: {fileID: 1372456801}
   - component: {fileID: 1372456800}
+  - component: {fileID: 1372456805}
   m_Layer: 10
   m_Name: Beliver4
   m_TagString: NPC
@@ -29483,6 +29521,20 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1372456805
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1372456798}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7057a9e81809aca439fa22dcfcf5f996, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startSceneId: 5
+  doneFlagKey: dl_done4
 --- !u!1 &1378920658
 GameObject:
   m_ObjectHideFlags: 0
@@ -33910,6 +33962,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a377f167d15ec944b820aa380ab5722, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  typingSpeed: 0.04
   dialogueRoot: {fileID: 653629615}
   backgroundImage: {fileID: 80079983}
   dialogueBackground: {fileID: 21300000, guid: bcbd39e4993059a43aa473ac9bb2779c, type: 3}
@@ -38766,7 +38819,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7057a9e81809aca439fa22dcfcf5f996, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startNodeId: 0
+  startSceneId: 2
+  doneFlagKey: dl_done1
 --- !u!1 &1870450526
 GameObject:
   m_ObjectHideFlags: 0
@@ -40456,6 +40510,7 @@ GameObject:
   - component: {fileID: 1934012916}
   - component: {fileID: 1934012915}
   - component: {fileID: 1934012914}
+  - component: {fileID: 1934012919}
   m_Layer: 10
   m_Name: Beliver3
   m_TagString: NPC
@@ -40638,6 +40693,20 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1934012919
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1934012912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7057a9e81809aca439fa22dcfcf5f996, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startSceneId: 4
+  doneFlagKey: dl_done3
 --- !u!1 &1934952185
 GameObject:
   m_ObjectHideFlags: 0
