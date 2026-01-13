@@ -49,5 +49,7 @@
 47,6,Narration,0,"쿵, 제단의 촛불들이 흔들리는 강한 바람이 불어온다.",,,,,,,,48
 48,6,Narration,0,"마침내 빛들이 훅 꺼지고 나면, 풍경은 아지랑이와 같이 뒤섞이고....",,,,,,,,49
 49,6,Narration,0,"암전한다",,,,,,,,50
-50,6,System,0,,,,,,fade,out,,51
-51,6,System,0,,,,,,set_var,dl_done5,true,-1
+50,6,System,0,,,,,,fade_wait,out,,51
+51,6,System,0,,,,,,set_var,dl_done5,true,52
+52,6,System,0,,dl_done5,true,,0,move,Player,position0,53
+53,6,System,0,,,,,,fade_wait,in,,-1

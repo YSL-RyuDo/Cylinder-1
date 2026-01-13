@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 using System.Collections;
 
 public class FadeManager : MonoBehaviour
@@ -15,14 +16,14 @@ public class FadeManager : MonoBehaviour
         else Destroy(gameObject);
     }
 
-    public IEnumerator FadeOut()
+    public IEnumerator FadeOut(Action onComplete = null)
     {
         float t = 0f;
         Color c = fadeImage.color;
 
         while (t < fadeDuration)
         {
-            t += Time.deltaTime;
+            t += Time.unscaledDeltaTime;
             c.a = Mathf.Clamp01(t / fadeDuration);
             fadeImage.color = c;
             yield return null;
@@ -30,16 +31,18 @@ public class FadeManager : MonoBehaviour
 
         c.a = 1f;
         fadeImage.color = c;
+        onComplete?.Invoke();
     }
 
-    public IEnumerator FadeIn()
+
+    public IEnumerator FadeIn(Action onComplete = null)
     {
         float t = fadeDuration;
         Color c = fadeImage.color;
 
         while (t > 0f)
         {
-            t -= Time.deltaTime;
+            t -= Time.unscaledDeltaTime;
             c.a = Mathf.Clamp01(t / fadeDuration);
             fadeImage.color = c;
             yield return null;
@@ -47,6 +50,8 @@ public class FadeManager : MonoBehaviour
 
         c.a = 0f;
         fadeImage.color = c;
+
+        onComplete?.Invoke();
     }
 
     public void FadeOutImmediate()
