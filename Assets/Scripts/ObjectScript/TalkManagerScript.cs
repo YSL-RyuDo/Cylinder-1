@@ -134,19 +134,52 @@ public class TalkManagerScript : MonoBehaviour, IPointerDownHandler
         while (istyping) yield return null;
 
         choicePanel.SetActive(true);
+<<<<<<< Updated upstream
         foreach (Transform child in choicePanel.transform)
             Destroy(child.gameObject);
+=======
+
+        foreach (Transform c in choicePanel.transform)
+            Destroy(c.gameObject);
+>>>>>>> Stashed changes
 
         foreach (var choice in choices)
         {
             GameObject btn = Instantiate(choiceButtonPrefab, choicePanel.transform);
-            btn.GetComponentInChildren<Text>().text = choice.choiceText;
 
+            
+            btn.GetComponentInChildren<Text>().text = choice.choiceText;
+            
+
+
+<<<<<<< Updated upstream
             DialogueNode nextNode = choice.nextNode;
             btn.GetComponent<Button>().onClick.AddListener(() =>
             {
                 choicePanel.SetActive(false);
                 Ondialogue(nextNode.dialogues);
+=======
+            string nextFile = choice.nextFile;
+
+            btn.GetComponent<Button>().onClick.AddListener(() =>
+            {
+                choicePanel.SetActive(false);
+
+              
+                if (string.IsNullOrEmpty(nextFile) || nextFile == "END")
+                {
+                    dialogueGroup.alpha = 0;
+                    dialogueGroup.blocksRaycasts = false;
+                    LeftImg.SetActive(false);
+                    RightImg.SetActive(false);
+                    LogButton.SetActive(false);
+                    dialogueLog.Clear();
+                    return;
+                }
+
+               
+                StartDialogue(nextFile);
+>>>>>>> Stashed changes
             });
         }
     }

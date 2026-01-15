@@ -1,0 +1,54 @@
+﻿{
+    "dialogues": [
+        {
+            "teller": "집사",
+            "sentence": "아가씨, 라즈 아가씨? 어서 일어나보세요! 큰일입니다.",
+            "leftSprite": "Ras_Standing_Affectionate_Standard",
+            "rightSprite": "Butler_Standing_Standard",
+            "hasChoices": false,
+            "choices": [],
+            "systemName": "",
+            "isNarration": false
+        },
+        {
+            "teller": "라즈",
+            "sentence": "집사 님? 무슨 일 있나요?",
+            "leftSprite": "Ras_Standing_Affectionate_Standard",
+            "rightSprite": "Butler_Standing_Standard",
+            "hasChoices": false,
+            "choices": [],
+            "systemName": "",
+            "isNarration": false
+        },
+        {
+            "teller": "집사",
+            "sentence": "예, 신도들이 갑자기 날뛰고 있어요.",
+            "leftSprite": "Ras_Standing_Affectionate_Standard",
+            "rightSprite": "Butler_Standing_Standard",
+            "hasChoices": false,
+            "choices": [],
+            "systemName": "",
+            "isNarration": false
+        },
+        {
+            "teller": "집사",
+            "sentence": "교주님께선 시끄러운 일을 싫어하시니까요, 미리 해결해두면 좋아하실거예요.",
+            "leftSprite": "Ras_Standing_Affectionate_Standard",
+            "rightSprite": "Butler_Standing_Standard",
+            "hasChoices": false,
+            "choices": [],
+            "systemName": "",
+            "isNarration": false
+        },
+        {
+            "teller": "집사",
+            "sentence": "나갈 채비를 하죠. 그 뒤에 어서 신도 건물로 가보는 게 좋겠어요.",
+            "leftSprite": "Ras_Standing_Affectionate_Standard",
+            "rightSprite": "Butler_Standing_Standard",
+            "hasChoices": false,
+            "choices": [],
+            "systemName": "",
+            "isNarration": false
+        }
+    ]
+}

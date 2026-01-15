@@ -1,0 +1,54 @@
+﻿{
+    "dialogues": [
+        {
+            "teller": "집사",
+            "sentence": "(책 [메뉴]를 준다.) 이건 라즈 아가씨께 도움이 되었으면 해서 드리는 선물이에요.",
+            "leftSprite": "Ras_Standing_Affectionate_Standard",
+            "rightSprite": "Butler_Standing_Standard",
+            "hasChoices": false,
+            "choices": [],
+            "systemName": "",
+            "isNarration": false
+        },
+        {
+            "teller": "집사",
+            "sentence": "늘 소지하고 다니며 했던 일들을 기록하는 걸 추천드리죠. 아가씨는 종종 잊어버리고 마니까요.",
+            "leftSprite": "Ras_Standing_Affectionate_Standard",
+            "rightSprite": "Butler_Standing_Standard",
+            "hasChoices": false,
+            "choices": [],
+            "systemName": "",
+            "isNarration": false
+        },
+        {
+            "teller": "집사",
+            "sentence": "가끔은 저와의 일도 잊으실 때가 있어, 얼마나 서운한지 모른답니다~?",
+            "leftSprite": "Ras_Standing_Affectionate_Standard",
+            "rightSprite": "Butler_Standing_Standard",
+            "hasChoices": false,
+            "choices": [],
+            "systemName": "",
+            "isNarration": false
+        },
+        {
+            "teller": "라즐리",
+            "sentence": "그렇군요.. 고마워요.",
+            "leftSprite": "Ras_Standing_Affectionate_Standard",
+            "rightSprite": "Butler_Standing_Standard",
+            "hasChoices": false,
+            "choices": [],
+            "systemName": "",
+            "isNarration": false
+        },
+        {
+            "teller": "집사",
+            "sentence": "자자, 슬슬 가시죠.",
+            "leftSprite": "Ras_Standing_Affectionate_Standard",
+            "rightSprite": "Butler_Standing_Standard",
+            "hasChoices": false,
+            "choices": [],
+            "systemName": "GiveItem_MenuBook, EndDialogueAndAllowMove",
+            "isNarration": false
+        }
+    ]
+}
