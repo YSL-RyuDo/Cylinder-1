@@ -11976,7 +11976,10 @@ CanvasRenderer:
   m_GameObject: {fileID: 2007543101}
   m_CullTransparentMesh: 1
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 --- !u!1 &2030530493
 GameObject:
   m_ObjectHideFlags: 0

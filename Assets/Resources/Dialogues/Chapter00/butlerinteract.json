@@ -1,0 +1,23 @@
+﻿{
+    "dialogues": [
+        {
+            "teller": "집사",
+            "sentence": "이제 갈까요?",
+            "leftSprite": "Ras_Standing_Affectionate_Standard",
+            "rightSprite": "Butler_Standing_Standard",
+            "hasChoices": true,
+            "choices": [
+                {
+                    "choiceText": "네.",
+                    "nextFile": "butlerinteract_yes"
+                },
+                {
+                    "choiceText": "아니오.",
+                    "nextFile": "END"
+                }
+            ],
+            "systemName": "",
+            "isNarration": false
+        }
+    ]
+}

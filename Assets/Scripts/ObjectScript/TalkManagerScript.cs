@@ -135,9 +135,12 @@ public class TalkManagerScript : MonoBehaviour, IPointerDownHandler
 
         choicePanel.SetActive(true);
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         foreach (Transform child in choicePanel.transform)
             Destroy(child.gameObject);
 =======
+=======
+>>>>>>> Stashed changes
 
         foreach (Transform c in choicePanel.transform)
             Destroy(c.gameObject);
@@ -146,6 +149,7 @@ public class TalkManagerScript : MonoBehaviour, IPointerDownHandler
         foreach (var choice in choices)
         {
             GameObject btn = Instantiate(choiceButtonPrefab, choicePanel.transform);
+<<<<<<< Updated upstream
 
             
             btn.GetComponentInChildren<Text>().text = choice.choiceText;
@@ -164,6 +168,19 @@ public class TalkManagerScript : MonoBehaviour, IPointerDownHandler
             btn.GetComponent<Button>().onClick.AddListener(() =>
             {
                 choicePanel.SetActive(false);
+=======
+
+            
+            btn.GetComponentInChildren<Text>().text = choice.choiceText;
+            
+
+
+            string nextFile = choice.nextFile;
+
+            btn.GetComponent<Button>().onClick.AddListener(() =>
+            {
+                choicePanel.SetActive(false);
+>>>>>>> Stashed changes
 
               
                 if (string.IsNullOrEmpty(nextFile) || nextFile == "END")
