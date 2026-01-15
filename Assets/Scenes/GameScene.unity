@@ -11794,7 +11794,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87bc73d3b530d3047b6687d86b68c311, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentPersonality: 0
 --- !u!114 &596407854
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23516,9 +23515,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a111f3073adb0f24f848fa2cb906d37f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  portalDataList:
-  - {fileID: 11400000, guid: fb6b002b747bbd9499cde07968a200bf, type: 2}
-  - {fileID: 11400000, guid: ceff54e71ddccaf479b44a045da901b6, type: 2}
 --- !u!1 &1184211667
 GameObject:
   m_ObjectHideFlags: 0
