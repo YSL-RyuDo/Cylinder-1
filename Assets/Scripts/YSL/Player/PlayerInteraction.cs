@@ -65,8 +65,16 @@ public class PlayerInteraction : MonoBehaviour
         {
             if (!results[i]) continue;
 
+            IInteractable interactable = results[i].GetComponentInParent<IInteractable>();
+
             NPCDialogueTrigger npc =
                 results[i].GetComponentInParent<NPCDialogueTrigger>();
+
+            if(interactable != null && npc == null)
+            {
+                nextSprite = normalSprite;
+                break;
+            }
 
             if (npc != null)
             {
