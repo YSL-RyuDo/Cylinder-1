@@ -8,7 +8,8 @@ public class FadeManager : MonoBehaviour
     public static FadeManager Instance;
 
     [SerializeField] private Image fadeImage;
-    [SerializeField] private float fadeDuration = 0.5f;
+    [SerializeField] private float fadeOutDuration = 0.5f;
+    [SerializeField] private float fadeInDuration = 3f;
 
     private void Awake()
     {
@@ -21,10 +22,10 @@ public class FadeManager : MonoBehaviour
         float t = 0f;
         Color c = fadeImage.color;
 
-        while (t < fadeDuration)
+        while (t < fadeOutDuration)
         {
             t += Time.unscaledDeltaTime;
-            c.a = Mathf.Clamp01(t / fadeDuration);
+            c.a = Mathf.Clamp01(t / fadeOutDuration);
             fadeImage.color = c;
             yield return null;
         }
@@ -37,13 +38,29 @@ public class FadeManager : MonoBehaviour
 
     public IEnumerator FadeIn(Action onComplete = null)
     {
-        float t = fadeDuration;
+        Debug.Log("페이드인");
+
         Color c = fadeImage.color;
 
-        while (t > 0f)
+        c.a = 1f;
+        fadeImage.color = c;
+
+        float holdTime = 2.0f;
+        float t = 0f;
+
+        while (t < holdTime)
         {
-            t -= Time.unscaledDeltaTime;
-            c.a = Mathf.Clamp01(t / fadeDuration);
+            t += Time.unscaledDeltaTime;
+            yield return null;
+        }
+
+        float fadeTime = 1.0f;
+        t = 0f;
+
+        while (t < fadeTime)
+        {
+            t += Time.unscaledDeltaTime;
+            c.a = Mathf.Lerp(1f, 0f, t / fadeTime);
             fadeImage.color = c;
             yield return null;
         }

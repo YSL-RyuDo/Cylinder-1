@@ -37,6 +37,15 @@ public class DialogueUI : MonoBehaviour, IUIWindow
     [Header("Choices")]
     public Transform choiceContainer;
     public Button choiceButtonPrefab;
+    
+    [Header("CutScene")]
+    public Image cutSceneImage;
+    public GameObject cutSceneBackGround;
+    public GameObject cutSceneRoot;
+    private Coroutine cutSceneFadeCoroutine;
+
+    [Header("Next Button")]
+    public Button nextButton;
 
     [Header("Slots")]
     public List<Slot> slots = new();
@@ -59,6 +68,14 @@ public class DialogueUI : MonoBehaviour, IUIWindow
                 slotTable[s.slotId] = s.portrait;
                 s.portrait.gameObject.SetActive(false);
             }
+        }
+
+        if (nextButton != null)
+        {
+            nextButton.onClick.AddListener(() =>
+            {
+                DialogueManager.Instance?.RequestNext();
+            });
         }
 
         dialogueRoot.SetActive(false);
@@ -130,15 +147,11 @@ public class DialogueUI : MonoBehaviour, IUIWindow
         typingCoroutine = null;
     }
 
-    public bool IsTyping()
-    {
-        return isTyping;
-    }
+    public bool IsTyping() => isTyping;
 
     public void ForceCompleteTyping()
     {
         if (!isTyping) return;
-
         StopTypingImmediate();
         dialogueText.text = fullText;
     }
@@ -180,6 +193,12 @@ public class DialogueUI : MonoBehaviour, IUIWindow
         spawnedChoices.Clear();
     }
 
+    public void SetNextButtonActive(bool active)
+    {
+        if (nextButton != null)
+            nextButton.gameObject.SetActive(active);
+    }
+
     public void EnterSlot(string slotId, Sprite portrait, string speaker)
     {
         if (!slotTable.TryGetValue(slotId, out var img)) return;
@@ -194,21 +213,84 @@ public class DialogueUI : MonoBehaviour, IUIWindow
             img.gameObject.SetActive(false);
     }
 
-    public IEnumerable<string> GetAllSlots() => slotTable.Keys;
-
-    public Sprite GetSlotSprite(string slotId)
-    {
-        if (!slotTable.TryGetValue(slotId, out var img)) return null;
-        return img.gameObject.activeSelf ? img.sprite : null;
-    }
-
-    public string GetSpeakerInSlot(string slotId)
-    {
-        return slotSpeakerMap.TryGetValue(slotId, out var s) ? s : null;
-    }
-
     public void ClearSlotSpeakers()
     {
         slotSpeakerMap.Clear();
+    }
+
+    //public void ShowCutScene(int index)
+    //{
+    //    Sprite sp = Resources.Load<Sprite>($"CutScene/{index}");
+    //    if (sp == null)
+    //    {
+    //        Debug.LogError($"[CutScene] Sprite not found: CutScene/{index}");
+    //        return;
+    //    }
+
+    //    cutSceneRoot.SetActive(true);
+
+    //    cutSceneImage.sprite = sp;
+
+    //    cutSceneImage.color = Color.white;
+
+    //    cutSceneImage.gameObject.SetActive(true);
+
+    //    cutSceneRoot.transform.SetAsLastSibling();
+    //}
+
+    public void ShowCutScene(int index)
+    {
+        Sprite sp = Resources.Load<Sprite>($"CutScene/{index}");
+        if (sp == null)
+        {
+            Debug.LogWarning($"[CutScene] Sprite not found: CutScene/{index}");
+            return;
+        }
+
+        cutSceneBackGround.SetActive(true);
+        cutSceneRoot.SetActive(true);
+        cutSceneRoot.transform.SetAsLastSibling();
+
+        cutSceneImage.sprite = sp;
+        cutSceneImage.gameObject.SetActive(true);
+
+        Color c = cutSceneImage.color;
+        c.a = 0f;
+        cutSceneImage.color = c;
+
+        if (cutSceneFadeCoroutine != null)
+            StopCoroutine(cutSceneFadeCoroutine);
+
+        cutSceneFadeCoroutine = StartCoroutine(FadeInCutScene());
+    }
+
+
+
+    private IEnumerator FadeInCutScene()
+    {
+        Color c = cutSceneImage.color;
+        c.a = 0f;
+        cutSceneImage.color = c;
+
+        float t = 0f;
+        const float duration = 0.6f;
+
+        while (t < duration)
+        {
+            t += Time.unscaledDeltaTime;
+            c.a = Mathf.Clamp01(t / duration);
+            cutSceneImage.color = c;
+            yield return null;
+        }
+
+        c.a = 1f;
+        cutSceneImage.color = c;
+    }
+
+    public void HideCutScene()
+    {
+        cutSceneImage.gameObject.SetActive(false);
+        cutSceneRoot.SetActive(false);
+        cutSceneBackGround.SetActive(false);
     }
 }

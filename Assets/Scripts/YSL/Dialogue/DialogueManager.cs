@@ -110,6 +110,8 @@ public class DialogueManager : MonoBehaviour
             currentNodeId = -1;
             DialogueUI.Instance.Close();
             CheckFinalDialogueCondition();
+            if (DialogueUI.Instance != null)
+                DialogueUI.Instance.HideCutScene();
             return;
         }
 
@@ -300,11 +302,14 @@ public class DialogueManager : MonoBehaviour
             if (FadeManager.Instance == null)
                 return false;
 
+            if (DialogueUI.Instance != null)
+                DialogueUI.Instance.HideCutScene();
+
+
             CameraFollow cam = Camera.main.GetComponent<CameraFollow>();
             if (cam != null)
                 cam.BeginExternalControl();
 
-            // fade out일 때 대사창 닫기
             if (target == "out")
             {
                 if (DialogueUI.Instance != null)
@@ -333,7 +338,6 @@ public class DialogueManager : MonoBehaviour
             return false;
         }
 
-
         if (cmd == "delay")
         {
             float sec = 0f;
@@ -341,6 +345,18 @@ public class DialogueManager : MonoBehaviour
 
             StartCoroutine(DelayAndNext(sec, node.next_id));
             return false;
+        }
+
+        if (cmd == "cutscene")
+        {
+            if (DialogueUI.Instance != null)
+            {
+                int index = 0;
+                int.TryParse(target, out index);
+                DialogueUI.Instance.ShowCutScene(index);
+            }
+
+            return true;
         }
 
         return true;
@@ -609,6 +625,15 @@ public class DialogueManager : MonoBehaviour
         }
 
         ExecuteNode(nextId);
+    }
+
+    public void RequestNext()
+    {
+        // Choice 중이면 입력 자체를 무시
+        if (waitingForChoice)
+            return;
+
+        Next();
     }
 
 }
