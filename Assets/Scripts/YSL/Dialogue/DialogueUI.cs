@@ -40,6 +40,7 @@ public class DialogueUI : MonoBehaviour, IUIWindow
     
     [Header("CutScene")]
     public Image cutSceneImage;
+    public GameObject cutSceneBackGround;
     public GameObject cutSceneRoot;
     private Coroutine cutSceneFadeCoroutine;
 
@@ -246,6 +247,7 @@ public class DialogueUI : MonoBehaviour, IUIWindow
             return;
         }
 
+        cutSceneBackGround.SetActive(true);
         cutSceneRoot.SetActive(true);
         cutSceneRoot.transform.SetAsLastSibling();
 
@@ -261,6 +263,7 @@ public class DialogueUI : MonoBehaviour, IUIWindow
 
         cutSceneFadeCoroutine = StartCoroutine(FadeInCutScene());
     }
+
 
 
     private IEnumerator FadeInCutScene()
@@ -286,8 +289,8 @@ public class DialogueUI : MonoBehaviour, IUIWindow
 
     public void HideCutScene()
     {
-        if (cutSceneImage == null) return;
         cutSceneImage.gameObject.SetActive(false);
+        cutSceneRoot.SetActive(false);
+        cutSceneBackGround.SetActive(false);
     }
-
 }
