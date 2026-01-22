@@ -11,6 +11,7 @@ public class DialogueFlagTable : MonoBehaviour
     public bool dl_done3;
     public bool dl_done4;
     public bool dl_done5;
+    public bool dl_done6;   
 
     public string ritual_offering;
 
@@ -25,7 +26,8 @@ public class DialogueFlagTable : MonoBehaviour
 
     public void Set(string key, string value)
     {
-        bool v = (value == "true");
+       
+        bool v = value != null && value.Trim().ToLower() == "true";
         bool changed = false;
 
         if (key == "dl_done" && dl_done != v) { dl_done = v; changed = true; }
@@ -35,6 +37,7 @@ public class DialogueFlagTable : MonoBehaviour
         else if (key == "dl_done3" && dl_done3 != v) { dl_done3 = v; changed = true; }
         else if (key == "dl_done4" && dl_done4 != v) { dl_done4 = v; changed = true; }
         else if (key == "dl_done5" && dl_done5 != v) { dl_done5 = v; changed = true; }
+        else if (key == "dl_done6" && dl_done6 != v) { dl_done6 = v; changed = true; } 
         else if (key == "ritual_offering") { ritual_offering = value; changed = true; }
 
         if (changed)
@@ -55,6 +58,7 @@ public class DialogueFlagTable : MonoBehaviour
         if (key == "dl_done3") return dl_done3 ? "true" : "false";
         if (key == "dl_done4") return dl_done4 ? "true" : "false";
         if (key == "dl_done5") return dl_done5 ? "true" : "false";
+        if (key == "dl_done6") return dl_done6 ? "true" : "false"; 
         if (key == "ritual_offering") return ritual_offering;
 
         return null;

@@ -1,14 +1,17 @@
+using System;
 using UnityEngine;
 
 public class NPCDialogueTrigger : MonoBehaviour, IInteractable
 {
     public int startSceneId;
+    public string doneFlagKey;
 
-    // 이 NPC가 확인할 플래그
-    public string doneFlagKey;   // 예: "dl_done0"
+    private float lockUntil = 0f;
 
     public void Interact(GameObject player)
     {
+        if (Time.time < lockUntil) return;
+
         // 대화 진행 중이면 Next
         if (DialogueUI.Instance != null
             && DialogueUI.Instance.IsOpen
@@ -16,18 +19,20 @@ public class NPCDialogueTrigger : MonoBehaviour, IInteractable
             && DialogueManager.Instance.CurrentNodeIsValid())
         {
             DialogueManager.Instance.Next();
+            lockUntil = Time.time + 0.2f;   
             return;
         }
 
-        // 이 NPC 전용 플래그 체크
+        // 플래그 체크 (대소문자 안전)
         if (!string.IsNullOrEmpty(doneFlagKey)
-            && DialogueFlagTable.Instance != null
-            && DialogueFlagTable.Instance.Get(doneFlagKey) == "true")
+            && DialogueFlagTable.Instance != null)
         {
-            // 이 NPC만 비활성
-            return;
+            var v = DialogueFlagTable.Instance.Get(doneFlagKey);
+            if (string.Equals(v?.Trim(), "true", StringComparison.OrdinalIgnoreCase))
+                return;
         }
 
         DialogueManager.Instance.StartDialogueByScene(startSceneId);
+        lockUntil = Time.time + 0.1f;       
     }
 }
