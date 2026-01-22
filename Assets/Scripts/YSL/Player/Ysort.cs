@@ -1,28 +1,23 @@
 using UnityEngine;
 
 [RequireComponent(typeof(SpriteRenderer))]
-public class YSort : MonoBehaviour
+public class YSortByCollider : MonoBehaviour
 {
-    [Header("정렬 기준")]
-    [Tooltip("정렬 기준이 되는 위치 Transform. 비워두면 자기 자신")]
-    public Transform pivot;
-
-    [Header("정렬 보정")]
-    [Tooltip("같은 Y값에서의 우선순위 보정값")]
     public int orderOffset = 0;
-
-    [Header("정밀도")]
-    [Tooltip("Y값을 정수로 변환할 때 사용하는 배율")]
     public int precision = 100;
 
     private SpriteRenderer spriteRenderer;
+    private Collider2D col;
 
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
+        col = GetComponent<Collider2D>();
 
-        if (pivot == null)
-            pivot = transform;
+        if (col == null)
+        {
+            Debug.LogError($"{name} : Collider2D가 필요합니다.");
+        }
     }
 
     private void LateUpdate()
@@ -32,7 +27,12 @@ public class YSort : MonoBehaviour
 
     private void ApplySorting()
     {
-        int sortingOrder = Mathf.RoundToInt(-pivot.position.y * precision);
+        if (col == null) return;
+
+        // 콜라이더 하단 Y값
+        float bottomY = col.bounds.min.y;
+
+        int sortingOrder = Mathf.RoundToInt(-bottomY * precision);
         spriteRenderer.sortingOrder = sortingOrder + orderOffset;
     }
 }
