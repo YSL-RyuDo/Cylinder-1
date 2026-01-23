@@ -5,7 +5,11 @@ public class PuzzleGridController : MonoBehaviour
 {
     [Header("이동")]
     public float moveSpeed = 6f;
-    public float cellSize = 1.1f;
+
+    [Header("그리드 셀 크기 (수동 설정)")]
+    public float cellSizeX = 1.1f;
+    public float cellSizeY = 1.1f;
+
     public bool gridEnabled = false;
 
     [Header("퍼즐 매니저(자동 연결됨)")]
@@ -30,12 +34,15 @@ public class PuzzleGridController : MonoBehaviour
     [Header("플레이어 기준 콜라이더(비워두면 자동 탐색)")]
     public Collider2D bodyCollider;
 
+    // 콜라이더 중심 - transform.position
     private Vector3 pivotOffset;
     private bool moving = false;
 
     void Awake()
     {
-        if (bodyCollider == null) bodyCollider = GetComponent<Collider2D>();
+        if (bodyCollider == null)
+            bodyCollider = GetComponent<Collider2D>();
+
         RecalcPivotOffset();
     }
 
@@ -51,7 +58,12 @@ public class PuzzleGridController : MonoBehaviour
     {
         RecalcPivotOffset();
 
-        gridOrigin = new Vector3(originWorldPos.x, originWorldPos.y, transform.position.z);
+        gridOrigin = new Vector3(
+            originWorldPos.x,
+            originWorldPos.y,
+            transform.position.z
+        );
+
         hasOrigin = true;
 
         transform.position = SnapToGrid(transform.position);
@@ -61,15 +73,15 @@ public class PuzzleGridController : MonoBehaviour
     {
         if (!hasOrigin) return transformPos;
 
-        //콜라이더 중심
+        // 기준점: 콜라이더 중심
         Vector3 refPos = transformPos + pivotOffset;
 
-        float x = Mathf.Round((refPos.x - gridOrigin.x) / cellSize) * cellSize + gridOrigin.x;
-        float y = Mathf.Round((refPos.y - gridOrigin.y) / cellSize) * cellSize + gridOrigin.y;
+        float x = Mathf.Round((refPos.x - gridOrigin.x) / cellSizeX) * cellSizeX + gridOrigin.x;
+        float y = Mathf.Round((refPos.y - gridOrigin.y) / cellSizeY) * cellSizeY + gridOrigin.y;
 
         Vector3 snappedRef = new Vector3(x, y, refPos.z);
 
-        // 다시 transform
+        // 다시 transform 위치로 환산
         return snappedRef - pivotOffset;
     }
 
@@ -86,10 +98,21 @@ public class PuzzleGridController : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.D)) dir = Vector3.right;
         if (dir == Vector3.zero) return;
 
+        // 이동 시작 전 스냅
         transform.position = SnapToGrid(transform.position);
-        Vector3 target = SnapToGrid(transform.position + dir * cellSize);
 
-        Vector2 checkSize = Vector2.one * (cellSize * obstacleCheckRatio);
+        Vector3 step = Vector3.zero;
+        if (dir == Vector3.left) step = new Vector3(-cellSizeX, 0f, 0f);
+        else if (dir == Vector3.right) step = new Vector3(cellSizeX, 0f, 0f);
+        else if (dir == Vector3.up) step = new Vector3(0f, cellSizeY, 0f);
+        else if (dir == Vector3.down) step = new Vector3(0f, -cellSizeY, 0f);
+
+        Vector3 target = SnapToGrid(transform.position + step);
+
+        // 장애물 체크 (X/Y 분리)
+        float sizeX = Mathf.Max(0.2f, cellSizeX * obstacleCheckRatio);
+        float sizeY = Mathf.Max(0.2f, cellSizeY * obstacleCheckRatio);
+        Vector2 checkSize = new Vector2(sizeX, sizeY);
 
         Vector2 targetCenter = (Vector2)(target + pivotOffset);
         if (Physics2D.OverlapBox(targetCenter, checkSize, 0f, obstacleMask) != null)
@@ -104,7 +127,11 @@ public class PuzzleGridController : MonoBehaviour
 
         while (Vector3.Distance(transform.position, target) > 0.01f)
         {
-            transform.position = Vector3.MoveTowards(transform.position, target, moveSpeed * Time.deltaTime);
+            transform.position = Vector3.MoveTowards(
+                transform.position,
+                target,
+                moveSpeed * Time.deltaTime
+            );
             yield return null;
         }
 
