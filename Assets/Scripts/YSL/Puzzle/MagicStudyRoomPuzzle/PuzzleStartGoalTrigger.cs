@@ -14,23 +14,18 @@ public class PuzzleStartGoalTrigger : MonoBehaviour
         if (!other.CompareTag("Player")) return;
         if (manager == null) return;
 
-        if (manager.isActive)
-        {
-            manager.Fail_ReturnPlatform();
-            return;
-        }
-
         if (mode == Mode.Start)
-        {
+        { 
             var col = GetComponent<Collider2D>();
             Vector3 center = col != null ? (Vector3)col.bounds.center : transform.position;
             center.z = other.transform.position.z;
 
             manager.StartPuzzle(center);
         }
-        else
+        else // Goal
         {
-            onGoal = false;
+            if (!manager.isActive) return;
+            onGoal = true;
         }
     }
 
@@ -42,7 +37,6 @@ public class PuzzleStartGoalTrigger : MonoBehaviour
 
     void Update()
     {
-        // (남겨둔 기존 E키 로직: 하지만 위에서 Goal 밟는 순간 초기화되니 실사용은 거의 없음)
         if (mode != Mode.Goal) return;
         if (!onGoal) return;
         if (manager == null || !manager.isActive) return;
