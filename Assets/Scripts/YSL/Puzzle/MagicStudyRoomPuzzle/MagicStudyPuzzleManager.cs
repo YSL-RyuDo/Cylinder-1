@@ -63,9 +63,6 @@ public class MagicStudyPuzzleManager : MonoBehaviour
             t.manager = this;
     }
 
-    // ===============================
-    // 퍼즐 시작
-    // ===============================
     public void StartPuzzle(Vector3 startCenter)
     {
         if (isActive) return;
@@ -74,7 +71,6 @@ public class MagicStudyPuzzleManager : MonoBehaviour
         CacheTiles();
         ResetTilesOnly();
 
-        // 퍼즐 시작 시 플레이어 기존 스크립트 OFF
         if (disableWhenPuzzleStarts != null)
         {
             foreach (var mb in disableWhenPuzzleStarts)
@@ -107,7 +103,6 @@ public class MagicStudyPuzzleManager : MonoBehaviour
             player.position = targetPos;
         }
 
-        // 그리드 이동 ON
         if (gridController != null)
         {
             gridController.manager = this;
@@ -119,9 +114,6 @@ public class MagicStudyPuzzleManager : MonoBehaviour
         Debug.Log("퍼즐 시작!");
     }
 
-    // ===============================
-    // 타일 카운트
-    // ===============================
     public void RegisterStep()
     {
         steppedTiles++;
@@ -132,30 +124,24 @@ public class MagicStudyPuzzleManager : MonoBehaviour
         return totalTiles > 0 && steppedTiles >= totalTiles;
     }
 
-    // ===============================
-    // 실패/성공 처리
-    // ===============================
+
     public void Fail_FallingTile()
     {
         Debug.Log("떨어져버렸어…");
-        ResetPuzzle(); // ❗ 낙하는 기존대로 텔레포트
+        ResetPuzzle();
     }
 
     public void Fail_ReturnPlatform()
     {
         Debug.Log("앗 책들이 다시 올라오잖아!");
-        ResetTilesAndStopPuzzle_KeepPlayer(); // ✅ 플레이어 위치 유지
+        ResetTilesAndStopPuzzle_KeepPlayer();
     }
 
     public void ClearPuzzle()
     {
         Debug.Log("성공했다!");
-        ResetPuzzle(); // 성공 시는 기존대로 처리(원하면 여기만 바꿀 수도 있음)
-    }
+        ResetPuzzle();
 
-    // ===============================
-    // 기존 리셋 (플레이어 이동 포함)
-    // ===============================
     public void ResetPuzzle()
     {
         ResetTilesOnly();
@@ -168,7 +154,6 @@ public class MagicStudyPuzzleManager : MonoBehaviour
             gridController.enabled = false;
         }
 
-        // 플레이어 스크립트 다시 ON
         if (disableWhenPuzzleStarts != null)
         {
             foreach (var mb in disableWhenPuzzleStarts)
@@ -195,10 +180,6 @@ public class MagicStudyPuzzleManager : MonoBehaviour
         }
     }
 
-    // ===============================
-    // 🔑 추가된 핵심 함수
-    // 플레이어 위치 유지 + 타일만 초기화
-    // ===============================
     public void ResetTilesAndStopPuzzle_KeepPlayer()
     {
         ResetTilesOnly();
@@ -223,9 +204,6 @@ public class MagicStudyPuzzleManager : MonoBehaviour
         }
     }
 
-    // ===============================
-    // 타일만 리셋
-    // ===============================
     private void ResetTilesOnly()
     {
         totalTiles = 0;

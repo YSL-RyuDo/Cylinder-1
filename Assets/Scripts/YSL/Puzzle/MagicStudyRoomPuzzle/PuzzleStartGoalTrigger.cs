@@ -14,14 +14,12 @@ public class PuzzleStartGoalTrigger : MonoBehaviour
         if (!other.CompareTag("Player")) return;
         if (manager == null) return;
 
-        // ✅ 퍼즐 진행 중이면 Start/Goal 상관없이 즉시 초기화
         if (manager.isActive)
         {
-            manager.Fail_ReturnPlatform(); // 책들이 다시 올라오며 초기화
+            manager.Fail_ReturnPlatform();
             return;
         }
 
-        // ✅ 퍼즐 비활성 상태에서 Start를 밟으면 퍼즐 시작
         if (mode == Mode.Start)
         {
             var col = GetComponent<Collider2D>();
@@ -30,7 +28,7 @@ public class PuzzleStartGoalTrigger : MonoBehaviour
 
             manager.StartPuzzle(center);
         }
-        else // Goal인데 isActive=false면 아무것도 안 함
+        else
         {
             onGoal = false;
         }
