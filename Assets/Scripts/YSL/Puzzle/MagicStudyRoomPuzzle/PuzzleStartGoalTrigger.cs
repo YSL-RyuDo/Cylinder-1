@@ -14,8 +14,17 @@ public class PuzzleStartGoalTrigger : MonoBehaviour
         if (!other.CompareTag("Player")) return;
         if (manager == null) return;
 
+        if (manager.isActive && mode == Mode.Start)
+        {
+            manager.Fail_ReturnPlatform();
+            return;
+        }
+
         if (mode == Mode.Start)
-        { 
+        {
+            // 퍼즐이 비활성일 때만 시작
+            if (manager.isActive) return;
+
             var col = GetComponent<Collider2D>();
             Vector3 center = col != null ? (Vector3)col.bounds.center : transform.position;
             center.z = other.transform.position.z;
