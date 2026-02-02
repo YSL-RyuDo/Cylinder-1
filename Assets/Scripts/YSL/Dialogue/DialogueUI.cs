@@ -113,7 +113,6 @@ public class DialogueUI : MonoBehaviour, IUIWindow
         speakerText.text = "";
         dialogueText.text = "";
         dialogueText.gameObject.SetActive(true);
-
         if (speaker == "Narration")
         {
             backgroundImage.sprite = narrationBackground;
@@ -125,7 +124,7 @@ public class DialogueUI : MonoBehaviour, IUIWindow
             backgroundImage.sprite = dialogueBackground;
             speakerText.gameObject.SetActive(true);
             speakerText.text = speaker;
-            dialogueText.color = Color.black;
+            dialogueText.color = Color.white;
         }
 
         fullText = text ?? "";
