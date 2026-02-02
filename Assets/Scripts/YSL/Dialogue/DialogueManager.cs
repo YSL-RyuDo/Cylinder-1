@@ -26,7 +26,14 @@ public class DialogueManager : MonoBehaviour
         Instance = this;
 
         PortraitDatabase.LoadAll();
+
+        
+        nodeTable.Clear();
+
+        
         LoadDialogueNodes("Dialogues/dialogue_Scene");
+        LoadDialogueNodes("Dialogues/dialogue_ObjectScene");
+
         LoadSceneSlots("Dialogues/dialogue");
     }
     private void Start()
@@ -509,7 +516,7 @@ public class DialogueManager : MonoBehaviour
             return;
         }
 
-        nodeTable.Clear();
+        
         StringReader r = new StringReader(csv.text);
         bool header = true;
 

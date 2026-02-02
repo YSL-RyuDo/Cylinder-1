@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class NPCDialogueTrigger : MonoBehaviour, IInteractable
@@ -19,7 +21,7 @@ public class NPCDialogueTrigger : MonoBehaviour, IInteractable
             && DialogueManager.Instance.CurrentNodeIsValid())
         {
             DialogueManager.Instance.Next();
-            lockUntil = Time.time + 0.2f;   
+            lockUntil = Time.time + 0.2f;
             return;
         }
 
@@ -33,6 +35,6 @@ public class NPCDialogueTrigger : MonoBehaviour, IInteractable
         }
 
         DialogueManager.Instance.StartDialogueByScene(startSceneId);
-        lockUntil = Time.time + 0.1f;       
+        lockUntil = Time.time + 0.1f;
     }
 }

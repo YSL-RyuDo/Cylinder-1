@@ -1,0 +1,11 @@
+﻿id,scene_id,speaker,emotion,text,condition_key,condition_value,choice0_text,choice0_next,command,command_target,command_value,next_id
+1000,1000,Narration,0,신도들이 자신의 하루 일과와 연구성과를 작성한 일지를 담은 캐비넷이다.,,,,,,,,-1
+1002,1001,Narration,0,아이템 [신도 일지] 획득,,,,,,,,-1
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,

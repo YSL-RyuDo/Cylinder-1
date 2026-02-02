@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class DialogueFlagTable : MonoBehaviour
@@ -18,9 +19,9 @@ public class DialogueFlagTable : MonoBehaviour
     public bool dl_done10;
     public bool dl_done11;
     public bool dl_done12;
+
     public string ritual_offering;
 
-    // 상태 변경 감지용
     public bool Dirty { get; private set; }
 
     private void Awake()
@@ -31,7 +32,6 @@ public class DialogueFlagTable : MonoBehaviour
 
     public void Set(string key, string value)
     {
-
         bool v = value != null && value.Trim().ToLower() == "true";
         bool changed = false;
 
