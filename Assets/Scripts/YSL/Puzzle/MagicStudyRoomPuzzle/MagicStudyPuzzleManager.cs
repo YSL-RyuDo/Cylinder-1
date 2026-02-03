@@ -40,7 +40,7 @@ public class MagicStudyPuzzleManager : MonoBehaviour
         CacheTiles();
         ResetTilesOnly();
 
-        // ✅ 시작 시 페이드 이미지가 깜빡이지 않게 알파 0 고정
+        // 시작 시 페이드 이미지가 깜빡이지 않게 알파 0 고정
         if (fadeImage != null)
         {
             var c = fadeImage.color;
@@ -87,7 +87,7 @@ public class MagicStudyPuzzleManager : MonoBehaviour
     public void StartPuzzle(Vector3 startCenter)
     {
         if (isActive) return;
-        if (isFading) return; // ✅ 페이드 중엔 시작 금지(안전)
+        if (isFading) return; // 페이드 중엔 시작 금지(안전)
 
         isActive = true;
 
@@ -160,7 +160,7 @@ public class MagicStudyPuzzleManager : MonoBehaviour
         if (isFading) return;
         Debug.Log("떨어져버렸어…");
 
-        // ✅ 페이드 후 '텔레포트 리셋'
+        // 페이드 후 '텔레포트 리셋'
         StartCoroutine(FadeRoutine(() => ResetPuzzle()));
     }
 
@@ -169,7 +169,7 @@ public class MagicStudyPuzzleManager : MonoBehaviour
         if (isFading) return;
         Debug.Log("앗 책들이 다시 올라오잖아!");
 
-        // ✅ 페이드 후 '플레이어 위치 유지 리셋'
+        // 페이드 후 '플레이어 위치 유지 리셋'
         StartCoroutine(FadeRoutine(() => ResetTilesAndStopPuzzle_KeepPlayer()));
     }
 

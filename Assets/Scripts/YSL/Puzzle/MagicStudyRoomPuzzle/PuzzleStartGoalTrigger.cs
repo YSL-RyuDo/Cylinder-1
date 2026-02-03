@@ -50,7 +50,7 @@ public class PuzzleStartGoalTrigger : MonoBehaviour
         if (!onGoal) return;
         if (manager == null || !manager.isActive) return;
 
-        if (Input.GetKeyDown(KeyCode.E))
+        if (Input.GetKeyDown(KeyCode.F))
         {
             if (manager.IsAllTilesStepped())
                 manager.ClearPuzzle();
