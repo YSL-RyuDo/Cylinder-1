@@ -69,3 +69,6 @@ TagManager:
   - name: interact
     uniqueID: 1535240251
     locked: 0
+  - name: Object
+    uniqueID: 4123934289
+    locked: 0

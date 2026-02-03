@@ -5,6 +5,9 @@ using System;
 using System.IO;
 using System.Linq;
 using Unity.VisualScripting;
+using static UnityEngine.Rendering.DebugUI;
+using System.Collections;
+using Palmmedia.ReportGenerator.Core;
 
 public class DialogueManager : MonoBehaviour
 {
@@ -23,7 +26,14 @@ public class DialogueManager : MonoBehaviour
         Instance = this;
 
         PortraitDatabase.LoadAll();
+
+        
+        nodeTable.Clear();
+
+        
         LoadDialogueNodes("Dialogues/dialogue_Scene");
+        LoadDialogueNodes("Dialogues/dialogue_ObjectScene");
+
         LoadSceneSlots("Dialogues/dialogue");
     }
     private void Start()
@@ -108,6 +118,8 @@ public class DialogueManager : MonoBehaviour
             currentNodeId = -1;
             DialogueUI.Instance.Close();
             CheckFinalDialogueCondition();
+            if (DialogueUI.Instance != null)
+                DialogueUI.Instance.HideCutScene();
             return;
         }
 
@@ -133,7 +145,6 @@ public class DialogueManager : MonoBehaviour
             return;
         }
 
-        // Choice는 즉시 처리
         if (node.speaker == "Choice")
         {
             waitingForChoice = true;
@@ -141,7 +152,8 @@ public class DialogueManager : MonoBehaviour
             return;
         }
 
-        // System / set_var 먼저 처리 (중요)
+        bool canContinue = true;
+
         if (!string.IsNullOrEmpty(node.command))
         {
             if (node.command == "set_var")
@@ -153,11 +165,13 @@ public class DialogueManager : MonoBehaviour
             }
             else
             {
-                RunSystem(node);
+                canContinue = RunSystem(node);
             }
         }
 
-        // 텍스트는 반드시 출력
+        if (!canContinue)
+            return;
+
         if (!string.IsNullOrEmpty(node.text))
         {
             DialogueUI.Instance.ShowLine(
@@ -166,28 +180,39 @@ public class DialogueManager : MonoBehaviour
             );
         }
 
-        // 종료 노드
         if (node.next_id < 0)
         {
             currentNodeId = -1;
             return;
         }
 
-        // 다음 노드 판별
         if (!nodeTable.TryGetValue(node.next_id, out var nextNode))
         {
             currentNodeId = -1;
             return;
         }
 
-        // 다음이 System이면 자동 연속 실행
         if (nextNode.speaker == "System")
         {
+            // fade_wait(in)은 자동 실행
+            if (IsWaitingSystem(nextNode) && nextNode.command_target == "in")
+            {
+                ExecuteNode(node.next_id);
+                return;
+            }
+
+            // 그 외 대기형 System은 입력 대기
+            if (IsWaitingSystem(nextNode))
+            {
+                currentNodeId = node.next_id;
+                return;
+            }
+
             ExecuteNode(node.next_id);
             return;
         }
 
-        // 다음이 Choice면 즉시 Choice 표시
+
         if (nextNode.speaker == "Choice")
         {
             waitingForChoice = true;
@@ -195,9 +220,19 @@ public class DialogueManager : MonoBehaviour
             return;
         }
 
-        // 그 외는 입력 대기
         currentNodeId = node.next_id;
     }
+
+    private bool IsWaitingSystem(DialogueNode node)
+    {
+        if (string.IsNullOrEmpty(node.command))
+            return false;
+
+        string cmd = node.command.Trim();
+        return cmd == "fade_wait" || cmd == "delay";
+    }
+
+
 
     private void ShowChoiceBlock(int startId)
     {
@@ -236,68 +271,173 @@ public class DialogueManager : MonoBehaviour
         DialogueUI.Instance.ShowChoices(choices);
     }
 
-    private void RunSystem(DialogueNode node)
+    private bool RunSystem(DialogueNode node)
     {
         string cmd = node.command?.Trim();
         string target = node.command_target?.Trim();
-
-        if (cmd == "enter")
-        {
-            Sprite sp = null;
-
-            if (target == "라즐리")
-                sp = PortraitDatabase.GetPlayer(0, 0);
-            else
-                sp = PortraitDatabase.GetNPC(target);
-
-            if (sp == null)
-                return;
-
-            DialogueUI.Instance.EnterSlot(node.command_value, sp, target);
-            return;
-        }
+        string value = node.command_value?.Trim();
 
         if (cmd == "move")
         {
-            Sprite foundSprite = null;
+            WorldMove(target, value);
 
-            foreach (string slot in DialogueUI.Instance.GetAllSlots())
+            CameraFollow cam = Camera.main.GetComponent<CameraFollow>();
+            if (cam != null)
             {
-                string speaker = DialogueUI.Instance.GetSpeakerInSlot(slot);
-                if (speaker == target)
-                {
-                    foundSprite = DialogueUI.Instance.GetSlotSprite(slot);
-                    break;
-                }
+                GameObject obj = GameObject.Find(target);
+                if (obj != null)
+                    cam.SnapToPositionImmediate(obj.transform.position);
             }
 
-            if (foundSprite == null)
-                return;
-
-            DialogueUI.Instance.EnterSlot(node.command_value, foundSprite, target);
-            return;
+            return true;
         }
 
         if (cmd == "fade")
         {
             if (FadeManager.Instance == null)
-                return;
+                return true;
+
+            if (target == "out")
+                FadeManager.Instance.StartCoroutine(FadeManager.Instance.FadeOut());
+            else if (target == "in")
+                FadeManager.Instance.StartCoroutine(FadeManager.Instance.FadeIn());
+
+            return true;
+        }
+
+        if (cmd == "fade_wait")
+        {
+            if (FadeManager.Instance == null)
+                return false;
+
+            if (DialogueUI.Instance != null)
+                DialogueUI.Instance.HideCutScene();
+            // 페이드 시작 전 시간 정지
+            Time.timeScale = 0f;
+
+            CameraFollow cam = Camera.main.GetComponent<CameraFollow>();
+            if (cam != null)
+                cam.BeginExternalControl();
 
             if (target == "out")
             {
+                if (DialogueUI.Instance != null)
+                    DialogueUI.Instance.Close();
+
                 FadeManager.Instance.StartCoroutine(
-                    FadeManager.Instance.FadeOut()
+                    FadeManager.Instance.FadeOut(() =>
+                    {
+                        // 페이드 완료 후 시간 재개
+                        Time.timeScale = 1f;
+
+                        ExecuteNode(node.next_id);
+                    })
                 );
             }
             else if (target == "in")
             {
                 FadeManager.Instance.StartCoroutine(
-                    FadeManager.Instance.FadeIn()
+                    FadeManager.Instance.FadeIn(() =>
+                    {
+                        if (cam != null)
+                            cam.EndExternalControl();
+
+                        // 페이드 완료 후 시간 재개
+                        Time.timeScale = 1f;
+
+                        ExecuteNode(node.next_id);
+                    })
                 );
             }
 
-            return;
+            return false;
         }
+
+        if (cmd == "walk")
+        {
+            StartCoroutine(WalkAndNext(target, value, node.next_id));
+            return false;
+        }
+        
+        if (cmd == "set_next")
+        {
+            GameObject targetObj = GameObject.Find(target);
+            if (targetObj == null)
+            {
+                Debug.LogWarning($"[Dialogue] set_next 대상 없음: {target}");
+                return true;
+            }
+
+            var NPC = targetObj.GetComponent<NPCDialogueTrigger>();
+
+            if (NPC != null)
+            {
+                int nextId = 0;
+                int.TryParse(value, out nextId);
+
+                NPC.startSceneId = nextId;
+                if (nextId == 1)
+                {
+                    NPC.doneFlagKey = "dl_done";
+                }
+                else
+                {
+                    NPC.doneFlagKey = "dl_done" + (nextId - 1);
+                }
+
+                Debug.Log($"[Dialogue] set_next 대상 설정: {target} -> scene {nextId},  flag {NPC.doneFlagKey}");
+            }
+            else
+            {
+                Debug.LogWarning($"[Dialogue] set_next 대상에 NPCDialogueTrigger 없음: {target}");
+            }
+            return true;
+        }
+
+        if (cmd == "delay")
+        {
+            float sec = 0f;
+            float.TryParse(value, out sec);
+
+            StartCoroutine(DelayAndNext(sec, node.next_id));
+            return false;
+        }
+
+        if (cmd == "revive")
+        {
+            GameObject targetObj = GameObject.Find(target);
+            if (targetObj == null)
+            {
+                Debug.LogWarning($"[Dialogue] revive 대상 없음: {target}");
+                return true;
+            }
+
+            var deathState = targetObj.GetComponent<NPCDeathState>();
+            if (deathState != null)
+            {
+                deathState.Revive();
+            }
+            else
+            {
+                Debug.LogWarning($"[Dialogue] {target}에 NPCDeathState 스크립트가 없습니다.");
+            }
+
+            return true;
+        }
+
+        if (cmd == "cutscene")
+        {
+            if (DialogueUI.Instance != null)
+            {
+                int index = 0;
+                int.TryParse(target, out index);
+                DialogueUI.Instance.ShowCutScene(index);
+            }
+
+            return true;
+        }
+
+        return true;
     }
 
     private void ApplyScene(int sceneId)
@@ -376,7 +516,7 @@ public class DialogueManager : MonoBehaviour
             return;
         }
 
-        nodeTable.Clear();
+        
         StringReader r = new StringReader(csv.text);
         bool header = true;
 
@@ -532,6 +672,107 @@ public class DialogueManager : MonoBehaviour
         {
             StartDialogueByScene(6);
         }
+    }
+
+    private void WorldMove(string characterName, string pointKey)
+    {
+        GameObject targetObj = GameObject.Find(characterName);
+        if (targetObj == null)
+        {
+            Debug.LogWarning($"[Dialogue] WorldMove 대상 없음: {characterName}");
+            return;
+        }
+
+        Transform point = WorldMovePointTable.Instance?.Get(pointKey);
+        if (point == null)
+        {
+            Debug.LogWarning($"[Dialogue] 이동 위치 없음: {pointKey}");
+            return;
+        }
+
+        targetObj.transform.position = point.position;
+    }
+
+    private IEnumerator DelayAndNext(float sec, int nextId)
+    {
+        float t = 0f;
+        while (t < sec)
+        {
+            t += Time.unscaledDeltaTime;
+            yield return null;
+        }
+
+        ExecuteNode(nextId);
+    }
+
+    public void RequestNext()
+    {
+        // Choice 중이면 입력 자체를 무시
+        if (waitingForChoice)
+            return;
+
+        Next();
+    }
+
+    private IEnumerator WalkAndNext(string characterName, string pointKey, int nextId)
+    {
+        if (DialogueUI.Instance != null)
+        {
+            DialogueUI.Instance.Close();
+        }
+        //걸을때 시간 정지
+        Time.timeScale = 0f;
+
+        GameObject targetObj = GameObject.Find(characterName);
+        if (targetObj == null)
+        {
+            Debug.LogWarning($"[Dialogue] Walk 대상 없음: {characterName}");
+            ExecuteNode(nextId);
+            yield break;
+        }
+
+        Transform point = WorldMovePointTable.Instance?.Get(pointKey);
+        Vector3 destPos = (point != null) ? point.position : targetObj.transform.position;
+        destPos.z = targetObj.transform.position.z;
+
+        // 컴포넌트 가져오기, 제어권 뺏기
+        var playerMove = targetObj.GetComponent<PlayerMove>();
+        var anim = targetObj.GetComponent<Animator>();
+        var sr = targetObj.GetComponent<SpriteRenderer>();
+
+        if (playerMove != null) playerMove.enabled = false;
+
+        float speed = (playerMove != null) ? playerMove.moveSpeed : 3f;
+
+        while (Vector3.Distance(targetObj.transform.position, destPos) > 0.01f)
+        {
+            Vector3 dir = (destPos - targetObj.transform.position).normalized;
+            
+            if (anim != null) anim.SetBool("IsWalk", true);
+
+            if (sr != null)
+            {
+                if (dir.x > 0) sr.flipX = true;      
+                else if (dir.x < 0) sr.flipX = false;
+            }
+
+            targetObj.transform.position = Vector3.MoveTowards(
+                targetObj.transform.position,
+                destPos,
+                speed * Time.unscaledDeltaTime
+            );
+
+            yield return null;
+        }
+
+        targetObj.transform.position = destPos; // 위치 보정
+
+        if (anim != null) anim.SetBool("IsWalk", false); // 걷기 모션 해제
+        if (playerMove != null) playerMove.enabled = true; // 제어권 반환
+
+        Time.timeScale = 1f; // 시간 재개
+
+        ExecuteNode(nextId);
     }
 
 }

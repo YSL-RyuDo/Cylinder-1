@@ -7,6 +7,7 @@ public class CameraFollow : MonoBehaviour
     private Camera cam;
     private float camHalfHeight;
     private float camHalfWidth;
+    private bool externalControl = false;
 
     void Start()
     {
@@ -22,6 +23,9 @@ public class CameraFollow : MonoBehaviour
 
     void LateUpdate()
     {
+        if (externalControl)
+            return;
+
         if (playerMove == null)
             return;
 
@@ -138,4 +142,15 @@ public class CameraFollow : MonoBehaviour
 
         SnapToPositionImmediate(target.position);
     }
+
+    public void BeginExternalControl()
+    {
+        externalControl = true;
+    }
+
+    public void EndExternalControl()
+    {
+        externalControl = false;
+    }
+
 }
