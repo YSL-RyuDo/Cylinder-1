@@ -13,13 +13,23 @@ public class PlayerMove : MonoBehaviour
     private SpriteRenderer sr;
 
     public CameraFollow cameraFollow;
-    [SerializeField]
-    private LayerMask obstacleLayer;
+
+    [Header("Collision Masks")]
+    [SerializeField] private LayerMask obstacleLayer; // 예: NPC, Obstacle
+    [SerializeField] private LayerMask waterLayer;    // 예: Water
+
+    [Header("Debug")]
+    [SerializeField] private bool debugHitLog = false;
 
     public MapBoundary CurrentMapBoundary { get; private set; }
     public CircularMapBoundary CurrentCircularBoundary { get; private set; }
 
-    private Collider2D[] overlapBuffer = new Collider2D[8];
+    private Collider2D[] overlapBuffer = new Collider2D[16];
+
+    [Header("Runtime Override")]
+    public bool useSpeedOverride = false;
+    public float speedOverride = 5f;
+    public float CurrentMoveSpeed => useSpeedOverride ? speedOverride : moveSpeed;
 
     private void Awake()
     {
@@ -42,30 +52,36 @@ public class PlayerMove : MonoBehaviour
 
     private void Move()
     {
+        // 대쉬 중이면 PlayerMove는 덮어쓰기 금지
+        var grief = GetComponent<GriefAbilityController>();
+        if (grief != null && grief.IsDashingNow)
+            return;
+
         Vector2 inputDir = input.MoveAxis;
         if (inputDir.sqrMagnitude < 0.0001f)
             return;
 
         Vector3 startPos = transform.position;
-        Vector3 targetPos = startPos + (Vector3)(inputDir.normalized * moveSpeed * Time.deltaTime);
+        Vector3 targetPos = startPos + (Vector3)(inputDir.normalized * CurrentMoveSpeed * Time.deltaTime);
 
         Vector3 finalPos = startPos;
 
-        // X축 (MapBoundary와 동일한 사고방식)
+        // X축
         Vector3 testX = new Vector3(targetPos.x, startPos.y, startPos.z);
-        if (!IsInsideObstacle(testX))
+        if (!IsBlocked(testX))
             finalPos.x = testX.x;
 
         // Y축
         Vector3 testY = new Vector3(finalPos.x, targetPos.y, startPos.z);
-        if (!IsInsideObstacle(testY))
+        if (!IsBlocked(testY))
             finalPos.y = testY.y;
 
         ClampToBoundaries(ref finalPos);
         transform.position = finalPos;
     }
 
-    private bool IsInsideObstacle(Vector3 pos)
+    //  핵심: 물 레이어는 grief만 통과, 그 외 인격은 막기
+    private bool IsBlocked(Vector3 pos)
     {
         Vector2 half = GetWorldHalfSize();
         Vector2 offset = GetWorldOffset();
@@ -73,25 +89,45 @@ public class PlayerMove : MonoBehaviour
         Vector2 center = (Vector2)pos + offset;
         Vector2 size = half * 2f - Vector2.one * SKIN;
 
-        int count = Physics2D.OverlapBoxNonAlloc(
-            center,
-            size,
-            0f,
-            overlapBuffer
-        );
+        //  Water + Obstacle만 검사하도록 필터 적용
+        LayerMask blockMask = obstacleLayer | waterLayer;
+
+        int count = Physics2D.OverlapBoxNonAlloc(center, size, 0f, overlapBuffer, blockMask);
 
         for (int i = 0; i < count; i++)
         {
             Collider2D hit = overlapBuffer[i];
-            if (hit == null)
-                continue;
+            if (hit == null) continue;
+            if (hit == col) continue;
 
-            if (hit == col)
-                continue;
+            int hitMask = 1 << hit.gameObject.layer;
 
-            if (((1 << hit.gameObject.layer) & obstacleLayer) != 0)
+            // --- Water 처리 ---
+            if ((hitMask & waterLayer) != 0)
+            {
+                var pp = PlayerPersonality.Instance;
+                bool isGrief = (pp != null && pp.currentPersonality == PersonalityType.grief);
+
+                if (debugHitLog)
+                {
+                    Debug.Log($"[BLOCK CHECK] WATER hit={hit.name} isTrigger={hit.isTrigger} personality={(pp ? pp.currentPersonality.ToString() : "null")} -> {(isGrief ? "PASS" : "BLOCK")}");
+                }
+
+                // grief면 통과, 아니면 막기
+                if (!isGrief)
+                    return true;
+
+                continue;
+            }
+
+            // --- Obstacle 처리 ---
+            if ((hitMask & obstacleLayer) != 0)
+            {
+                if (debugHitLog)
+                    Debug.Log($"[BLOCK CHECK] OBSTACLE hit={hit.name} layer={LayerMask.LayerToName(hit.gameObject.layer)} isTrigger={hit.isTrigger} -> BLOCK");
+
                 return true;
-
+            }
         }
 
         return false;
