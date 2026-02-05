@@ -20,9 +20,7 @@ public class PlayerPersonality : MonoBehaviour
     public void SetPersonality(PersonalityType newType)
     {
         currentPersonality = newType;
-
         Debug.Log("인격이 " + currentPersonality + " 상태로 변경됨");
-
     }
 
     public bool IsInState(PersonalityType type)

@@ -17,6 +17,7 @@ TagManager:
   - Start
   - Goal
   - Tile
+  - Water
   layers:
   - Default
   - TransparentFX
@@ -32,7 +33,7 @@ TagManager:
   - Portal
   - Obstacle
   - Tile
-  - 
+  - Water
   - 
   - 
   - 
