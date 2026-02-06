@@ -17,6 +17,7 @@ TagManager:
   - Start
   - Goal
   - Tile
+  - Water
   layers:
   - Default
   - TransparentFX
@@ -33,6 +34,7 @@ TagManager:
   - Obstacle
   - Tile
   - Candle
+  - Water
   - 
   - 
   - 
