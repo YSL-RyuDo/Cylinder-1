@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Candle : MonoBehaviour
 {
@@ -28,6 +28,13 @@ public class Candle : MonoBehaviour
 
     public void TryLight()
     {
+        // ✅ 열망 마법이 발동되어야만 촛불 점화 가능
+        if (DesireSpellManager.Instance == null || !DesireSpellManager.Instance.SpellActive)
+        {
+            Debug.Log("[Candle] 마법이 아직 발동되지 않음!");
+            return;
+        }
+
         Debug.Log($"[Candle] Clicked: {name}");
 
         if (isLit && !allowToggleOff) return;
@@ -35,6 +42,7 @@ public class Candle : MonoBehaviour
         isLit = allowToggleOff ? !isLit : true;
         RefreshVisual();
     }
+
 
     private void RefreshVisual()
     {

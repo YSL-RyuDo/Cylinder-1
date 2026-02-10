@@ -4,31 +4,39 @@ public class DesireSpellManager : MonoBehaviour
 {
     public static DesireSpellManager Instance { get; private set; }
 
-    [Header("슬롯 5개 연결")]
+    [Header("슬롯 5개 연결 (Inspector에서 0~4에 각각 드래그)")]
     public DropSlot[] slots = new DropSlot[5];
 
-    private int filledCount = 0;
+    // ✅ 한 번 발동하면 계속 유지
+    public bool SpellActive { get; private set; } = false;
 
     private void Awake()
     {
-        if (Instance == null) Instance = this;
-        else Destroy(gameObject);
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
     }
 
-    public void NotifySlotFilled(int slotIndex, int sigilId)
+    // DropSlot에서 드롭 성공 시 호출
+    public void NotifySlotChanged()
     {
-        Debug.Log($"[Desire] Slot[{slotIndex}]에 문양 ID={sigilId} 들어감");
+        // 이미 발동했으면 유지이므로 더 체크할 필요는 없음(원하면 계속 로그는 남길 수 있음)
+        if (SpellActive) return;
 
-        RecountFilled();
+        int filled = GetFilledCount();
+        Debug.Log($"[Desire] filled = {filled}/5");
 
-        if (filledCount >= 5)
+        if (filled >= 5)
         {
-            Debug.Log("[Desire] ✅ 5개 문양 완성! 마법 발동(디버그)");
-            // 오늘은 여기까지. 나중에 실제 마법/이펙트 연결.
+            SpellActive = true;
+            Debug.Log("[Desire] ✅ 5개 완성! 열망 마법 발동(이후 계속 유지)");
         }
     }
 
-    private void RecountFilled()
+    public int GetFilledCount()
     {
         int cnt = 0;
         for (int i = 0; i < slots.Length; i++)
@@ -36,21 +44,8 @@ public class DesireSpellManager : MonoBehaviour
             if (slots[i] != null && slots[i].CurrentSigil != null)
                 cnt++;
         }
-        filledCount = cnt;
-    }
-
-    // 옵션: 리셋하고 싶을 때 호출용
-    public void ResetAll()
-    {
-        for (int i = 0; i < slots.Length; i++)
-        {
-            if (slots[i] == null) continue;
-            if (slots[i].CurrentSigil != null)
-                slots[i].CurrentSigil.ReturnToOrigin();
-            slots[i].ClearSlot();
-        }
-        filledCount = 0;
-        Debug.Log("[Desire] reset");
+        return cnt;
     }
 }
+
 

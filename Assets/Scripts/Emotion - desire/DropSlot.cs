@@ -1,35 +1,43 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class DropSlot : MonoBehaviour, IDropHandler
 {
-    [Header("ÀÌ ½½·ÔÀÇ ÀÎµ¦½º (0~4)")]
+    [Header("ì´ ìŠ¬ë¡¯ì˜ ì¸ë±ìŠ¤ (0~4)")]
     public int slotIndex = 0;
 
     public DraggableSigil CurrentSigil { get; private set; }
 
     public void OnDrop(PointerEventData eventData)
     {
-        var sigil = eventData.pointerDrag?.GetComponent<DraggableSigil>();
+        var sigil = eventData.pointerDrag ? eventData.pointerDrag.GetComponent<DraggableSigil>() : null;
         if (sigil == null) return;
 
-        // ÀÌ¹Ì Â÷ÀÖÀ¸¸é µå·Ó ºÒ°¡ ¡æ ¿øÀ§Ä¡ º¹±Í
+        // ì´ë¯¸ ì°¨ ìˆìœ¼ë©´ ë“œë¡­ ë¶ˆê°€ â†’ ì›ìœ„ì¹˜
         if (CurrentSigil != null)
         {
             sigil.ReturnToOrigin();
             return;
         }
 
-        // ½½·Ô¿¡ ¹èÄ¡
+        // âœ… ë¬¸ì–‘ì´ ì´ì „ ìŠ¬ë¡¯ì— ìˆì—ˆìœ¼ë©´ ê·¸ ìŠ¬ë¡¯ ë¹„ìš°ê¸°
+        if (sigil.CurrentSlot != null)
+        {
+            sigil.CurrentSlot.ClearSlot();
+        }
+
+        // ìŠ¬ë¡¯ì— ê³ ì •
         CurrentSigil = sigil;
+        sigil.CurrentSlot = this;
+
         sigil.transform.SetParent(transform, false);
 
-        // ½½·Ô Á¤Áß¾Ó¿¡ µü °íÁ¤
         var rt = sigil.GetComponent<RectTransform>();
         rt.anchoredPosition = Vector2.zero;
 
-        // ¸Å´ÏÀú¿¡°Ô ¾Ë¸²
-        DesireSpellManager.Instance?.NotifySlotFilled(slotIndex, sigil.sigilId);
+        // ë§¤ë‹ˆì €ì—ê²Œ "ë³€ê²½ë¨" ì•Œë¦¼ (ì¹´ìš´íŠ¸ ì²´í¬)
+        if (DesireSpellManager.Instance != null)
+            DesireSpellManager.Instance.NotifySlotChanged();
     }
 
     public void ClearSlot()
@@ -37,3 +45,4 @@ public class DropSlot : MonoBehaviour, IDropHandler
         CurrentSigil = null;
     }
 }
+

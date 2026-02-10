@@ -1,64 +1,70 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 [RequireComponent(typeof(CanvasGroup))]
 public class DraggableSigil : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    [Header("ID (¹®¾ç ±¸ºĞ¿ë)")]
     public int sigilId = 0;
+
+    [HideInInspector] public DropSlot CurrentSlot;
 
     private RectTransform rect;
     private Canvas rootCanvas;
-    private CanvasGroup canvasGroup;
+    private CanvasGroup cg;
 
-    private Transform originalParent;
-    private Vector2 originalAnchoredPos;
+    private Transform originParent;
+    private Vector2 originPos;
 
     private void Awake()
     {
         rect = GetComponent<RectTransform>();
-        canvasGroup = GetComponent<CanvasGroup>();
+        cg = GetComponent<CanvasGroup>();
         rootCanvas = GetComponentInParent<Canvas>();
+
         if (rootCanvas == null)
-            Debug.LogError("[DraggableSigil] Canvas¸¦ Ã£À» ¼ö ¾øÀ½. ¹®¾çÀÌ Canvas ¾Æ·¡¿¡ ÀÖ¾î¾ß ÇÔ!");
+            Debug.LogError("[DraggableSigil] Canvas ì•„ë˜ì— ìˆì–´ì•¼ í•©ë‹ˆë‹¤!");
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        originalParent = transform.parent;
-        originalAnchoredPos = rect.anchoredPosition;
+        originParent = transform.parent;
+        originPos = rect.anchoredPosition;
 
-        // µå·¡±× Áß¿£ ½½·Ô ·¹ÀÌÄ³½ºÆ®¿¡ °É¸®Áö ¾Ê°Ô
-        canvasGroup.blocksRaycasts = false;
+        // âœ… ìŠ¬ë¡¯ì— ë°•í˜€ìˆë˜ ìƒíƒœë©´ ìŠ¬ë¡¯ì„ ë¨¼ì € ë¹„ì›Œì¤Œ (ê·¸ë˜ì•¼ ë‹¤ì‹œ ëº„ ìˆ˜ ìˆìŒ)
+        if (CurrentSlot != null)
+        {
+            CurrentSlot.ClearSlot();
+            CurrentSlot = null;
+        }
 
-        // UI°¡ ´Ù¸¥ UI À§·Î ¿Ã¶ó¿À°Ô (ÃÖ»óÀ§·Î)
+        cg.blocksRaycasts = false;
+
+        // ìµœìƒë‹¨ìœ¼ë¡œ ì˜¬ë ¤ì„œ ë“œë˜ê·¸
         transform.SetParent(rootCanvas.transform, true);
     }
 
     public void OnDrag(PointerEventData eventData)
     {
         if (rootCanvas == null) return;
-
-        // ¸¶¿ì½º À§Ä¡·Î ÀÌµ¿ (Canvas Scale °í·Á)
         rect.anchoredPosition += eventData.delta / rootCanvas.scaleFactor;
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        // ±âº»Àº ¿ø·¡ À§Ä¡·Î º¹±Í (½½·Ô¿¡ ¸ø µé¾î°¬À» ¶§)
+        // ë“œë¡­ ì‹¤íŒ¨í•˜ë©´ ì•„ì§ Canvas ë£¨íŠ¸ì— ë‚¨ì•„ìˆìŒ â†’ ì›ìœ„ì¹˜ ë³µê·€
         if (transform.parent == rootCanvas.transform)
         {
             ReturnToOrigin();
         }
 
-        canvasGroup.blocksRaycasts = true;
+        cg.blocksRaycasts = true;
     }
 
     public void ReturnToOrigin()
     {
-        transform.SetParent(originalParent, true);
-        rect.anchoredPosition = originalAnchoredPos;
+        transform.SetParent(originParent, true);
+        rect.anchoredPosition = originPos;
     }
 }
+
 

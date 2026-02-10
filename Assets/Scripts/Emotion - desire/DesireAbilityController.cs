@@ -1,70 +1,76 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class DesireAbilityController : MonoBehaviour
 {
-    [Header("UI Root (DesireUIRoot)")]
+    [Header("UI Root")]
     [SerializeField] private GameObject desireUIRoot;
 
-    [Header("토글 키")]
+    [Header("Input")]
     [SerializeField] private KeyCode toggleKey = KeyCode.E;
 
-    [Header("중복 입력 방지")]
-    [SerializeField] private float toggleCooldown = 0.2f;
+    [Header("Animator")]
+    [SerializeField] private Animator playerAnimator;
+    [SerializeField] private string castTriggerName = "Cast";
 
-    private float lastToggleTime = -999f;
+    [Header("옵션: 시전 중 입력 잠그기")]
+    [SerializeField] private bool lockPlayerWhileCasting = true;
+    [SerializeField] private float castLockTime = 0.6f; // 애니 길이에 맞춰
+
+    [SerializeField] private PlayerMove playerMove; // 이동 스크립트(있으면 연결)
+
     private bool isOpen = false;
+    private bool isCasting = false;
 
     private void Awake()
     {
         if (desireUIRoot != null)
             desireUIRoot.SetActive(false);
+
+        if (playerAnimator == null)
+            playerAnimator = GetComponentInChildren<Animator>();
     }
 
     private void Update()
     {
-        if (!Input.GetKeyDown(toggleKey))
-            return;
+        if (isCasting) return;
 
-        // 열망(Desire) 상태일 때만 토글 허용
-        if (!IsDesireState())
+        if (Input.GetKeyDown(toggleKey))
         {
-            Debug.Log("[Desire] 현재 인격이 Desire가 아니라서 UI 토글 막음");
-            Close();
-            return;
+            // 열망 상태일 때만(너 enum이 desire 소문자라 했지)
+            if (PlayerPersonality.Instance != null &&
+                !PlayerPersonality.Instance.IsInState(PersonalityType.desire))
+            {
+                return;
+            }
+
+            StartCoroutine(CastAndToggleUI());
         }
-
-        // 쿨다운
-        if (Time.unscaledTime - lastToggleTime < toggleCooldown)
-            return;
-
-        lastToggleTime = Time.unscaledTime;
-
-        if (isOpen) Close();
-        else Open();
     }
 
-    private bool IsDesireState()
+    private IEnumerator CastAndToggleUI()
     {
-        if (PlayerPersonality.Instance == null)
-        {
-            Debug.LogWarning("[Desire] PlayerPersonality.Instance가 null임 (씬에 PlayerPersonality 오브젝트가 있는지 확인)");
-            return false;
-        }
+        isCasting = true;
 
-        return PlayerPersonality.Instance.IsInState(PersonalityType.desire);
-    }
+        // 1) 시전 모션
+        if (playerAnimator != null)
+            playerAnimator.SetTrigger(castTriggerName);
 
-    private void Open()
-    {
-        isOpen = true;
-        if (desireUIRoot != null) desireUIRoot.SetActive(true);
-        Debug.Log("[Desire] OPEN");
-    }
+        // 2) 이동 잠금(선택)
+        if (lockPlayerWhileCasting && playerMove != null)
+            playerMove.enabled = false;
 
-    private void Close()
-    {
-        isOpen = false;
-        if (desireUIRoot != null) desireUIRoot.SetActive(false);
-        Debug.Log("[Desire] CLOSE");
+        // 3) 모션 타임 기다리고 UI 토글
+        yield return new WaitForSecondsRealtime(castLockTime);
+
+        isOpen = !isOpen;
+        if (desireUIRoot != null)
+            desireUIRoot.SetActive(isOpen);
+
+        // 4) 이동 해제
+        if (lockPlayerWhileCasting && playerMove != null)
+            playerMove.enabled = true;
+
+        isCasting = false;
     }
 }

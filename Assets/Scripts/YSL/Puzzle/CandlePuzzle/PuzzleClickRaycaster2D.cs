@@ -2,15 +2,9 @@
 
 public class PuzzleClickRaycaster2D : MonoBehaviour
 {
-    [SerializeField] private Camera cam;
     [SerializeField] private LayerMask candleLayer;
     [SerializeField] private float candlePlaneZ = 0f;
     [SerializeField] private float hitRadius = 0.25f;
-
-    private void Awake()
-    {
-        if (cam == null) cam = Camera.main;
-    }
 
     private void Update()
     {
@@ -19,6 +13,9 @@ public class PuzzleClickRaycaster2D : MonoBehaviour
         if (ctrl.State != CandlePuzzleController.GameState.PuzzleView) return;
 
         if (!Input.GetMouseButtonDown(0)) return;
+
+        Camera cam = ctrl.GetMainCamera();
+        if (cam == null) return;
 
         Vector3 mp = Input.mousePosition;
 
