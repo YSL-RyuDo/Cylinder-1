@@ -110,21 +110,25 @@ public class PersonalityUI : MonoBehaviour, IUIWindow
         if (selected == 5) return;
         if (selected == playerPersonality.GetPersonalityIndex()) return;
 
-        playerPersonality.SetPersonality((PersonalityType)selected);
+        //인격변경시 애니메이션 출력 기능 때문에 주석처리
+        //playerPersonality.SetPersonality((PersonalityType)selected);
 
         //DialogueManager.Instance.ShowDialogue(currentDialogue, false);
         UpdatePersonalityButtonUI(selected);
         chooseButton.interactable = false;
-        StartCoroutine(CloseAfterDelay(3f));
+        //코루틴에서 이제 인격 변경
+        StartCoroutine(CloseAfterDelay(3f, (PersonalityType)selected));
     }
 
 
-    private IEnumerator CloseAfterDelay(float sec)
+    private IEnumerator CloseAfterDelay(float sec, PersonalityType newType)
     {
         yield return new WaitForSecondsRealtime(sec);
 
         //DialogueManager.Instance.HideDialogue();
         Close();
+        // 인격 변경 추가
+        playerPersonality.SetPersonality(newType);
     }
 
     private void UpdatePersonalityButtonUI(int index)

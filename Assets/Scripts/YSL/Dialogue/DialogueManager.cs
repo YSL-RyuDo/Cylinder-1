@@ -437,6 +437,41 @@ public class DialogueManager : MonoBehaviour
             return true;
         }
 
+        if (cmd == "set_active")
+        {
+            bool isActive = false;
+            if (value != null && (value.ToLower() == "true" || value == "1"))
+            {
+                isActive = true;
+            }
+
+            GameObject targetObj = FindObjectAnywhere(target);
+
+            if (targetObj != null)
+            {
+                targetObj.SetActive(isActive);
+                Debug.Log($"[Dialogue] {target} Active 상태 변경: {isActive}");
+                if (isActive)
+                {
+                    Transform parent = targetObj.transform.parent;
+                    while (parent != null)
+                    {
+                        if (!parent.gameObject.activeSelf)
+                        {
+                            parent.gameObject.SetActive(true);
+                        }
+                        parent = parent.parent;
+                    }
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"[Dialogue] set_active 실패: '{target}' 오브젝트를 찾을 수 없습니다.");
+            }
+
+            return true;
+        }
+
         return true;
     }
 
@@ -775,4 +810,32 @@ public class DialogueManager : MonoBehaviour
         ExecuteNode(nextId);
     }
 
+    private GameObject FindObjectAnywhere(string name)
+    {
+        GameObject obj = GameObject.Find(name);
+        if (obj != null) return obj;
+
+        //씬 내 전체 탐색, 대화때만 사용이라 성능 신경 안씀
+        foreach (GameObject root in UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects())
+        {
+            if (root.name == name) return root;
+
+            Transform result = RecursiveFindChild(root.transform, name);
+            if (result != null) return result.gameObject;
+        }
+
+        return null;
+    }
+
+    private Transform RecursiveFindChild(Transform parent, string name)
+    {
+        foreach (Transform child in parent)
+        {
+            if (child.name == name) return child;
+
+            Transform result = RecursiveFindChild(child, name);
+            if (result != null) return result;
+        }
+        return null;
+    }
 }
