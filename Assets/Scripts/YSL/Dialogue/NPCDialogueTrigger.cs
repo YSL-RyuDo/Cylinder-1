@@ -34,6 +34,10 @@ public class NPCDialogueTrigger : MonoBehaviour, IInteractable
                 return;
         }
 
+        //  현재 대화 NPC 등록
+        if (DialogueManager.Instance != null)
+            DialogueManager.Instance.SetCurrentNpc(gameObject);
+
         DialogueManager.Instance.StartDialogueByScene(startSceneId);
         lockUntil = Time.time + 0.1f;
     }

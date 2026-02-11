@@ -25,6 +25,11 @@ public class DialogueUI : MonoBehaviour, IUIWindow
     [Header("Root")]
     public GameObject dialogueRoot;
 
+    [Header("Dialogue Window (대화창 패널)")]
+    //  [추가] 대화창(배경+텍스트)이 묶여있는 패널 오브젝트를 넣어줘
+    // (선택지 영역은 포함하지 않는 게 좋음)
+    public GameObject dialogueWindowRoot;
+
     [Header("Background")]
     public Image backgroundImage;
     public Sprite dialogueBackground;
@@ -37,7 +42,7 @@ public class DialogueUI : MonoBehaviour, IUIWindow
     [Header("Choices")]
     public Transform choiceContainer;
     public Button choiceButtonPrefab;
-    
+
     [Header("CutScene")]
     public Image cutSceneImage;
     public GameObject cutSceneBackGround;
@@ -104,15 +109,44 @@ public class DialogueUI : MonoBehaviour, IUIWindow
         UIManager.Instance.NotifyWindowClosed(this);
     }
 
+    //  [추가] 선택지 전용: 대화창(프레임/배경) 자체를 숨긴다
+    public void EnterChoiceMode()
+    {
+        StopTypingImmediate();
+
+        // 대화창 패널 숨김 (배경/프레임까지 포함)
+        if (dialogueWindowRoot != null)
+            dialogueWindowRoot.SetActive(false);
+
+        // 텍스트도 안전하게 비움
+        if (speakerText != null) speakerText.text = "";
+        if (dialogueText != null) dialogueText.text = "";
+
+        // Next 버튼 숨김
+        if (nextButton != null)
+            nextButton.gameObject.SetActive(false);
+    }
+
+    //  [추가] 다시 대화 모드로 복귀
+    public void ExitChoiceMode()
+    {
+        if (dialogueWindowRoot != null)
+            dialogueWindowRoot.SetActive(true);
+    }
+
     public void ShowLine(string speaker, string text)
     {
         Open();
         ClearChoices();
         StopTypingImmediate();
 
+        //  대사 출력 시엔 대화창 다시 켜기
+        ExitChoiceMode();
+
         speakerText.text = "";
         dialogueText.text = "";
         dialogueText.gameObject.SetActive(true);
+
         if (speaker == "Narration")
         {
             backgroundImage.sprite = narrationBackground;
@@ -170,6 +204,9 @@ public class DialogueUI : MonoBehaviour, IUIWindow
         Open();
         ClearChoices();
 
+        //  선택지 뜰 때 대화창(프레임/배경) 숨김
+        EnterChoiceMode();
+
         foreach (var c in choices)
         {
             Button btn = Instantiate(choiceButtonPrefab, choiceContainer);
@@ -217,26 +254,6 @@ public class DialogueUI : MonoBehaviour, IUIWindow
         slotSpeakerMap.Clear();
     }
 
-    //public void ShowCutScene(int index)
-    //{
-    //    Sprite sp = Resources.Load<Sprite>($"CutScene/{index}");
-    //    if (sp == null)
-    //    {
-    //        Debug.LogError($"[CutScene] Sprite not found: CutScene/{index}");
-    //        return;
-    //    }
-
-    //    cutSceneRoot.SetActive(true);
-
-    //    cutSceneImage.sprite = sp;
-
-    //    cutSceneImage.color = Color.white;
-
-    //    cutSceneImage.gameObject.SetActive(true);
-
-    //    cutSceneRoot.transform.SetAsLastSibling();
-    //}
-
     public void ShowCutScene(int index)
     {
         Sprite sp = Resources.Load<Sprite>($"CutScene/{index}");
@@ -262,8 +279,6 @@ public class DialogueUI : MonoBehaviour, IUIWindow
 
         cutSceneFadeCoroutine = StartCoroutine(FadeInCutScene());
     }
-
-
 
     private IEnumerator FadeInCutScene()
     {

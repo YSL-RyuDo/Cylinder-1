@@ -12,7 +12,7 @@ public class GriefAbilityController : MonoBehaviour
     [SerializeField] private Transform interactOrigin;
 
     [Header("Dash (Space)")]
-    [SerializeField] private float dashSpeed = 12f;     // 1초당 이동거리 느낌
+    [SerializeField] private float dashSpeed = 12f;
     [SerializeField] private float dashDuration = 0.12f;
     [SerializeField] private float dashCooldown = 0.5f;
 
@@ -28,15 +28,17 @@ public class GriefAbilityController : MonoBehaviour
     [Header("Push")]
     [SerializeField] private float pushForce = 6f;
 
-    [Header("Swim (in water)")]
-    [SerializeField] private float swimSpeed = 4f;
+    [Header("Swim (in water) - Physics only")]
     [SerializeField] private float waterDrag = 6f;
 
     private bool isDashing;
     private float dashTimer;
     private float dashCdTimer;
 
+    // 물 트리거가 여러 개 겹칠 때 대비
+    private int waterCount = 0;
     private bool inWater;
+
     private float defaultDrag;
     private float defaultGravityScale;
 
@@ -64,8 +66,16 @@ public class GriefAbilityController : MonoBehaviour
 
     private void Update()
     {
-        
-        if (!IsGriefActive()) return;
+        // 인격이 grief가 아니면(또는 바뀌면) 능력 비활성 + 물 상태 강제 해제
+        if (!IsGriefActive())
+        {
+            if (inWater || waterCount > 0)
+            {
+                waterCount = 0;
+                ApplyWaterState(false);
+            }
+            return;
+        }
 
         dashCdTimer -= Time.deltaTime;
 
@@ -110,7 +120,7 @@ public class GriefAbilityController : MonoBehaviour
     {
         if (!IsGriefActive()) return;
 
-        // 핵심: transform 이동 프로젝트에서 확실히 보이게 MovePosition으로 대쉬
+        // MovePosition 대쉬
         if (isDashing)
         {
             dashTimer -= Time.fixedDeltaTime;
@@ -123,8 +133,6 @@ public class GriefAbilityController : MonoBehaviour
 
             return;
         }
-
-        
     }
 
     private bool IsGriefActive()
@@ -138,7 +146,6 @@ public class GriefAbilityController : MonoBehaviour
         if (dashCdTimer > 0f) return;
         if (rb == null) return;
 
-        // 대쉬 방향 확정
         dashDir = (lastMoveDir.sqrMagnitude > 0.01f) ? lastMoveDir : Vector2.right;
 
         isDashing = true;
@@ -146,13 +153,12 @@ public class GriefAbilityController : MonoBehaviour
         dashCdTimer = dashCooldown;
 
         if (animator) animator.SetTrigger("dash");
-        
     }
 
     private void EndDash()
     {
         isDashing = false;
-        rb.velocity = Vector2.zero; // 안전 정리
+        rb.velocity = Vector2.zero;
     }
 
     // ====== Target Find ======
@@ -191,20 +197,38 @@ public class GriefAbilityController : MonoBehaviour
         }
     }
 
-    // ====== Water hooks ======
+    // ====== Water hooks (called by WaterTrigger) ======
     public void EnterWater()
     {
         if (!IsGriefActive()) return;
 
-        inWater = true;
-        rb.drag = waterDrag;
-        rb.gravityScale = 0f;
+        waterCount++;
+        if (waterCount == 1)
+            ApplyWaterState(true);
     }
 
     public void ExitWater()
     {
-        inWater = false;
-        rb.drag = defaultDrag;
-        rb.gravityScale = defaultGravityScale;
+        waterCount = Mathf.Max(0, waterCount - 1);
+        if (waterCount == 0)
+            ApplyWaterState(false);
+    }
+
+    private void ApplyWaterState(bool on)
+    {
+        inWater = on;
+
+        if (rb == null) return;
+
+        if (on)
+        {
+            rb.drag = waterDrag;
+            rb.gravityScale = 0f;
+        }
+        else
+        {
+            rb.drag = defaultDrag;
+            rb.gravityScale = defaultGravityScale;
+        }
     }
 }
