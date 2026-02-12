@@ -25561,6 +25561,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerAnimator: {fileID: 596407851}
+  col: {fileID: 596407848}
   visualSettings:
   - type: 2
     overrideController: {fileID: 22100000, guid: 2030b421d55974c4dafb4c7abe0fba93, type: 2}
@@ -25570,6 +25571,10 @@ MonoBehaviour:
     overrideController: {fileID: 22100000, guid: 8e3b45eb06d340c49a324cddccff4389, type: 2}
   - type: 1
     overrideController: {fileID: 22100000, guid: b27568e51ffa194459617fec9af03c75, type: 2}
+  griefSwimController: {fileID: 22100000, guid: e3335f4beb646a94f817806cd5b8d318, type: 2}
+  waterLayer:
+    serializedVersion: 2
+    m_Bits: 16
 --- !u!1 &602122633
 GameObject:
   m_ObjectHideFlags: 0
@@ -63688,6 +63693,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   waterLayerName: Water
   obstacleLayerName: Obstacle
+  logEveryApply: 1
 --- !u!1 &1525730045
 GameObject:
   m_ObjectHideFlags: 0
@@ -66309,6 +66315,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   typingSpeed: 0.04
   dialogueRoot: {fileID: 653629615}
+  dialogueWindowRoot: {fileID: 0}
   backgroundImage: {fileID: 80079983}
   dialogueBackground: {fileID: 21300000, guid: 2f866782b22797d49923c091b6e66cf4, type: 3}
   narrationBackground: {fileID: 21300000, guid: 2f866782b22797d49923c091b6e66cf4, type: 3}
