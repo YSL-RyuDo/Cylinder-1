@@ -25584,6 +25584,8 @@ MonoBehaviour:
     overrideController: {fileID: 22100000, guid: 8452f8369f6e14d4e99c117297cc4150, type: 2}
   - type: 0
     overrideController: {fileID: 22100000, guid: 8e3b45eb06d340c49a324cddccff4389, type: 2}
+  - type: 1
+    overrideController: {fileID: 22100000, guid: b27568e51ffa194459617fec9af03c75, type: 2}
 --- !u!1 &602122633
 GameObject:
   m_ObjectHideFlags: 0

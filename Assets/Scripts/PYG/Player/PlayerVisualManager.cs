@@ -77,6 +77,8 @@ public class PlayerVisualManager : MonoBehaviour
         yield return new WaitForSecondsRealtime(animLength);
 
         playerAnimator.updateMode = originalMode;
+
+        yield return new WaitForSecondsRealtime(0.5f);
         Time.timeScale = 1f;
     }
     private void ApplyVisualsImmediate(PersonalityType type)
