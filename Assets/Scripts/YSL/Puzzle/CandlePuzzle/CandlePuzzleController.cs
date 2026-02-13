@@ -8,6 +8,9 @@ public class CandlePuzzleController : MonoBehaviour
     public enum GameState { Exploration, PuzzleView }
     public GameState State { get; private set; } = GameState.Exploration;
 
+    public bool CandleInteractionUnlocked { get; private set; }
+    public void UnlockCandleInteraction() => CandleInteractionUnlocked = true;
+
     [Header("References")]
     [SerializeField] private Camera mainCam;
     [SerializeField] private Transform puzzleCameraTarget;
@@ -25,11 +28,15 @@ public class CandlePuzzleController : MonoBehaviour
     [SerializeField] private Texture2D puzzleCursor;
     [SerializeField] private Vector2 cursorHotspot = Vector2.zero;
 
+    [Header("Lighting")]
+    [SerializeField] private PuzzleLightingController lighting;
+
     private Vector3 camOriginalPos;
     private float camOriginalSize;
     private Coroutine cameraRoutine;
 
     private CameraFollow camFollow;
+    private PlayerCastingController casting;
 
     private void Awake()
     {
@@ -38,28 +45,21 @@ public class CandlePuzzleController : MonoBehaviour
 
         if (mainCam == null) mainCam = Camera.main;
         if (mainCam != null) camFollow = mainCam.GetComponent<CameraFollow>();
+
+        casting = FindObjectOfType<PlayerCastingController>();
     }
 
     private void Start()
     {
         ApplyCursor(normalCursor);
-
-        // ✅ 핵심: "상호작용 전 검정 화면" 방지
-        // CameraFollow가 아직 맵 바운더리를 못 잡아서 카메라가 멀리 있어도,
-        // SnapToPositionImmediate는 boundary 없어도 플레이어 위치로 카메라를 옮겨줌.
         TrySnapCameraToPlayer();
     }
 
     private void LateUpdate()
     {
-        // 퍼즐 중엔 손대지 않음
         if (State != GameState.Exploration) return;
+        if (mainCam == null || camFollow == null || camFollow.target == null) return;
 
-        if (mainCam == null) return;
-        if (camFollow == null) return;
-        if (camFollow.target == null) return;
-
-        // ✅ 핵심: CameraFollow가 return 타는 상황(바운더리 둘 다 null)일 때만 임시 팔로우
         if (playerMove != null &&
             playerMove.CurrentMapBoundary == null &&
             playerMove.CurrentCircularBoundary == null)
@@ -69,33 +69,25 @@ public class CandlePuzzleController : MonoBehaviour
         }
     }
 
-
-    private void TrySnapCameraToPlayer()
-    {
-        if (camFollow == null) return;
-        if (camFollow.target == null) return;
-
-        // 외부제어가 켜져있으면 풀고(혹시 씬 이동/재진입에서 꼬이는 경우 대비)
-        camFollow.EndExternalControl();
-
-        // boundary 없어도 일단 플레이어를 보게는 만들기
-        camFollow.SnapToPositionImmediate(camFollow.target.position);
-    }
-
-    public void EnterPuzzleView()
+    public void EnterPuzzleView(bool spellReady)
     {
         if (State == GameState.PuzzleView) return;
         if (mainCam == null || puzzleCameraTarget == null) return;
 
         State = GameState.PuzzleView;
+        CandleInteractionUnlocked = false;
 
-        // 퍼즐 동안 Follow가 덮어쓰기 금지
+        lighting?.OnEnterPuzzle();
+
         camFollow?.BeginExternalControl();
-
         if (playerMove != null) playerMove.enabled = false;
 
         SetDisableObjects(false);
-        ApplyCursor(puzzleCursor);
+
+        ApplyCursor(spellReady ? puzzleCursor : normalCursor);
+
+        if (spellReady)
+            (casting ??= FindObjectOfType<PlayerCastingController>())?.StartCastingMotionOnly();
 
         camOriginalPos = mainCam.transform.position;
         camOriginalSize = mainCam.orthographicSize;
@@ -110,12 +102,15 @@ public class CandlePuzzleController : MonoBehaviour
 
         State = GameState.Exploration;
 
+        lighting?.OnExitPuzzle();
+
         if (playerMove != null) playerMove.enabled = true;
         SetDisableObjects(true);
 
         ApplyCursor(normalCursor);
 
-        // ✅ EndExternalControl은 "복귀 이동 끝난 뒤"에 (아래 MoveCameraBack 콜백에서)
+        (casting ??= FindObjectOfType<PlayerCastingController>())?.StopCastingMotionOnly();
+
         MoveCameraBack();
     }
 
@@ -134,8 +129,6 @@ public class CandlePuzzleController : MonoBehaviour
                 if (s == null) continue;
                 if (s == this) continue;
 
-                // 퍼즐 관련은 항상 살아있어야 함
-                if (s is CandlePuzzleController) continue;
                 if (s is PuzzleTrigger) continue;
                 if (s is PuzzleClickRaycaster2D) continue;
 
@@ -146,36 +139,42 @@ public class CandlePuzzleController : MonoBehaviour
 
     private void MoveCameraToPuzzle()
     {
-        if (cameraRoutine != null) StopCoroutine(cameraRoutine);
-
-        cameraRoutine = StartCoroutine(CameraTransition(
+        StartCameraTransition(
             mainCam.transform.position,
             new Vector3(puzzleCameraTarget.position.x, puzzleCameraTarget.position.y, mainCam.transform.position.z),
             mainCam.orthographicSize,
             puzzleOrthoSize,
-            cameraMoveTime,
-            onDone: null
-        ));
+            null
+        );
     }
 
     private void MoveCameraBack()
     {
-        if (cameraRoutine != null) StopCoroutine(cameraRoutine);
-
-        cameraRoutine = StartCoroutine(CameraTransition(
+        StartCameraTransition(
             mainCam.transform.position,
             camOriginalPos,
             mainCam.orthographicSize,
             camOriginalSize,
-            cameraMoveTime,
-            onDone: () =>
+            () =>
             {
-                // ✅ 복귀 끝난 뒤에 Follow 다시 켜기
                 camFollow?.EndExternalControl();
-
-                // ✅ 복귀 직후 한 번 더 스냅 (Follow가 boundary 못 잡은 맵에서도 검정 방지)
                 TrySnapCameraToPlayer();
             }
+        );
+    }
+
+    private void StartCameraTransition(
+        Vector3 fromPos, Vector3 toPos,
+        float fromSize, float toSize,
+        System.Action onDone)
+    {
+        if (cameraRoutine != null) StopCoroutine(cameraRoutine);
+
+        cameraRoutine = StartCoroutine(CameraTransition(
+            fromPos, toPos,
+            fromSize, toSize,
+            cameraMoveTime,
+            onDone
         ));
     }
 
@@ -196,22 +195,24 @@ public class CandlePuzzleController : MonoBehaviour
 
         mainCam.transform.position = toPos;
         mainCam.orthographicSize = toSize;
-        cameraRoutine = null;
 
+        cameraRoutine = null;
         onDone?.Invoke();
+    }
+
+    private void TrySnapCameraToPlayer()
+    {
+        if (camFollow == null || camFollow.target == null) return;
+
+        camFollow.EndExternalControl();
+        camFollow.SnapToPositionImmediate(camFollow.target.position);
     }
 
     private void ApplyCursor(Texture2D tex)
     {
-        if (tex == null)
-        {
-            Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
-            return;
-        }
         Cursor.SetCursor(tex, cursorHotspot, CursorMode.Auto);
     }
 
-    // ✅ (선택) 다른 스크립트에서 카메라 참조가 필요하면 안전하게 제공
     public Camera GetMainCamera() => mainCam;
 }
 

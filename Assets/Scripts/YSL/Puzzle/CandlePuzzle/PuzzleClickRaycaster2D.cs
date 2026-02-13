@@ -3,8 +3,6 @@
 public class PuzzleClickRaycaster2D : MonoBehaviour
 {
     [SerializeField] private LayerMask candleLayer;
-    [SerializeField] private float candlePlaneZ = 0f;
-    [SerializeField] private float hitRadius = 0.25f;
 
     private void Update()
     {
@@ -12,35 +10,47 @@ public class PuzzleClickRaycaster2D : MonoBehaviour
         if (ctrl == null) return;
         if (ctrl.State != CandlePuzzleController.GameState.PuzzleView) return;
 
+        if (DesireSpellManager.Instance != null && !DesireSpellManager.Instance.IsSpellActivated) return;
+
         if (!Input.GetMouseButtonDown(0)) return;
 
         Camera cam = ctrl.GetMainCamera();
         if (cam == null) return;
 
-        Vector3 mp = Input.mousePosition;
-
-        float zDist = candlePlaneZ - cam.transform.position.z;
-        mp.z = zDist;
-
-        Vector3 w = cam.ScreenToWorldPoint(mp);
+        Vector3 w = cam.ScreenToWorldPoint(Input.mousePosition);
         Vector2 worldPos = new Vector2(w.x, w.y);
 
-        Collider2D hitCol = Physics2D.OverlapCircle(worldPos, hitRadius, candleLayer);
+        Collider2D[] hits = Physics2D.OverlapPointAll(worldPos, candleLayer);
 
-        if (hitCol == null)
+        if (hits == null || hits.Length == 0)
         {
-            Debug.Log($"[Click] nothing hit at {worldPos} (planeZ={candlePlaneZ}, zDist={zDist})");
+            Debug.Log("[Click] nothing hit");
             return;
         }
 
-        Candle candle = hitCol.GetComponentInParent<Candle>();
-        if (candle == null)
+        float minDist = float.MaxValue;
+        Candle nearest = null;
+
+        foreach (var col in hits)
         {
-            Debug.Log($"[Click] hit {hitCol.name} but no Candle in parent");
+            Candle c = col.GetComponentInParent<Candle>();
+            if (c == null) continue;
+
+            float d = Vector2.Distance(worldPos, col.bounds.ClosestPoint(worldPos));
+            if (d < minDist)
+            {
+                minDist = d;
+                nearest = c;
+            }
+        }
+
+        if (nearest == null)
+        {
+            Debug.Log("[Click] no candle found");
             return;
         }
 
-        Debug.Log($"[Click] hit candle: {candle.name}");
-        candle.TryLight();
+        Debug.Log($"[Click] hit candle: {nearest.name}");
+        nearest.Light();
     }
 }

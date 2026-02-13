@@ -4,39 +4,36 @@ public class DesireSpellManager : MonoBehaviour
 {
     public static DesireSpellManager Instance { get; private set; }
 
-    [Header("슬롯 5개 연결 (Inspector에서 0~4에 각각 드래그)")]
+    [Header("슬롯 5개 연결")]
     public DropSlot[] slots = new DropSlot[5];
 
-    // ✅ 한 번 발동하면 계속 유지
-    public bool SpellActive { get; private set; } = false;
+    private int filledCount = 0;
+
+    public bool IsSpellActive { get; private set; } = false;
+    private bool spellActivated = false;
+    public bool IsSpellActivated => spellActivated;
+
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
     }
 
-    // DropSlot에서 드롭 성공 시 호출
-    public void NotifySlotChanged()
+    public void NotifySlotFilled(int slotIndex, int sigilId)
     {
-        // 이미 발동했으면 유지이므로 더 체크할 필요는 없음(원하면 계속 로그는 남길 수 있음)
-        if (SpellActive) return;
+        RecountFilled();
 
-        int filled = GetFilledCount();
-        Debug.Log($"[Desire] filled = {filled}/5");
+        Debug.Log($"[Desire] filled = {filledCount}/5");
 
-        if (filled >= 5)
+        if (filledCount >= 5)
         {
-            SpellActive = true;
-            Debug.Log("[Desire] ✅ 5개 완성! 열망 마법 발동(이후 계속 유지)");
+            IsSpellActive = true;
+            Debug.Log("[Desire] 열망 마법 발동");
         }
     }
 
-    public int GetFilledCount()
+    private void RecountFilled()
     {
         int cnt = 0;
         for (int i = 0; i < slots.Length; i++)
@@ -44,8 +41,20 @@ public class DesireSpellManager : MonoBehaviour
             if (slots[i] != null && slots[i].CurrentSigil != null)
                 cnt++;
         }
-        return cnt;
+        filledCount = cnt;
     }
+
+    public void NotifySlotChanged()
+    {
+        RecountFilled();
+
+        Debug.Log($"[Desire] filled = {filledCount}/5");
+
+        if (filledCount >= 5 && !spellActivated)
+        {
+            spellActivated = true;
+            Debug.Log("[Desire] 불 마법 발동");
+        }
+    }
+
 }
-
-

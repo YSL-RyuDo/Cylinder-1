@@ -1,8 +1,11 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public class PuzzleTrigger : MonoBehaviour
 {
     [SerializeField] private KeyCode interactKey = KeyCode.F;
+
+    public static bool IsPlayerNearPuzzleWall { get; private set; } = false;
+
     private bool playerInside = false;
 
     private void Update()
@@ -12,13 +15,20 @@ public class PuzzleTrigger : MonoBehaviour
         var ctrl = CandlePuzzleController.Instance;
         if (ctrl == null) return;
 
-        // F¸¦ ´©¸£¸é ÆÛÁñ ÁøÀÔ
+        // Fë¥¼ ëˆ„ë¥´ë©´ í¼ì¦ ì§„ì…
         if (Input.GetKeyDown(interactKey))
         {
-            ctrl.EnterPuzzleView();
+            bool spellReady = false;
+
+            if (DesireSpellManager.Instance != null)
+            {
+                spellReady = DesireSpellManager.Instance.IsSpellActivated;
+            }
+
+            ctrl.EnterPuzzleView(spellReady);
         }
 
-        // ÆÛÁñ »óÅÂ¿¡¼­ ESC·Î ºüÁ®³ª¿À±â
+        // í¼ì¦ ìƒíƒœì—ì„œ ESCë¡œ ë¹ ì ¸ë‚˜ì˜´
         if (ctrl.State == CandlePuzzleController.GameState.PuzzleView &&
             Input.GetKeyDown(KeyCode.Escape))
         {
@@ -28,11 +38,16 @@ public class PuzzleTrigger : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Player")) playerInside = true;
+        if (!other.CompareTag("Player")) return;
+        playerInside = true;
+        IsPlayerNearPuzzleWall = true;
     }
 
     private void OnTriggerExit2D(Collider2D other)
     {
-        if (other.CompareTag("Player")) playerInside = false;
+        if (!other.CompareTag("Player")) return;
+        playerInside = false;
+        IsPlayerNearPuzzleWall = false;
     }
 }
+

@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 [RequireComponent(typeof(PlayerInput))]
 [RequireComponent(typeof(BoxCollider2D))]
@@ -14,9 +14,16 @@ public class PlayerMove : MonoBehaviour
 
     public CameraFollow cameraFollow;
 
+    private bool moveLocked = false;
+    public void SetMoveLocked(bool locked)
+    {
+        moveLocked = locked;
+    }
+
+
     [Header("Collision Masks")]
-    [SerializeField] private LayerMask obstacleLayer; // ¿¹: NPC, Obstacle
-    [SerializeField] private LayerMask waterLayer;    // ¿¹: Water
+    [SerializeField] private LayerMask obstacleLayer; // ì˜ˆ: NPC, Obstacle
+    [SerializeField] private LayerMask waterLayer;    // ì˜ˆ: Water
 
     [Header("Debug")]
     [SerializeField] private bool debugHitLog = false;
@@ -52,7 +59,9 @@ public class PlayerMove : MonoBehaviour
 
     private void Move()
     {
-        // ´ë½¬ ÁßÀÌ¸é PlayerMove´Â µ¤¾î¾²±â ±İÁö
+        if (moveLocked) return;
+
+        // ëŒ€ì‰¬ ì¤‘ì´ë©´ PlayerMoveëŠ” ë®ì–´ì“°ê¸° ê¸ˆì§€
         var grief = GetComponent<GriefAbilityController>();
         if (grief != null && grief.IsDashingNow)
             return;
@@ -66,12 +75,12 @@ public class PlayerMove : MonoBehaviour
 
         Vector3 finalPos = startPos;
 
-        // XÃà
+        // Xì¶•
         Vector3 testX = new Vector3(targetPos.x, startPos.y, startPos.z);
         if (!IsBlocked(testX))
             finalPos.x = testX.x;
 
-        // YÃà
+        // Yì¶•
         Vector3 testY = new Vector3(finalPos.x, targetPos.y, startPos.z);
         if (!IsBlocked(testY))
             finalPos.y = testY.y;
@@ -80,7 +89,7 @@ public class PlayerMove : MonoBehaviour
         transform.position = finalPos;
     }
 
-    //  ÇÙ½É: ¹° ·¹ÀÌ¾î´Â grief¸¸ Åë°ú, ±× ¿Ü ÀÎ°İÀº ¸·±â
+    //  í•µì‹¬: ë¬¼ ë ˆì´ì–´ëŠ” griefë§Œ í†µê³¼, ê·¸ ì™¸ ì¸ê²©ì€ ë§‰ê¸°
     private bool IsBlocked(Vector3 pos)
     {
         Vector2 half = GetWorldHalfSize();
@@ -89,7 +98,7 @@ public class PlayerMove : MonoBehaviour
         Vector2 center = (Vector2)pos + offset;
         Vector2 size = half * 2f - Vector2.one * SKIN;
 
-        //  Water + Obstacle¸¸ °Ë»çÇÏµµ·Ï ÇÊÅÍ Àû¿ë
+        //  Water + Obstacleë§Œ ê²€ì‚¬í•˜ë„ë¡ í•„í„° ì ìš©
         LayerMask blockMask = obstacleLayer | waterLayer;
 
         int count = Physics2D.OverlapBoxNonAlloc(center, size, 0f, overlapBuffer, blockMask);
@@ -102,7 +111,7 @@ public class PlayerMove : MonoBehaviour
 
             int hitMask = 1 << hit.gameObject.layer;
 
-            // --- Water Ã³¸® ---
+            // --- Water ì²˜ë¦¬ ---
             if ((hitMask & waterLayer) != 0)
             {
                 var pp = PlayerPersonality.Instance;
@@ -113,14 +122,14 @@ public class PlayerMove : MonoBehaviour
                     Debug.Log($"[BLOCK CHECK] WATER hit={hit.name} isTrigger={hit.isTrigger} personality={(pp ? pp.currentPersonality.ToString() : "null")} -> {(isGrief ? "PASS" : "BLOCK")}");
                 }
 
-                // grief¸é Åë°ú, ¾Æ´Ï¸é ¸·±â
+                // griefë©´ í†µê³¼, ì•„ë‹ˆë©´ ë§‰ê¸°
                 if (!isGrief)
                     return true;
 
                 continue;
             }
 
-            // --- Obstacle Ã³¸® ---
+            // --- Obstacle ì²˜ë¦¬ ---
             if ((hitMask & obstacleLayer) != 0)
             {
                 if (debugHitLog)

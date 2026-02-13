@@ -30,7 +30,6 @@ public class DraggableSigil : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         originParent = transform.parent;
         originPos = rect.anchoredPosition;
 
-        // ✅ 슬롯에 박혀있던 상태면 슬롯을 먼저 비워줌 (그래야 다시 뺄 수 있음)
         if (CurrentSlot != null)
         {
             CurrentSlot.ClearSlot();
@@ -39,7 +38,6 @@ public class DraggableSigil : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
         cg.blocksRaycasts = false;
 
-        // 최상단으로 올려서 드래그
         transform.SetParent(rootCanvas.transform, true);
     }
 
@@ -51,7 +49,6 @@ public class DraggableSigil : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        // 드롭 실패하면 아직 Canvas 루트에 남아있음 → 원위치 복귀
         if (transform.parent == rootCanvas.transform)
         {
             ReturnToOrigin();

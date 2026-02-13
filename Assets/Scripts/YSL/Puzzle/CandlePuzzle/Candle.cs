@@ -1,54 +1,60 @@
 ﻿using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public class Candle : MonoBehaviour
 {
-    [Header("State")]
-    [SerializeField] private bool isLit = false;
-    public bool IsLit => isLit;
+    [Header("Sprites")]
+    public Sprite offSprite;
+    public Sprite onSprite;
 
-    [Header("Visual (placeholder)")]
-    [SerializeField] private GameObject flameObject;
-    [SerializeField] private bool allowToggleOff = false;
-    [SerializeField] private string flameChildName = "Flame";
+    [Header("Light (child object with Light2D)")]
+    [SerializeField] private GameObject lightObj;
+    [SerializeField] private Light2D light2D;
+
+    private SpriteRenderer sr;
+    private bool isLit = false;
+    public bool IsLit => isLit;
 
     private void Awake()
     {
-        if (flameObject == null)
+        sr = GetComponent<SpriteRenderer>();
+        if (offSprite != null) sr.sprite = offSprite;
+
+        if (lightObj == null)
         {
-            Transform t = transform.Find(flameChildName);
-            if (t != null) flameObject = t.gameObject;
+            light2D = GetComponentInChildren<Light2D>(true);
+            if (light2D != null) lightObj = light2D.gameObject;
+        }
+
+        if (lightObj != null) lightObj.SetActive(false);
+    }
+
+    public void Light()
+    {
+        if (isLit) return;
+        isLit = true;
+
+        if (onSprite != null) sr.sprite = onSprite;
+
+        if (lightObj != null) lightObj.SetActive(true);
+
+        var lighting = FindObjectOfType<PuzzleLightingController>();
+        if (lighting != null)
+        {
+            var all = FindObjectsOfType<Candle>();
+            bool allLit = true;
+            for (int i = 0; i < all.Length; i++)
+            {
+                if (!all[i].IsLit) { allLit = false; break; }
+            }
+            if (allLit) lighting.MarkAllCandlesLit();
         }
     }
 
-    private void Start()
+    public void Unlight()
     {
         isLit = false;
-        RefreshVisual();
-    }
-
-    public void TryLight()
-    {
-        // ✅ 열망 마법이 발동되어야만 촛불 점화 가능
-        if (DesireSpellManager.Instance == null || !DesireSpellManager.Instance.SpellActive)
-        {
-            Debug.Log("[Candle] 마법이 아직 발동되지 않음!");
-            return;
-        }
-
-        Debug.Log($"[Candle] Clicked: {name}");
-
-        if (isLit && !allowToggleOff) return;
-
-        isLit = allowToggleOff ? !isLit : true;
-        RefreshVisual();
-    }
-
-
-    private void RefreshVisual()
-    {
-        if (flameObject != null)
-            flameObject.SetActive(isLit);
+        if (offSprite != null) sr.sprite = offSprite;
+        if (lightObj != null) lightObj.SetActive(false);
     }
 }
-
-
