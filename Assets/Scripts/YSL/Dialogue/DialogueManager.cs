@@ -21,21 +21,24 @@ public class DialogueManager : MonoBehaviour
     private bool waitingForChoice = false;
     private bool autoStartFinished = false;
 
+    //  [추가] "현재 대화 중인 NPC" 저장 (살해 타겟)
+    public GameObject CurrentNpc { get; private set; }
+    public void SetCurrentNpc(GameObject npc) => CurrentNpc = npc;
+
     private void Awake()
     {
         Instance = this;
 
         PortraitDatabase.LoadAll();
 
-        
         nodeTable.Clear();
 
-        
         LoadDialogueNodes("Dialogues/dialogue_Scene");
         LoadDialogueNodes("Dialogues/dialogue_ObjectScene");
 
         LoadSceneSlots("Dialogues/dialogue");
     }
+
     private void Start()
     {
         if (autoStartFinished)
@@ -104,12 +107,14 @@ public class DialogueManager : MonoBehaviour
         {
             DialogueUI.Instance.Close();
             CheckFinalDialogueCondition();
+
+            //  [추가] 대화 끝났으면 타겟 초기화(원하면 지워도 됨)
+            CurrentNpc = null;
             return;
         }
 
         ExecuteNode(currentNodeId);
     }
-
 
     private void ExecuteNode(int id)
     {
@@ -120,6 +125,9 @@ public class DialogueManager : MonoBehaviour
             CheckFinalDialogueCondition();
             if (DialogueUI.Instance != null)
                 DialogueUI.Instance.HideCutScene();
+
+            //  [추가] 대화 끝났으면 타겟 초기화(원하면 지워도 됨)
+            CurrentNpc = null;
             return;
         }
 
@@ -127,6 +135,9 @@ public class DialogueManager : MonoBehaviour
         {
             currentNodeId = -1;
             DialogueUI.Instance.Close();
+
+            //  [추가]
+            CurrentNpc = null;
             return;
         }
 
@@ -142,6 +153,9 @@ public class DialogueManager : MonoBehaviour
         {
             currentNodeId = -1;
             DialogueUI.Instance.Close();
+
+            //  [추가]
+            CurrentNpc = null;
             return;
         }
 
@@ -212,7 +226,6 @@ public class DialogueManager : MonoBehaviour
             return;
         }
 
-
         if (nextNode.speaker == "Choice")
         {
             waitingForChoice = true;
@@ -232,18 +245,16 @@ public class DialogueManager : MonoBehaviour
         return cmd == "fade_wait" || cmd == "delay";
     }
 
-
-
     private void ShowChoiceBlock(int startId)
     {
-        List<(string, Action)> choices = new();
+        List<(string text, Action onClick)> choices = new();
         int id = startId;
 
         while (nodeTable.TryGetValue(id, out var n)
                && n.scene_id == currentSceneId
                && n.speaker == "Choice")
         {
-            int next = n.next_id; // 핵심: choice0_next 사용 금지
+            int next = n.next_id;
 
             string cmd = n.command?.Trim();
             string tgt = n.command_target?.Trim();
@@ -254,6 +265,21 @@ public class DialogueManager : MonoBehaviour
             choices.Add((text, () =>
             {
                 waitingForChoice = false;
+
+                //  "살해" 선택 처리
+                if (!string.IsNullOrEmpty(text) && text.Trim() == "살해")
+                {
+                    var npc = CurrentNpc;
+                    if (npc != null && npc.TryGetComponent<CultistKillable>(out var killable))
+                    {
+                        Debug.Log($"[CHOICE] '살해' selected. Target = {npc.name}");
+                        killable.GriefKill();
+                    }
+                    else
+                    {
+                        Debug.LogWarning("[CHOICE] '살해' selected but CurrentNpc is null or not killable.");
+                    }
+                }
 
                 if (cmd == "set_var")
                 {
@@ -268,6 +294,38 @@ public class DialogueManager : MonoBehaviour
         }
 
         currentNodeId = id;
+
+        
+        // 여기부터가 "비애가 아니면 선택지 UI를 아예 안 띄움" 처리
+       
+        bool isGrief = false;
+        if (PlayerPersonality.Instance != null)
+        {
+            isGrief = (PlayerPersonality.Instance.currentPersonality == PersonalityType.grief);
+        }
+
+        if (!isGrief)
+        {
+            // 비애가 아니면 자동으로 "자비" 선택(없으면 첫 선택지)
+            waitingForChoice = false;
+
+            int idx = choices.FindIndex(c => !string.IsNullOrEmpty(c.text) && c.text.Trim() == "자비");
+            if (idx < 0) idx = 0;
+
+            if (choices.Count > 0)
+            {
+                Debug.Log($"[CHOICE] auto-select (not grief): {choices[idx].text}");
+                choices[idx].onClick?.Invoke();
+            }
+            else
+            {
+                // 선택지 없으면 그냥 종료
+                ExecuteNode(-1);
+            }
+            return;
+        }
+
+        // 비애면 정상적으로 선택지 UI 띄움
         DialogueUI.Instance.ShowChoices(choices);
     }
 
@@ -358,7 +416,7 @@ public class DialogueManager : MonoBehaviour
             StartCoroutine(WalkAndNext(target, value, node.next_id));
             return false;
         }
-        
+
         if (cmd == "set_next")
         {
             GameObject targetObj = GameObject.Find(target);
@@ -437,6 +495,41 @@ public class DialogueManager : MonoBehaviour
             return true;
         }
 
+        if (cmd == "set_active")
+        {
+            bool isActive = false;
+            if (value != null && (value.ToLower() == "true" || value == "1"))
+            {
+                isActive = true;
+            }
+
+            GameObject targetObj = FindObjectAnywhere(target);
+
+            if (targetObj != null)
+            {
+                targetObj.SetActive(isActive);
+                Debug.Log($"[Dialogue] {target} Active 상태 변경: {isActive}");
+                if (isActive)
+                {
+                    Transform parent = targetObj.transform.parent;
+                    while (parent != null)
+                    {
+                        if (!parent.gameObject.activeSelf)
+                        {
+                            parent.gameObject.SetActive(true);
+                        }
+                        parent = parent.parent;
+                    }
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"[Dialogue] set_active 실패: '{target}' 오브젝트를 찾을 수 없습니다.");
+            }
+
+            return true;
+        }
+
         return true;
     }
 
@@ -493,7 +586,6 @@ public class DialogueManager : MonoBehaviour
         return flagValue == expected;
     }
 
-
     private string ParseText(string raw)
     {
         return Regex.Replace(raw ?? "", "{(.*?)}", m =>
@@ -516,7 +608,6 @@ public class DialogueManager : MonoBehaviour
             return;
         }
 
-        
         StringReader r = new StringReader(csv.text);
         bool header = true;
 
@@ -600,7 +691,6 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-
     private string Normalize(string s)
     {
         if (string.IsNullOrEmpty(s))
@@ -613,6 +703,7 @@ public class DialogueManager : MonoBehaviour
 
     private int ToInt(string s) => int.TryParse(s, out var v) ? v : 0;
     private string Clean(string s) => s.Replace("\"\"\"", "").Replace("\"", "").Replace("\\n", "\n");
+
     private string[] ParseCSVLine(string line)
     {
         List<string> result = new();
@@ -747,12 +838,12 @@ public class DialogueManager : MonoBehaviour
         while (Vector3.Distance(targetObj.transform.position, destPos) > 0.01f)
         {
             Vector3 dir = (destPos - targetObj.transform.position).normalized;
-            
+
             if (anim != null) anim.SetBool("IsWalk", true);
 
             if (sr != null)
             {
-                if (dir.x > 0) sr.flipX = true;      
+                if (dir.x > 0) sr.flipX = true;
                 else if (dir.x < 0) sr.flipX = false;
             }
 
@@ -775,4 +866,32 @@ public class DialogueManager : MonoBehaviour
         ExecuteNode(nextId);
     }
 
+    private GameObject FindObjectAnywhere(string name)
+    {
+        GameObject obj = GameObject.Find(name);
+        if (obj != null) return obj;
+
+        //씬 내 전체 탐색, 대화때만 사용이라 성능 신경 안씀
+        foreach (GameObject root in UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects())
+        {
+            if (root.name == name) return root;
+
+            Transform result = RecursiveFindChild(root.transform, name);
+            if (result != null) return result.gameObject;
+        }
+
+        return null;
+    }
+
+    private Transform RecursiveFindChild(Transform parent, string name)
+    {
+        foreach (Transform child in parent)
+        {
+            if (child.name == name) return child;
+
+            Transform result = RecursiveFindChild(child, name);
+            if (result != null) return result;
+        }
+        return null;
+    }
 }
