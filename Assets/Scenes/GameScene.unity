@@ -23420,7 +23420,7 @@ GameObject:
   - component: {fileID: 513021974}
   m_Layer: 3
   m_Name: Interaction
-  m_TagString: Player
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -28002,14 +28002,8 @@ GameObject:
   - component: {fileID: 596407855}
   - component: {fileID: 596407856}
   - component: {fileID: 596407857}
-<<<<<<< HEAD
-  - component: {fileID: 596407858}
   - component: {fileID: 596407859}
-  - component: {fileID: 596407861}
   - component: {fileID: 596407860}
-=======
-  - component: {fileID: 596407859}
->>>>>>> 602f292551da61fcb21b35fc779247cb376fd84f
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -28078,11 +28072,7 @@ Transform:
   m_GameObject: {fileID: 596407845}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-<<<<<<< HEAD
   m_LocalPosition: {x: -76.22, y: 251.96, z: 0}
-=======
-  m_LocalPosition: {x: -615.3, y: -0.18, z: 0}
->>>>>>> 602f292551da61fcb21b35fc779247cb376fd84f
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -28308,73 +28298,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10c21ce36feaabb499dbb6195d241cfa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-<<<<<<< HEAD
-  swimSpeed: 4
---- !u!114 &596407859
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 596407845}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6b16ee9f9e6a87f46802ed1f968f29e9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveSpeed: 5
-  cellSizeX: 1.12
-  cellSizeY: 0.93
-  gridEnabled: 0
-  manager: {fileID: 1460560437}
-  obstacleMask:
-    serializedVersion: 2
-    m_Bits: 4096
-  groundMask:
-    serializedVersion: 2
-    m_Bits: 8192
-  obstacleCheckRatio: 0.55
-  groundCheckOffset: {x: 0, y: -0.3}
-  groundCheckRadius: 0.05
-  gridOrigin: {x: 0, y: 10, z: 0}
-  hasOrigin: 0
-  bodyCollider: {fileID: 0}
---- !u!114 &596407860
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 596407845}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 810d07c74da2f184eb5f57a0e08db1a4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerMove: {fileID: 596407850}
-  rb: {fileID: 596407849}
-  spriteAnimator: {fileID: 596407861}
-  animatorToDisable: {fileID: 0}
---- !u!114 &596407861
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 596407845}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c0c8a5adfd2264e489cb0fd515b0324f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  castSprites:
-  - {fileID: 21300000, guid: 22030d4ca80cd054d95c4d3f86436573, type: 3}
-  - {fileID: 21300000, guid: a0b3691f29778624288dc22f9fc04c08, type: 3}
-  - {fileID: 21300000, guid: 90154556d55d6f54fbff6b74727e1331, type: 3}
-  - {fileID: 21300000, guid: 16b702fbbcc9c6543b24beb3984af961, type: 3}
-  - {fileID: 21300000, guid: 12d2a4c9538004e41b41f15954768ea3, type: 3}
-  fps: 10
-=======
   playerAnimator: {fileID: 596407851}
   col: {fileID: 596407848}
   visualSettings:
@@ -28390,7 +28313,35 @@ MonoBehaviour:
   waterLayer:
     serializedVersion: 2
     m_Bits: 16
->>>>>>> 602f292551da61fcb21b35fc779247cb376fd84f
+--- !u!114 &596407860
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 596407845}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b16ee9f9e6a87f46802ed1f968f29e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 6
+  cellSizeX: 1.1
+  cellSizeY: 1.1
+  gridEnabled: 0
+  manager: {fileID: 1460560437}
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 4096
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 0
+  obstacleCheckRatio: 0.55
+  groundCheckOffset: {x: 0, y: -0.3}
+  groundCheckRadius: 0.05
+  gridOrigin: {x: 0, y: 0, z: 0}
+  hasOrigin: 0
+  bodyCollider: {fileID: 596407848}
 --- !u!1 &602122633
 GameObject:
   m_ObjectHideFlags: 0
@@ -70552,48 +70503,13 @@ PolygonCollider2D:
       - {x: 1.61, y: -3.51}
       - {x: 1.48, y: -3.46}
   m_UseDelaunayMesh: 0
-<<<<<<< HEAD
---- !u!1 &1523809263
-=======
---- !u!1 &1524116654
->>>>>>> 602f292551da61fcb21b35fc779247cb376fd84f
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-<<<<<<< HEAD
-  - component: {fileID: 1523809264}
-  - component: {fileID: 1523809266}
-  - component: {fileID: 1523809265}
-  - component: {fileID: 1523809267}
-  m_Layer: 14
-  m_Name: Candle_5
-=======
-  - component: {fileID: 1524116656}
-  - component: {fileID: 1524116657}
-  m_Layer: 0
-  m_Name: WaterLayerManager
->>>>>>> 602f292551da61fcb21b35fc779247cb376fd84f
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
-<<<<<<< HEAD
 --- !u!4 &1523809264
-=======
---- !u!4 &1524116656
->>>>>>> 602f292551da61fcb21b35fc779247cb376fd84f
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-<<<<<<< HEAD
-  m_GameObject: {fileID: 1523809263}
+  m_GameObject: {fileID: 1524116654}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.5199988, y: -4.1, z: 0}
@@ -70604,25 +70520,12 @@ Transform:
   m_Father: {fileID: 691047269}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1523809265
-=======
-  m_GameObject: {fileID: 1524116654}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -626.4487, y: 0.7868974, z: -0.124975875}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1524116657
->>>>>>> 602f292551da61fcb21b35fc779247cb376fd84f
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-<<<<<<< HEAD
-  m_GameObject: {fileID: 1523809263}
+  m_GameObject: {fileID: 1524116654}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8c1902f35aca2d94da4b7eab6203ee44, type: 3}
@@ -70638,7 +70541,7 @@ SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1523809263}
+  m_GameObject: {fileID: 1524116654}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -70690,7 +70593,7 @@ BoxCollider2D:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1523809263}
+  m_GameObject: {fileID: 1524116654}
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
@@ -70729,17 +70632,25 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.6888962, y: 0.8848038}
   m_EdgeRadius: 0
-=======
-  m_GameObject: {fileID: 1524116654}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a3a3e159eeec1294ab2c8b5e7e434254, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  waterLayerName: Water
-  obstacleLayerName: Obstacle
-  logEveryApply: 1
->>>>>>> 602f292551da61fcb21b35fc779247cb376fd84f
+--- !u!1 &1524116654
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1523809264}
+  - component: {fileID: 1523809266}
+  - component: {fileID: 1523809265}
+  - component: {fileID: 1523809267}
+  m_Layer: 14
+  m_Name: Candle_5
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &1525730045
 GameObject:
   m_ObjectHideFlags: 0
@@ -95670,4 +95581,3 @@ SceneRoots:
   - {fileID: 404025968}
   - {fileID: 94677913}
   - {fileID: 281196125}
-  - {fileID: 1524116656}

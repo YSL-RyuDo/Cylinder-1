@@ -36,7 +36,6 @@ public class MagicStudyPuzzleManager : MonoBehaviour
 
     void Awake()
     {
-        AutoBind();
         CacheTiles();
         ResetTilesOnly();
 
@@ -46,6 +45,16 @@ public class MagicStudyPuzzleManager : MonoBehaviour
             var c = fadeImage.color;
             fadeImage.color = new Color(c.r, c.g, c.b, 0f);
         }
+    }
+
+    void Start()
+    {
+        var players = GameObject.FindGameObjectsWithTag("Player");
+        Debug.Log("Player 개수: " + players.Length);
+        foreach (var p in players)
+            Debug.Log("Player 이름: " + p.name);
+        AutoBind();
+
     }
 
     void AutoBind()
