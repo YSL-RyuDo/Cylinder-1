@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class PlayerCastingController : MonoBehaviour
 {
@@ -28,22 +29,37 @@ public class PlayerCastingController : MonoBehaviour
         isCasting = on;
 
         playerMove?.SetMoveLocked(on);
-
         if (on) StopPhysics();
 
         if (spriteAnimator != null)
         {
-            if (on) spriteAnimator.StartCast();
-            else spriteAnimator.StopCast();
-        }
+            if (on)
+            {
+                if (animatorToDisable != null) animatorToDisable.enabled = false;
+                spriteAnimator.BeginCast();
+            }
+            else
+            {
+                if (animatorToDisable != null) animatorToDisable.enabled = false;
 
-        if (animatorToDisable != null)
-            animatorToDisable.enabled = !on;
+                spriteAnimator.EndCast();
+
+                float t = spriteAnimator.GetEndDuration();
+                if (t <= 0f) t = 0.15f;
+                StartCoroutine(ReEnableAnimatorAfter(t));
+            }
+        }
+    }
+
+    private IEnumerator ReEnableAnimatorAfter(float t)
+    {
+        yield return new WaitForSeconds(t);
+        if (animatorToDisable != null) animatorToDisable.enabled = true;
     }
 
     public void StopCastingMotionOnly()
     {
-        spriteAnimator?.StopCast();
+        spriteAnimator?.SnapToStanding();
 
         if (animatorToDisable != null)
             animatorToDisable.enabled = true;
@@ -61,4 +77,3 @@ public class PlayerCastingController : MonoBehaviour
         rb.angularVelocity = 0f;
     }
 }
-

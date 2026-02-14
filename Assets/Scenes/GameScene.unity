@@ -28005,6 +28005,8 @@ GameObject:
   - component: {fileID: 596407859}
   - component: {fileID: 596407860}
   - component: {fileID: 596407861}
+  - component: {fileID: 596407862}
+  - component: {fileID: 596407863}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -28073,7 +28075,7 @@ Transform:
   m_GameObject: {fileID: 596407845}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -76.2, y: 256, z: 0}
+  m_LocalPosition: {x: -76.2, y: 254.43, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -28356,6 +28358,65 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   swimSpeed: 4
+--- !u!114 &596407862
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 596407845}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0c8a5adfd2264e489cb0fd515b0324f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetRenderer: {fileID: 0}
+  standingSprite: {fileID: 0}
+  preCastSprites:
+  - {fileID: 21300000, guid: dfc808fa1e9424e4bb0135dda59c7c5d, type: 3}
+  - {fileID: 21300000, guid: b3b22d9b19f8a254184ed01955e0a64d, type: 3}
+  - {fileID: 21300000, guid: 4d22065ea2bd8a44cb5ba8a102971e0d, type: 3}
+  - {fileID: 21300000, guid: 6b14e4c332b620e4d8350d2ee2704703, type: 3}
+  - {fileID: 21300000, guid: fbe924161cea4ac44bed946b4798fcbd, type: 3}
+  - {fileID: 21300000, guid: f41943b94c94f9e4085d9ee342f45fa8, type: 3}
+  - {fileID: 21300000, guid: e75285aba2a918948bcfc2d0c5607902, type: 3}
+  - {fileID: 21300000, guid: a5c12c4503d88984f958905448fd88b8, type: 3}
+  castLoopSprites:
+  - {fileID: 21300000, guid: 22030d4ca80cd054d95c4d3f86436573, type: 3}
+  - {fileID: 21300000, guid: a0b3691f29778624288dc22f9fc04c08, type: 3}
+  - {fileID: 21300000, guid: 90154556d55d6f54fbff6b74727e1331, type: 3}
+  - {fileID: 21300000, guid: 16b702fbbcc9c6543b24beb3984af961, type: 3}
+  - {fileID: 21300000, guid: 12d2a4c9538004e41b41f15954768ea3, type: 3}
+  castEndSprites:
+  - {fileID: 21300000, guid: ea8e37a96318af4419af01f933d225b5, type: 3}
+  - {fileID: 21300000, guid: 43dcdeaf0b7091843a100035bb3abdd5, type: 3}
+  - {fileID: 21300000, guid: 3be146374957ae447b9cbe96d7d60d1e, type: 3}
+  - {fileID: 21300000, guid: c101cf85cbe05cc488477e6c2e2ffa2f, type: 3}
+  - {fileID: 21300000, guid: a4ddc3b05ab933543bb71f863cf8c63f, type: 3}
+  - {fileID: 21300000, guid: af92fc2fac06b5044aad4166471fc76f, type: 3}
+  - {fileID: 21300000, guid: c918330f8f8d2794786ba74951b40c63, type: 3}
+  - {fileID: 21300000, guid: a4c73e9ec7ae2cd49815dfb56b40da96, type: 3}
+  fps: 10
+  useEndFps: 1
+  endFps: 10
+  endSlowAfterFrameIndex: 2
+  endExtraFrames: 2
+--- !u!114 &596407863
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 596407845}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 810d07c74da2f184eb5f57a0e08db1a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerMove: {fileID: 596407850}
+  rb: {fileID: 596407849}
+  spriteAnimator: {fileID: 596407862}
+  animatorToDisable: {fileID: 0}
 --- !u!1 &602122633
 GameObject:
   m_ObjectHideFlags: 0

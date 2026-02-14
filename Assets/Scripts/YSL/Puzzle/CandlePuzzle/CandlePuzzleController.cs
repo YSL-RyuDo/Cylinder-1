@@ -38,6 +38,9 @@ public class CandlePuzzleController : MonoBehaviour
     private CameraFollow camFollow;
     private PlayerCastingController casting;
 
+    private bool isExiting = false;
+    private bool wasCastingThisPuzzle = false;
+
     private void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
@@ -57,6 +60,8 @@ public class CandlePuzzleController : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (isExiting) return;
+
         if (State != GameState.Exploration) return;
         if (mainCam == null || camFollow == null || camFollow.target == null) return;
 
@@ -76,6 +81,9 @@ public class CandlePuzzleController : MonoBehaviour
 
         State = GameState.PuzzleView;
         CandleInteractionUnlocked = false;
+        isExiting = false;
+
+        wasCastingThisPuzzle = spellReady;
 
         lighting?.OnEnterPuzzle();
 
@@ -99,8 +107,14 @@ public class CandlePuzzleController : MonoBehaviour
     {
         if (State == GameState.Exploration) return;
         if (mainCam == null) return;
+        if (isExiting) return;
 
-        State = GameState.Exploration;
+        StartCoroutine(ExitPuzzleViewRoutine());
+    }
+
+    private IEnumerator ExitPuzzleViewRoutine()
+    {
+        isExiting = true;
 
         lighting?.OnExitPuzzle();
 
@@ -109,9 +123,46 @@ public class CandlePuzzleController : MonoBehaviour
 
         ApplyCursor(normalCursor);
 
-        (casting ??= FindObjectOfType<PlayerCastingController>())?.StopCastingMotionOnly();
+        casting ??= FindObjectOfType<PlayerCastingController>();
+
+        if (wasCastingThisPuzzle && casting != null)
+        {
+            casting.SetCasting(false);
+
+            float wait = 0.25f;
+
+            var spriteAnim = casting.GetComponentInChildren<PlayerCastSpriteAnimator>();
+            if (spriteAnim != null)
+            {
+                try
+                {
+                    wait = Mathf.Max(0.15f, spriteAnim.GetEndDuration());
+                }
+                catch
+                {
+                    wait = 0.35f;
+                }
+            }
+            else
+            {
+                wait = 0.35f;
+            }
+
+            yield return new WaitForSeconds(wait);
+        }
+        else
+        {
+            yield return null;
+        }
 
         MoveCameraBack();
+
+        while (cameraRoutine != null)
+            yield return null;
+
+        State = GameState.Exploration;
+
+        isExiting = false;
     }
 
     private void SetDisableObjects(bool enable)
@@ -215,5 +266,3 @@ public class CandlePuzzleController : MonoBehaviour
 
     public Camera GetMainCamera() => mainCam;
 }
-
-
