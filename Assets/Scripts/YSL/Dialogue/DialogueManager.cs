@@ -7,7 +7,6 @@ using System.Linq;
 using Unity.VisualScripting;
 using static UnityEngine.Rendering.DebugUI;
 using System.Collections;
-using Palmmedia.ReportGenerator.Core;
 
 public class DialogueManager : MonoBehaviour
 {
@@ -526,6 +525,38 @@ public class DialogueManager : MonoBehaviour
             {
                 Debug.LogWarning($"[Dialogue] set_active 실패: '{target}' 오브젝트를 찾을 수 없습니다.");
             }
+
+            return true;
+        }
+
+        if (cmd == "give_item")
+        {
+            if (ItemDatabase.Instance == null || InventoryManager.Instance == null)
+            {
+                Debug.LogWarning("[Dialogue] Item system not ready.");
+                return true;
+            }
+
+            int itemId = 0;
+            int amount = 1;
+
+            int.TryParse(target, out itemId);
+            int.TryParse(value, out amount);
+
+            var item = ItemDatabase.Instance.GetItemById(itemId);
+
+            if (item == null)
+            {
+                Debug.LogWarning($"[Dialogue] give_item 실패: id={itemId} 아이템 없음");
+                return true;
+            }
+
+            for (int i = 0; i < Mathf.Max(1, amount); i++)
+            {
+                InventoryManager.Instance.AddItem(item);
+            }
+
+            Debug.Log($"[Dialogue] 아이템 지급: {item.itemName} x{amount}");
 
             return true;
         }
