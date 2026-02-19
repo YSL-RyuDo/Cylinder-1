@@ -64,4 +64,16 @@ public class InventoryManager : MonoBehaviour
         UIManager.Instance.ResetItemTabIcon();
     }
 
+    public void UseItem(ItemData item)
+    {
+        if (DialogueItemSlotUI.Instance == null)
+            return;
+
+        bool success = DialogueItemSlotUI.Instance.TryInsertItem(item);
+
+        if (success)
+        {
+            RemoveItem(item.id);
+        }
+    }
 }

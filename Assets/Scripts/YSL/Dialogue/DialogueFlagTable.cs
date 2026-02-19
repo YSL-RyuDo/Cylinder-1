@@ -19,6 +19,7 @@ public class DialogueFlagTable : MonoBehaviour
     public bool dl_done10;
     public bool dl_done11;
     public bool dl_done12;
+    public bool dl_done13;
 
     public bool dl_done1000;
 
@@ -51,6 +52,7 @@ public class DialogueFlagTable : MonoBehaviour
         else if (key == "dl_done10" && dl_done10 != v) { dl_done10 = v; changed = true; }
         else if (key == "dl_done11" && dl_done11 != v) { dl_done11 = v; changed = true; }
         else if (key == "dl_done12" && dl_done12 != v) { dl_done12 = v; changed = true; }
+        else if (key == "dl_done14" && dl_done13 != v) { dl_done13 = v; changed = true; }
 
         else if (key == "dl_done1000" && dl_done1000 != v) { dl_done1000 = v; changed = true; }
         else if (key == "ritual_offering") { ritual_offering = value; changed = true; }
@@ -80,6 +82,7 @@ public class DialogueFlagTable : MonoBehaviour
         if (key == "dl_done10") return dl_done10 ? "true" : "false";
         if (key == "dl_done11") return dl_done11 ? "true" : "false";
         if (key == "dl_done12") return dl_done12 ? "true" : "false";
+        if (key == "dl_done13") return dl_done13 ? "true" : "false";
 
         if (key == "dl_done1000") return dl_done1000 ? "true" : "false";
         if (key == "ritual_offering") return ritual_offering;

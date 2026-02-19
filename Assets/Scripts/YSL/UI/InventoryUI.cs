@@ -1,6 +1,7 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
+//using static UnityEditor.Progress;
 
 public class InventoryUI : MonoBehaviour
 {
@@ -68,7 +69,17 @@ public class InventoryUI : MonoBehaviour
     {
         if (selectedItem == null) return;
 
+        bool isDialoguePuzzleActive = DialogueItemSlotUI.Instance != null && DialogueItemSlotUI.Instance.rootPanel.activeSelf;
+
         // 아이템 등록
+        if (isDialoguePuzzleActive)
+        {
+            InventoryManager.Instance.UseItem(selectedItem);
+        }
+        else
+        {
+            InventoryManager.Instance.RegisterItem(selectedItem);
+        }
         InventoryManager.Instance.RegisterItem(selectedItem);
         chooseImage.gameObject.SetActive(false);
         itemNameText.gameObject.SetActive(false);

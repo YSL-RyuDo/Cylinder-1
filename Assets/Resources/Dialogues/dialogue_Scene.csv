@@ -126,3 +126,6 @@
 124,12,칼립소,0,나갈 채비를 하죠. 그 뒤에 어서 신도 건물로 가보는 게 좋겠어요. ,,,,,set_var,dl_done11,TRUE,-1
 125,13,Choice,0,살해,,,,,,,,-1
 126,13,Choice,0,자비,,,,,,,,-1
+127,14,Narration,0,무엇이 필요할까.,dl_done12,FALSE,,,open_item_puzzle/set_active,3/ItemPanel,"2,3,4/TRUE",128
+128,14,Event,0,,,,,,dialogue_alpha,,0,129
+129,14,Narration,0,소리가 들린다. ,,,,,set_active/dialogue_alpha,MenuPanel,FALSE/1,-1

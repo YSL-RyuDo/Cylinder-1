@@ -59,6 +59,9 @@ public class DialogueUI : MonoBehaviour, IUIWindow
     private Dictionary<string, string> slotSpeakerMap = new();
     private readonly List<Button> spawnedChoices = new();
 
+    [Header("Transparency")]
+    [SerializeField] private CanvasGroup panelCanvasGroup;
+
     public bool IsOpen { get; private set; }
 
     private void Awake()
@@ -306,5 +309,10 @@ public class DialogueUI : MonoBehaviour, IUIWindow
         cutSceneImage.gameObject.SetActive(false);
         cutSceneRoot.SetActive(false);
         cutSceneBackGround.SetActive(false);
+    }
+
+    public void SetTransparency(float alpha)
+    {
+        panelCanvasGroup.alpha = alpha;
     }
 }

@@ -331,10 +331,25 @@ public class DialogueManager : MonoBehaviour
 
     private bool RunSystem(DialogueNode node)
     {
-        string cmd = node.command?.Trim();
-        string target = node.command_target?.Trim();
-        string value = node.command_value?.Trim();
+        string[] cmds = node.command?.Split('/');
+        string[] targets = node.command_target?.Split('/');
+        string[] values = node.command_value?.Split('/');
 
+        for (int i = 0; i < cmds.Length; i++)
+        {
+            string cmd = cmds[i].Trim();
+            string target = (i < targets.Length) ? targets[i].Trim() : "";
+            string value = (i < values.Length) ? values[i].Trim() : "";
+
+            bool continueFlow = RunSingleCommand(cmd, target, value, node);
+            if (!continueFlow)
+                return false;
+        }
+        return true;
+    }
+
+    private bool RunSingleCommand(string cmd, string target, string value, DialogueNode node)
+    {
         if (cmd == "move")
         {
             WorldMove(target, value);
@@ -409,6 +424,15 @@ public class DialogueManager : MonoBehaviour
             }
 
             return false;
+        }
+
+        if (cmd == "dialogue_alpha")
+        {
+            float alpha = 1f;
+            float.TryParse(value, out alpha);
+
+            DialogueUI.Instance?.SetTransparency(alpha);
+            return true;
         }
 
         if (cmd == "walk")
@@ -559,6 +583,27 @@ public class DialogueManager : MonoBehaviour
 
             Debug.Log($"[Dialogue] 아이템 지급: {item.itemName} x{amount}");
 
+            return true;
+        }
+
+        if (cmd == "open_item_puzzle")
+        {
+            int slotCount = 3;
+            int.TryParse(target, out slotCount);
+
+            List<int> correctIds = new List<int>();
+
+            if (!string.IsNullOrEmpty(value))
+            {
+                string[] split = value.Split(',');
+                foreach (var s in split)
+                {
+                    if (int.TryParse(s, out int id))
+                        correctIds.Add(id);
+                }
+            }
+
+            DialogueItemSlotUI.Instance?.Open(slotCount, correctIds);
             return true;
         }
 
