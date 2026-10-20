@@ -1,6 +1,8 @@
 # Cylinder
 
-[English](README.md), [Korean](README.ko.md), [Japanese](README.ja.md)
+<!-- portfolio-languages -->
+[![English](https://ysl-ryudo.github.io/assets/diagrams/language-en.svg)](README.md) [![한국어 (현재 언어)](https://ysl-ryudo.github.io/assets/diagrams/language-ko-current.svg)](README.ko.md) [![日本語](https://ysl-ryudo.github.io/assets/diagrams/language-ja.svg)](README.ja.md)
+<!-- /portfolio-languages -->
 
 팀으로 만든 내러티브 게임입니다. 분기 대화와 인벤토리, 인격 UI, 포털과 퍼즐 시스템을 작업했습니다.
 
@@ -11,15 +13,17 @@
 
 [개발 사례 보기](https://ysl-ryudo.github.io/ko/work/cylinder/), [Portfolio](https://ysl-ryudo.github.io/ko/)
 
+## 게임에서 보는 구현
+
+[![ysl-development 브랜치로 실행한 Cylinder의 탐험 씬과 캐릭터 화면.](https://ysl-ryudo.github.io/assets/gameplay/cylinder-world.webp)](https://ysl-ryudo.github.io/assets/gameplay/cylinder-world.webp)
+
+ysl-development 브랜치로 실행한 Cylinder의 탐험 씬과 캐릭터 화면.
+
 ## 게임 전체에서 맡은 구현
 
-초기의 JSON 대사 로더 외에도 YSL 브랜치에서 CSV 기반 대화, 인벤토리, 인격과 메뉴 UI, 포털과 카메라 전환, 퍼즐 시스템을 작업했습니다. 이동과 대화의 공동 파일에는 팀원의 변경도 포함됩니다. 이 페이지는 더 작은 main 브랜치만이 아니라 YSL 브랜치의 작업을 구분해 설명합니다.
+YSL 브랜치에서 CSV 기반 대화와 선택지, 명령 실행, 인벤토리, 인격과 메뉴 UI, 포털과 카메라 전환, 도서관과 슬라이더 퍼즐을 구현했습니다.
 
-**플레이 흐름**
-
-탐색 → 상호작용과 대화 → 선택과 플래그 변화 → 아이템 획득과 등록 → 퍼즐과 경로 해금
-
-소스 링크는 확인한 버전에 고정하고 기여 링크는 제가 작성한 병합 외 변경을 가리킵니다. 공동 파일을 연결했다고 단독 작성이라는 뜻은 아닙니다. 비공개 소스는 저장소 접근 권한이 필요합니다.
+[![담당 구현 흐름](https://ysl-ryudo.github.io/assets/diagrams/cylinder-flow-ko.svg)](https://ysl-ryudo.github.io/assets/diagrams/cylinder-flow-ko.svg)
 
 ### 분기 대화와 시스템 명령
 
@@ -51,14 +55,6 @@
 
 [LibraryPuzzlePanel.cs (YSL)](https://github.com/YSL-RyuDo/Cylinder-1/blob/b5de69a235c4548e93b4dc8438efea1701fa5d63/Assets/Scripts/YSL/Puzzle/LibraryPuzzle/LibraryPuzzlePanel.cs), [내 변경 24497c4](https://github.com/YSL-RyuDo/Cylinder-1/commit/24497c4aed3f61d3eafcdef1937fcc29ddaae436), [SliderPuzzleManager.cs (YSL)](https://github.com/YSL-RyuDo/Cylinder-1/blob/b5de69a235c4548e93b4dc8438efea1701fa5d63/Assets/Scripts/YSL/Puzzle/SliderPuzzleManager/SliderPuzzleManager.cs), [내 변경 24497c4](https://github.com/YSL-RyuDo/Cylinder-1/commit/24497c4aed3f61d3eafcdef1937fcc29ddaae436)
 
-## 내 기여
-
-CSV 로딩, 대화 노드, UI, 초상화, 플래그와 상호작용 트리거를 연결해 대화 시스템을 개편했습니다.
-
-대사, 감정 상태 변화와 튜토리얼 진행, 컷신 연동을 작업했습니다.
-
-인벤토리, 포털, 상호작용 UI를 작업했습니다. YSL 브랜치에도 팀원 커밋이 섞여 있으므로 폴더, 브랜치 이름만으로 기여를 판단하지 않습니다.
-
 ## 기여 근거
 
 [Dialogue rework / 대화 개편 / 会話改修](https://github.com/YSL-RyuDo/Cylinder-1/commit/89a3080fa996dd7b30180d51d87a1db21f7e3ec5)
@@ -66,8 +62,6 @@ CSV 로딩, 대화 노드, UI, 초상화, 플래그와 상호작용 트리거를
 [Emotion state / 감정 상태 / 感情状態](https://github.com/YSL-RyuDo/Cylinder-1/commit/719fe90233e191f8d4df5fe5b05bb0143525edcb)
 
 [Working branch / 작업 브랜치 / 作業ブランチ](https://github.com/YSL-RyuDo/Cylinder-1/tree/YSL)
-
-커밋은 설명한 변경의 근거이며 기여율 점수가 아닙니다. 외부 에셋과 팀원 작업의 크레딧은 구분합니다.
 
 ## 구현과 설계
 
@@ -77,7 +71,9 @@ CSV 로딩, 대화 노드, UI, 초상화, 플래그와 트리거를 개편하고
 
 ## 코드의 동작과 구현 방식을 택한 이유
 
-확인한 구현이 어떤 제약을 다루며 어떤 장단점이 생기는지 설명합니다. 설계 효과에 대한 설명은 코드 분석이며, 비교한 모든 대안을 당시 직접 구현했다는 뜻은 아닙니다. 기여 링크는 공동 프로젝트 안의 담당 변경을 가리키고 소스 링크는 기존 접근 권한을 유지합니다.
+[![대화 명령 실행과 이어가기](https://ysl-ryudo.github.io/assets/diagrams/cylinder-design-ko.svg)](https://ysl-ryudo.github.io/assets/diagrams/cylinder-design-ko.svg)
+
+즉시 명령은 다음 노드로 진행하고, walk와 delay, fade_wait는 완료 경로에서 실행을 이어갑니다.
 
 ### 대화 명령이 즉시 끝나지 않을 때
 
@@ -95,7 +91,7 @@ YSL 브랜치의 DialogueManager는 데이터 노드와 시스템 명령을 실�
 
 **장단점과 검증 범위**
 
-문자열 명령과 씬 객체 검색은 실행 중 실패할 수 있습니다. 예를 들어 fade_wait에서 FadeManager가 없으면 다음 실행을 예약하지 않고 반환합니다. 이런 경우는 실제로 검사해야 할 조건이며 모든 명령 흐름이 안전하다고 단정할 수는 없습니다.
+문자열 명령과 씬 객체 검색은 실행 중 실패할 수 있습니다. fade_wait에서 FadeManager가 없으면 다음 노드를 예약하지 않고 반환하므로, 이 경로에 이어 실행하거나 오류를 처리하는 규칙이 필요합니다.
 
 [Cylinder-1/DialogueManager.cs (YSL)](https://github.com/YSL-RyuDo/Cylinder-1/blob/b5de69a235c4548e93b4dc8438efea1701fa5d63/Assets/Scripts/YSL/Dialogue/DialogueManager.cs), [Cylinder-1/DialogueCSVLoader.cs (YSL)](https://github.com/YSL-RyuDo/Cylinder-1/blob/b5de69a235c4548e93b4dc8438efea1701fa5d63/Assets/Scripts/YSL/Dialogue/DialogueCSVLoader.cs)
 
@@ -115,7 +111,7 @@ DialogueLoader는 JSON 대사를 읽어 ID로 찾을 수 있는 데이터로 구
 
 **장단점과 검증 범위**
 
-문자열 ID와 리소스 이름 규칙은 검증이 필요한 데이터 계약입니다. 데이터를 분리했다고 다국어 제작 파이프라인까지 완성되는 것은 아니며, 글자를 붙여 출력하는 구현에는 문자열 할당 비용도 남습니다. 이는 로더와 표시를 분리하는 것과 별도로 다룰 문제입니다.
+문자열 ID와 리소스 이름 규칙을 데이터 계약으로 관리하고 검사해야 합니다. 글자를 붙여 출력하는 방식에는 문자열 할당 비용도 있어 대사 파일 로딩과 별도로 표시 경로를 고려해야 합니다.
 
 [Cylinder-1/DialogueLoader.cs](https://github.com/YSL-RyuDo/Cylinder-1/blob/e6b28c873b11bd9daa1421780e0608a057b40cb4/Assets/Scripts/YSL/Dialogue/DialogueLoader.cs), [Cylinder-1/DialogueManager.cs](https://github.com/YSL-RyuDo/Cylinder-1/blob/e6b28c873b11bd9daa1421780e0608a057b40cb4/Assets/Scripts/YSL/Dialogue/DialogueManager.cs)
 
@@ -124,10 +120,6 @@ DialogueLoader는 JSON 대사를 읽어 ID로 찾을 수 있는 데이터로 구
 [ProjectVersion.txt](ProjectSettings/ProjectVersion.txt)의 Unity 버전으로 프로젝트를 여세요. 패키지 잠금 파일과 직렬화된 에셋을 유지하고, Unity를 열기 전에 문서에서 설명한 브랜치를 선택하세요.
 
 YSL 브랜치의 씬과 Build Settings를 확인하세요. 확인되지 않은 시작 씬을 임의로 지정하지 않습니다.
-
-## 개발, 검증 범위
-
-YSL 브랜치에 main에 없는 작업과 팀 공동 변경이 있습니다. 인용한 커밋으로 제 기여를 구분하며 Assets/Scripts/YSL 아래 모든 시스템을 단독 제작했다고 주장하지 않습니다. 시연 가능 상태는 선택한 브랜치에서 확인해야 합니다.
 
 ## 상세 문서
 

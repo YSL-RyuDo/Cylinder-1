@@ -1,6 +1,8 @@
 # Cylinder
 
-[English](README.md), [Korean](README.ko.md), [Japanese](README.ja.md)
+<!-- portfolio-languages -->
+[![English (current)](https://ysl-ryudo.github.io/assets/diagrams/language-en-current.svg)](README.md) [![한국어](https://ysl-ryudo.github.io/assets/diagrams/language-ko.svg)](README.ko.md) [![日本語](https://ysl-ryudo.github.io/assets/diagrams/language-ja.svg)](README.ja.md)
+<!-- /portfolio-languages -->
 
 A team narrative game. My systems span branching dialogue, inventory, personality UI, portals and puzzles.
 
@@ -11,15 +13,17 @@ A team narrative game. My systems span branching dialogue, inventory, personalit
 
 [Explore the case](https://ysl-ryudo.github.io/en/work/cylinder/), [Portfolio](https://ysl-ryudo.github.io/en/)
 
+## Inside the game
+
+[![Cylinder running from the ysl-development branch, the exploration scene and character view.](https://ysl-ryudo.github.io/assets/gameplay/cylinder-world.webp)](https://ysl-ryudo.github.io/assets/gameplay/cylinder-world.webp)
+
+Cylinder running from the ysl-development branch, the exploration scene and character view.
+
 ## What I built across the game
 
-My contribution extends beyond the early JSON dialogue loader. The YSL branch contains my work on CSV-driven dialogue, inventory, personality/menu UI, portals, camera transitions and puzzle systems. Shared movement and dialogue files also contain teammates' changes. This page describes that branch explicitly, not only the smaller main-branch snapshot.
+I implemented CSV-driven dialogue, choices and command execution, inventory, personality and menu UI, portals, camera transitions and library/slider puzzles on the YSL branch.
 
-**Player flow**
-
-Explore → interact and converse → choose and update flags → collect or register items → solve puzzles and unlock routes
-
-Source links pin the inspected revision; contribution links identify my non-merge changes. Shared-file links do not imply sole authorship. Private source requires repository access.
+[![My implementation flow](https://ysl-ryudo.github.io/assets/diagrams/cylinder-flow-en.svg)](https://ysl-ryudo.github.io/assets/diagrams/cylinder-flow-en.svg)
 
 ### Branching dialogue and system commands
 
@@ -51,14 +55,6 @@ Implemented library seal-group interaction and answer checking, and a sliding-pu
 
 [LibraryPuzzlePanel.cs (YSL)](https://github.com/YSL-RyuDo/Cylinder-1/blob/b5de69a235c4548e93b4dc8438efea1701fa5d63/Assets/Scripts/YSL/Puzzle/LibraryPuzzle/LibraryPuzzlePanel.cs), [My change 24497c4](https://github.com/YSL-RyuDo/Cylinder-1/commit/24497c4aed3f61d3eafcdef1937fcc29ddaae436), [SliderPuzzleManager.cs (YSL)](https://github.com/YSL-RyuDo/Cylinder-1/blob/b5de69a235c4548e93b4dc8438efea1701fa5d63/Assets/Scripts/YSL/Puzzle/SliderPuzzleManager/SliderPuzzleManager.cs), [My change 24497c4](https://github.com/YSL-RyuDo/Cylinder-1/commit/24497c4aed3f61d3eafcdef1937fcc29ddaae436)
 
-## My contribution
-
-Reworked dialogue around CSV loading, dialogue nodes/UI, portraits, flags and interaction triggers.
-
-Added dialogue/emotion-state changes and worked on tutorial progression and cutscene integration.
-
-Worked on inventory, portals and interaction UI. The YSL branch also includes teammates' commits; a folder or branch name alone is not authorship evidence.
-
 ## Contribution evidence
 
 [Dialogue rework / 대화 개편 / 会話改修](https://github.com/YSL-RyuDo/Cylinder-1/commit/89a3080fa996dd7b30180d51d87a1db21f7e3ec5)
@@ -66,8 +62,6 @@ Worked on inventory, portals and interaction UI. The YSL branch also includes te
 [Emotion state / 감정 상태 / 感情状態](https://github.com/YSL-RyuDo/Cylinder-1/commit/719fe90233e191f8d4df5fe5b05bb0143525edcb)
 
 [Working branch / 작업 브랜치 / 作業ブランチ](https://github.com/YSL-RyuDo/Cylinder-1/tree/YSL)
-
-Commits are evidence of the stated changes, not a percentage-of-authorship score. Third-party assets and teammates' work remain separately credited.
 
 ## Implementation and design
 
@@ -77,7 +71,9 @@ I reworked CSV loading, dialogue nodes/UI, portraits, flags and triggers, and in
 
 ## How the code works and why it is structured this way
 
-These notes connect the inspected implementation to the constraints it addresses and its tradeoffs. Explanations of design consequences are code analysis, not a claim that every alternative was prototyped. Contribution links identify my changes within team projects; source links retain their original access permissions.
+[![Dialogue command execution](https://ysl-ryudo.github.io/assets/diagrams/cylinder-design-en.svg)](https://ysl-ryudo.github.io/assets/diagrams/cylinder-design-en.svg)
+
+Immediate commands continue to the next node. Walk, delay and fade_wait resume through their completion path.
 
 ### A dialogue command may finish later
 
@@ -95,7 +91,7 @@ Hard-coded scene coroutines are direct but duplicate sequencing across events. A
 
 **Tradeoffs and verification**
 
-String command names and scene-object lookup can fail at runtime. For example, the missing-FadeManager branch of fade_wait returns without scheduling continuation. That is a concrete validation case, not evidence that every command sequence is already safe.
+String commands and scene lookups can fail at runtime. In fade_wait, a missing FadeManager returns without scheduling the next node; that path needs an explicit continuation or error policy.
 
 [Cylinder-1/DialogueManager.cs (YSL)](https://github.com/YSL-RyuDo/Cylinder-1/blob/b5de69a235c4548e93b4dc8438efea1701fa5d63/Assets/Scripts/YSL/Dialogue/DialogueManager.cs), [Cylinder-1/DialogueCSVLoader.cs (YSL)](https://github.com/YSL-RyuDo/Cylinder-1/blob/b5de69a235c4548e93b4dc8438efea1701fa5d63/Assets/Scripts/YSL/Dialogue/DialogueCSVLoader.cs)
 
@@ -115,7 +111,7 @@ Hard-coded dialogue needs little tooling but scatters content changes through co
 
 **Tradeoffs and verification**
 
-String IDs and resource naming form a content contract that needs validation. Data-driven dialogue is not automatically a complete localization pipeline, and repeatedly appending strings during typing still has allocation costs. These are separate concerns from the loader/presentation split.
+String IDs and resource names form a data contract that needs validation. Character-by-character concatenation also allocates strings, so the display path has costs beyond loading the dialogue file.
 
 [Cylinder-1/DialogueLoader.cs](https://github.com/YSL-RyuDo/Cylinder-1/blob/e6b28c873b11bd9daa1421780e0608a057b40cb4/Assets/Scripts/YSL/Dialogue/DialogueLoader.cs), [Cylinder-1/DialogueManager.cs](https://github.com/YSL-RyuDo/Cylinder-1/blob/e6b28c873b11bd9daa1421780e0608a057b40cb4/Assets/Scripts/YSL/Dialogue/DialogueManager.cs)
 
@@ -124,10 +120,6 @@ String IDs and resource naming form a content contract that needs validation. Da
 Open the project with the Unity version recorded in [ProjectVersion.txt](ProjectSettings/ProjectVersion.txt). Keep its package lock and serialized assets intact. Select the documented branch before opening Unity.
 
 Inspect the YSL branch's scenes and Build Settings; this overview does not prescribe an unverified startup scene.
-
-## Development and verification scope
-
-The YSL branch contains substantial work absent from main and includes shared team changes. The cited commits identify my contribution; no claim is made that every system under Assets/Scripts/YSL was solely authored by me. Demonstration readiness must be assessed on the selected branch.
 
 ## Further documentation
 
