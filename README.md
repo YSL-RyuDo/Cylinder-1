@@ -41,6 +41,30 @@ I reworked CSV loading, dialogue nodes/UI, portraits, flags and triggers, and in
 | Progression | Flags, emotion state and interaction triggers |
 | Presentation | Dialogue UI, portraits, tutorial and cutscene integration |
 
+## How the code works and why it is structured this way
+
+These notes connect the inspected implementation to the constraints it addresses and its tradeoffs. Explanations of design consequences are code analysis, not a claim that every alternative was prototyped. Contribution links identify my changes within team projects; source links retain their original access permissions.
+
+### Dialogue content and presentation change independently
+
+**Implementation**
+
+DialogueLoader loads JSON dialogue into ID-indexed data. DialogueManager selects preview or confirmation text, resolves an emotion portrait using a key, stops the previous typing coroutine and starts the new text with real-time waits.
+
+**Design rationale**
+
+Separating content from display avoids embedding every line and portrait choice in UI control flow. Cancelling the previous coroutine prevents two text producers from writing into the same field. Real-time waits keep dialogue advancing independently of gameplay time scale.
+
+**Alternatives and the current tradeoff**
+
+Hard-coded dialogue needs little tooling but scatters content changes through code. ScriptableObjects would offer Unity inspector integration; JSON offers a text-based content format with a separate loader. The current JSON approach needs schema and resource-key validation that the format does not provide automatically.
+
+**Tradeoffs and verification**
+
+String IDs and resource naming form a content contract that needs validation. Data-driven dialogue is not automatically a complete localization pipeline, and repeatedly appending strings during typing still has allocation costs. These are separate concerns from the loader/presentation split.
+
+[Cylinder-1/DialogueLoader.cs](https://github.com/YSL-RyuDo/Cylinder-1/blob/e6b28c873b11bd9daa1421780e0608a057b40cb4/Assets/Scripts/YSL/Dialogue/DialogueLoader.cs), [Cylinder-1/DialogueManager.cs](https://github.com/YSL-RyuDo/Cylinder-1/blob/e6b28c873b11bd9daa1421780e0608a057b40cb4/Assets/Scripts/YSL/Dialogue/DialogueManager.cs)
+
 ## Open and inspect
 
 Open the project with the Unity version recorded in [ProjectVersion.txt](ProjectSettings/ProjectVersion.txt). Keep its package lock and serialized assets intact. Select the documented branch before opening Unity.
