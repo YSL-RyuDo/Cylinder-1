@@ -1,36 +1,45 @@
 # Cylinder
 
-[English](README.md) · [Korean](README.ko.md) · [Japanese](README.ja.md)
+[English](README.md), [Korean](README.ko.md), [Japanese](README.ja.md)
 
 会話、ポートレート、感情状態、進行条件を扱うナラティブゲームのシステム開発事例です。
 
-**C# · Unity · CSV** · チーム開発での担当
+| プロジェクト情報 | 内容 |
+|---|---|
+| 開発状況 | チーム開発での担当 |
+| 使用技術 | C#, Unity, CSV |
 
-[開発事例を見る](https://ysl-ryudo.github.io/ja/work/cylinder/) · [Portfolio](https://ysl-ryudo.github.io/ja/)
+[開発事例を見る](https://ysl-ryudo.github.io/ja/work/cylinder/), [Portfolio](https://ysl-ryudo.github.io/ja/)
 
-[Cylinder-1](https://github.com/YSL-RyuDo/Cylinder-1) (非公開・アクセス権が必要)
+## 担当した内容
 
-## システム別の担当内容
+CSV読み込み、会話ノード・UI、立ち絵、フラグ、操作トリガーを結ぶ会話システムを改修しました。
+
+会話・感情状態の変化、チュートリアル進行、カットシーン連携を担当しました。
+
+インベントリ、ポータル、操作UIを担当しました。YSLブランチにも他のメンバーのコミットが含まれ、名前だけで担当者を判断しません。
+
+## 貢献の根拠
+
+[Dialogue rework / 대화 개편 / 会話改修](https://github.com/YSL-RyuDo/Cylinder-1/commit/89a3080fa996dd7b30180d51d87a1db21f7e3ec5)
+
+[Emotion state / 감정 상태 / 感情状態](https://github.com/YSL-RyuDo/Cylinder-1/commit/719fe90233e191f8d4df5fe5b05bb0143525edcb)
+
+[Working branch / 작업 브랜치 / 作業ブランチ](https://github.com/YSL-RyuDo/Cylinder-1/tree/YSL)
+
+コミットは記載した変更の根拠であり、貢献率の点数ではありません。外部素材・チームメンバーの貢献は区別します。
+
+## 実装と設計
+
+進行状況、感情状態、インタラクション条件に応じて会話を変え、肖像とUIを更新する必要があります。
+
+CSV読み込み、会話ノード・UI、肖像、フラグ、トリガーを改修し、チュートリアル・カットシーン進行を連携しました。共同変更を含むYSLブランチでは会話・感情状態のコミットで担当を示します。
 
 | 領域 | 実装 |
 |---|---|
 | 制作データ | CSV読み込みと会話ノード |
 | 進行条件 | フラグ・感情状態・インタラクショントリガー |
 | 画面表示 | 会話UI・ポートレート・チュートリアル・カットシーン連携 |
-
-## 担当した内容
-
-- CSV読み込み、会話ノード・UI、立ち絵、フラグ、操作トリガーを結ぶ会話システムを改修しました。
-- 会話・感情状態の変化、チュートリアル進行、カットシーン連携を担当しました。
-- インベントリ、ポータル、操作UIを担当しました。YSLブランチにも他のメンバーのコミットが含まれ、名前だけで担当者を判断しません。
-
-## 貢献の根拠
-
-- [Dialogue rework / 대화 개편 / 会話改修](https://github.com/YSL-RyuDo/Cylinder-1/commit/89a3080fa996dd7b30180d51d87a1db21f7e3ec5)
-- [Emotion state / 감정 상태 / 感情状態](https://github.com/YSL-RyuDo/Cylinder-1/commit/719fe90233e191f8d4df5fe5b05bb0143525edcb)
-- [Working branch / 작업 브랜치 / 作業ブランチ](https://github.com/YSL-RyuDo/Cylinder-1/tree/YSL)
-
-コミットは記載した変更の根拠であり、貢献率の点数ではありません。外部素材・チームメンバーの貢献は区別します。
 
 ## 実行・コードの確認
 
@@ -44,4 +53,8 @@ YSLブランチにはmain未反映の作業とチーム共有の変更があり�
 
 ## 詳細資料
 
-- [既存の詳細開発・利用・検証資料（韓国語）](docs/DEVELOPMENT_REFERENCE.ko.md)
+[既存の詳細開発・利用・検証資料（韓国語）](docs/DEVELOPMENT_REFERENCE.ko.md)
+
+## 関連リポジトリ
+
+[Cylinder-1](https://github.com/YSL-RyuDo/Cylinder-1), 非公開・アクセス権が必要
