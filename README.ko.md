@@ -2,7 +2,30 @@
 
 [English](README.md) · [Korean](README.ko.md) · [Japanese](README.ja.md)
 
+**C# · Unity · CSV** · 팀 프로젝트 기여
+
+[개발 사례 보기](https://ysl-ryudo.github.io/ko/work/cylinder/) · [Portfolio](https://ysl-ryudo.github.io/ko/)
+
+
 팀 Unity 어드벤처 프로젝트입니다. 전체 게임의 소유나 단독 제작이 아닌, 제가 맡은 대화·상호작용 시스템을 중심으로 소개합니다.
+
+## 해결하려던 문제
+
+진행 상황·감정 상태·상호작용 조건에 맞춰 대화가 바뀌고, 초상화와 UI가 함께 갱신되어야 합니다.
+
+## 내 구현과 설계
+
+CSV 로딩, 대화 노드·UI, 초상화, 플래그와 트리거를 개편하고 튜토리얼·컷씬 진행을 연동했습니다. 공용 변경이 섞인 YSL 브랜치에서는 대화·감정 상태 커밋으로 제 작업을 구분합니다.
+
+### 구현 개요 · 개념 흐름도
+
+```mermaid
+flowchart LR
+    N0["CSV dialogue"] --> N1
+    N1["Nodes / flags"] --> N2
+    N2["Interaction triggers"] --> N3
+    N3["Dialogue / portraits"]
+```
 
 ## 내 기여
 
@@ -31,3 +54,7 @@ YSL 브랜치에 main에 없는 작업과 팀 공동 변경이 있습니다. 인
 ## 상세 문서
 
 - [기존 개발·사용·검증 상세 안내](docs/DEVELOPMENT_REFERENCE.ko.md)
+
+## 구현을 확인하는 방법
+
+대화 개편과 감정 상태 변경 커밋을 함께 읽으면 됩니다. YSL 브랜치에서 구현을 살펴볼 수 있으며 브랜치명이 단독 제작을 의미하지는 않습니다.
