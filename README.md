@@ -127,4 +127,4 @@ Inspect the YSL branch's scenes and Build Settings; this overview does not presc
 
 ## Related repositories
 
-[Cylinder-1](https://github.com/YSL-RyuDo/Cylinder-1), Private, access required
+[Cylinder-1](https://github.com/YSL-RyuDo/Cylinder-1), Public repository

@@ -129,4 +129,4 @@ YSLブランチのシーンとBuild Settingsを確認してください。未確
 
 ## 関連リポジトリ
 
-[Cylinder-1](https://github.com/YSL-RyuDo/Cylinder-1), 非公開・アクセス権が必要
+[Cylinder-1](https://github.com/YSL-RyuDo/Cylinder-1), 公開リポジトリ

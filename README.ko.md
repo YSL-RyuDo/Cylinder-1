@@ -127,4 +127,4 @@ YSL 브랜치의 씬과 Build Settings를 확인하세요. 확인되지 않은 �
 
 ## 관련 저장소
 
-[Cylinder-1](https://github.com/YSL-RyuDo/Cylinder-1), 비공개, 접근 권한 필요
+[Cylinder-1](https://github.com/YSL-RyuDo/Cylinder-1), 공개 저장소
